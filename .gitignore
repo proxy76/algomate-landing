@@ -1,0 +1,15 @@
+# General
+.DS_Store
+Thumbs.db
+*.swp
+
+# Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment Variables (Redundant safety)
+.env
+.env.*
+!.env.example
