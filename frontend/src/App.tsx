@@ -60,7 +60,6 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     const fetchModules = async () => {
       try {
-        // Adjust URL based on your backend port
         const response = await axios.get(`${API_BASE_URL}/api/modules/`);
         if (response.data && response.data.length > 0) {
           const enhancedModules = response.data.map((m: Module) => ({
@@ -83,6 +82,7 @@ const LandingPage: React.FC = () => {
       <Header />
       <main>
         <Hero />
+
         {/* Modules Section */}
         <section className="py-24 relative z-10 overflow-hidden" id="modules">
           {/* Ambient Background Blobs */}
@@ -94,6 +94,7 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="text-center mb-16"
             >
               <h2 className="text-3xl md:text-5xl font-bold mb-4">Programele Noastre</h2>
@@ -104,22 +105,16 @@ const LandingPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {modules.map((module, index) => (
-                <motion.div
+                <ModuleCard
                   key={module.id}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
-                >
-                  <ModuleCard
-                    title={module.title}
-                    description={module.description}
-                    isActive={module.is_active}
-                    comingSoonLabel={module.coming_soon_label}
-                    icon={module.icon}
-                    link={module.link}
-                  />
-                </motion.div>
+                  title={module.title}
+                  description={module.description}
+                  isActive={module.is_active}
+                  comingSoonLabel={module.coming_soon_label}
+                  icon={module.icon}
+                  link={module.link}
+                  index={index}
+                />
               ))}
             </div>
           </div>
