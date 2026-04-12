@@ -1,118 +1,171 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
 
-const MATH_SYMBOLS = [
-    '∫', '∂', 'f(x)', '∑', '∞', 'π', 'Δ', '√', 'dx', 'lim',
-    '∇', 'α', 'β', 'θ', 'λ', '≈', '≠', '∈', '⊂', 'ε',
-    'd/dx', '∮', 'log', 'sin', 'cos', 'tan',
-];
-
-interface MathParticle {
-    id: number;
-    x: number;
-    y: number;
-    symbol: string;
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  homeX: number;
+  homeY: number;
+  size: number;
+  alpha: number;
+  orange: boolean;
 }
 
-let particleId = 0;
+const PARTICLE_COUNT = 220;
+const REPEL_RADIUS = 160;
+const REPEL_STRENGTH = 2.2;
+const SPRING_K = 0.018;   // pulls particle back to its home position
+const DAMPING = 0.88;     // velocity decay
 
 const InteractiveBackground: React.FC = () => {
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
-    const [particles, setParticles] = useState<MathParticle[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouseRef = useRef({ x: -9999, y: -9999, active: false });
+  const particlesRef = useRef<Particle[]>([]);
+  const rafRef = useRef<number | null>(null);
 
-    const springConfig = { damping: 50, stiffness: 400 };
-    const springX = useSpring(mouseX, springConfig);
-    const springY = useSpring(mouseY, springConfig);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            mouseX.set(e.clientX);
-            mouseY.set(e.clientY);
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    const spawnParticles = () => {
+      particlesRef.current = Array.from({ length: PARTICLE_COUNT }, () => {
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        const orange = Math.random() < 0.22;
+        return {
+          x,
+          y,
+          homeX: x,
+          homeY: y,
+          vx: 0,
+          vy: 0,
+          size: Math.random() * 1.6 + 1.0,
+          alpha: Math.random() * 0.45 + 0.4,
+          orange,
         };
+      });
+    };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, [mouseX, mouseY]);
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      spawnParticles();
+    };
+    resize();
 
-    const handleClick = useCallback((e: MouseEvent) => {
-        const symbol = MATH_SYMBOLS[Math.floor(Math.random() * MATH_SYMBOLS.length)];
-        const id = particleId++;
-        const newParticle: MathParticle = {
-            id,
-            x: e.clientX,
-            y: e.clientY,
-            symbol,
-        };
+    const onMouseMove = (e: MouseEvent) => {
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
+      mouseRef.current.active = true;
+    };
 
-        setParticles(prev => [...prev, newParticle]);
+    const onMouseLeave = () => {
+      mouseRef.current.active = false;
+      mouseRef.current.x = -9999;
+      mouseRef.current.y = -9999;
+    };
 
-        // Auto-remove after animation completes
-        setTimeout(() => {
-            setParticles(prev => prev.filter(p => p.id !== id));
-        }, 1200);
-    }, []);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseleave', onMouseLeave);
+    window.addEventListener('resize', resize);
 
-    useEffect(() => {
-        window.addEventListener('click', handleClick);
-        return () => window.removeEventListener('click', handleClick);
-    }, [handleClick]);
+    const animate = () => {
+      ctx.clearRect(0, 0, width, height);
 
-    return (
-        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-            {/* Dark gradient base */}
-            <div className="absolute inset-0 bg-slate-950" />
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+      const repelSq = REPEL_RADIUS * REPEL_RADIUS;
 
-            {/* Mouse Spotlight */}
-            <motion.div
-                className="absolute w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2"
-                style={{
-                    x: springX,
-                    y: springY,
-                }}
-            />
+      for (const p of particlesRef.current) {
+        // Spring force toward home position
+        const hx = p.homeX - p.x;
+        const hy = p.homeY - p.y;
+        p.vx += hx * SPRING_K;
+        p.vy += hy * SPRING_K;
 
-            {/* Static Ambient Gradients */}
-            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/20 rounded-full blur-[120px]" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-900/20 rounded-full blur-[120px]" />
+        // Cursor repulsion
+        if (mouseRef.current.active) {
+          const dx = p.x - mx;
+          const dy = p.y - my;
+          const distSq = dx * dx + dy * dy;
 
-            {/* Grid Overlay (Subtle) */}
-            <div
-                className="absolute inset-0 opacity-[0.03]"
-                style={{
-                    backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
-                    backgroundSize: '50px 50px'
-                }}
-            />
+          if (distSq < repelSq && distSq > 0.5) {
+            const dist = Math.sqrt(distSq);
+            const falloff = (REPEL_RADIUS - dist) / REPEL_RADIUS;
+            const force = falloff * falloff * REPEL_STRENGTH;
+            p.vx += (dx / dist) * force;
+            p.vy += (dy / dist) * force;
+          }
+        }
 
-            {/* Math symbol click particles */}
-            <AnimatePresence>
-                {particles.map(particle => (
-                    <motion.span
-                        key={particle.id}
-                        initial={{
-                            opacity: 1,
-                            scale: 0.5,
-                            x: particle.x,
-                            y: particle.y,
-                        }}
-                        animate={{
-                            opacity: 0,
-                            scale: 1.5,
-                            y: particle.y - 80,
-                            x: particle.x + (Math.random() - 0.5) * 60,
-                        }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 1.1, ease: "easeOut" }}
-                        className="fixed text-blue-400/70 font-mono text-xl font-bold pointer-events-none select-none z-50"
-                        style={{ left: 0, top: 0, translateX: '-50%', translateY: '-50%' }}
-                    >
-                        {particle.symbol}
-                    </motion.span>
-                ))}
-            </AnimatePresence>
-        </div>
-    );
+        // Damping
+        p.vx *= DAMPING;
+        p.vy *= DAMPING;
+
+        // Integrate
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Draw
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        if (p.orange) {
+          ctx.fillStyle = `rgba(232, 115, 74, ${p.alpha})`;
+        } else {
+          ctx.fillStyle = `rgba(230, 230, 230, ${p.alpha})`;
+        }
+        ctx.fill();
+      }
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseleave', onMouseLeave);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      {/* Gray base with subtle radial gradient */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse at center, #1e1e1e 0%, #171717 50%, #111111 100%)',
+        }}
+      />
+
+      {/* Subtle grid */}
+      <div
+        className="absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+
+      {/* Particle canvas */}
+      <canvas ref={canvasRef} className="absolute inset-0" />
+    </div>
+  );
 };
 
 export default InteractiveBackground;

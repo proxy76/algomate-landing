@@ -1,60 +1,89 @@
 import React from 'react';
-import { Facebook, Instagram, Twitter, Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
-    return (
-        <footer className="bg-slate-950 text-gray-400 py-12 border-t border-slate-800 relative z-10" id="footer">
-            <div className="container mx-auto px-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                    <div>
-                        <h3 className="text-white text-xl font-bold mb-4">ALGOMATE</h3>
-                        <p className="text-sm leading-relaxed">
-                            Partenerul tău de încredere pentru excelență în educație.
-                            Pregătim viitorii lideri în tehnologie și științe exacte.
-                        </p>
-                    </div>
+  return (
+    <footer className="border-t border-[#1a1a1a] bg-[#0a0a0a] relative z-10">
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <h3 className="text-base font-semibold text-[#f0f0f0] tracking-wide mb-3">
+              ALGO<span className="text-[#e8734a]">MATE</span>
+            </h3>
+            <p className="text-sm text-[#666] leading-relaxed">
+              Partenerul tău de încredere pentru excelență în educație.
+            </p>
+          </div>
 
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">Link-uri Rapide</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:text-blue-500 transition-colors">Acasă</a></li>
-                            <li><a href="#modules" className="hover:text-blue-500 transition-colors">Programe</a></li>
-                            <li><a href="#features" className="hover:text-blue-500 transition-colors">Despre Noi</a></li>
-                            <li><a href="#" className="hover:text-blue-500 transition-colors">Termeni și Condiții</a></li>
-                        </ul>
-                    </div>
+          {/* Links */}
+          <div>
+            <h4 className="text-xs font-medium text-[#888] uppercase tracking-wider mb-4">
+              Navigare
+            </h4>
+            <ul className="space-y-2">
+              {[
+                { name: 'Acasă', href: '/' },
+                { name: 'Servicii', href: '/servicii' },
+                { name: 'Curriculum', href: '/curriculum' },
+                { name: 'Înscrie-te', href: '/inscriere' },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.href}
+                    className="text-sm text-[#666] hover:text-[#e8734a] transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">Contact</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li className="flex items-center"><Mail size={16} className="mr-2" /> algomate.razvan@gmail.com</li>
-                            <li className="flex items-center"><MapPin size={16} className="mr-2" /> București, România</li>
-                        </ul>
-                    </div>
+          {/* Contact */}
+          <div>
+            <h4 className="text-xs font-medium text-[#888] uppercase tracking-wider mb-4">
+              Contact
+            </h4>
+            <ul className="space-y-2 text-sm text-[#666]">
+              <li className="flex items-center gap-2">
+                <Mail size={14} className="text-[#555]" />
+                algomate.razvan@gmail.com
+              </li>
+              <li className="flex items-center gap-2">
+                <MapPin size={14} className="text-[#555]" />
+                București, România
+              </li>
+            </ul>
+          </div>
 
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">Urmărește-ne</h4>
-                        <div className="flex space-x-4">
-                            <a href="#" className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all">
-                                <Facebook size={20} />
-                            </a>
-                            <a href="#" className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all">
-                                <Instagram size={20} />
-                            </a>
-                            <a href="#" className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center hover:bg-sky-500 hover:text-white transition-all">
-                                <Twitter size={20} />
-                            </a>
-                        </div>
-                    </div>
-                </div>
+          {/* Legal */}
+          <div>
+            <h4 className="text-xs font-medium text-[#888] uppercase tracking-wider mb-4">
+              Legal
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="#" className="text-sm text-[#666] hover:text-[#e8734a] transition-colors">
+                  Termeni și Condiții
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-sm text-[#666] hover:text-[#e8734a] transition-colors">
+                  Politica de Confidențialitate
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
 
-                <div className="border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
-                    <p>&copy; {new Date().getFullYear()} AlgoMate. Toate drepturile rezervate.</p>
-                    <p>Designed with ❤️ for Education.</p>
-                </div>
-            </div>
-        </footer>
-    );
+        <div className="border-t border-[#1a1a1a] pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-[#555]">
+          <p>&copy; {new Date().getFullYear()} AlgoMate. Toate drepturile rezervate.</p>
+        </div>
+      </div>
+    </footer>
+  );
 };
 
 export default React.memo(Footer);
