@@ -10,7 +10,7 @@ const RootLayout: React.FC = () => {
   const outlet = useOutlet();
 
   return (
-    <div className="min-h-screen text-[#f0f0f0] font-sans">
+    <div className="min-h-screen text-[#f0f0f0] font-sans overflow-x-hidden">
       {/* ScrollRestoration is the magic bullet for React Router v7 scroll jumping */}
       <ScrollRestoration />
       

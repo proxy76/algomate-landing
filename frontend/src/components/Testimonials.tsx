@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, Quote } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 
 const testimonials = [
@@ -32,61 +32,84 @@ const testimonials = [
 
 const Testimonials: React.FC = () => {
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-20 md:py-28 relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+          className="mb-20"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-[#f0f0f0] mb-4">
-            Ce spun elevii noștri
-          </h2>
-          <p className="text-[#888] max-w-xl mx-auto">
-            Succesul lor este cea mai bună dovadă.
-          </p>
+          <div className="flex items-baseline gap-3 md:gap-4 mb-6 md:mb-8">
+            <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#e8734a] uppercase whitespace-nowrap">
+              § 04
+            </span>
+            <span className="h-px flex-1 bg-gradient-to-r from-[#333] via-[#222] to-transparent" />
+            <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#666] uppercase hidden md:inline">
+              Voci / Mărturii
+            </span>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 md:gap-6">
+            <h2 className="font-display font-semibold text-[2.25rem] sm:text-5xl md:text-6xl text-[#f0f0f0] leading-[1.05] tracking-tight max-w-3xl">
+              Ce spun <em className="italic text-[#e8734a] font-normal">elevii</em> noștri.
+            </h2>
+            <p className="font-mono text-[11px] md:text-xs text-[#888] md:max-w-xs uppercase tracking-wider leading-relaxed">
+              → Succesul lor este cea mai bună dovadă.
+            </p>
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t) => (
-              <div
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#222]">
+          {testimonials.map((t, idx) => (
+            <motion.article
               key={t.id}
-              className="bg-[#141414] border border-[#222] rounded-xl p-6 relative group transition-all duration-300 hover:-translate-y-1 hover:border-[#e8734a]/40"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+              className="group relative bg-[#0a0a0a] p-7 md:p-10 flex flex-col hover:bg-[#111] transition-colors duration-500"
             >
-              <Quote
-                size={32}
-                className="absolute top-5 right-5 text-[#1a1a1a] group-hover:text-[#e8734a]/10 transition-colors duration-300"
-              />
+              {/* Huge quote mark */}
+              <div
+                className="font-display italic text-[5rem] md:text-[7rem] leading-[0.6] text-[#e8734a]/15 group-hover:text-[#e8734a]/30 transition-colors duration-500 select-none mb-4"
+                aria-hidden
+              >
+                "
+              </div>
 
-              <div className="flex gap-0.5 mb-4">
+              {/* Rating */}
+              <div className="flex gap-1 mb-6">
                 {[...Array(t.rating)].map((_, i) => (
                   <Star
                     key={i}
-                    size={14}
+                    size={12}
                     fill="#e8734a"
+                    strokeWidth={0}
                     className="text-[#e8734a]"
                   />
                 ))}
               </div>
 
-              <p className="text-[#bbb] text-sm leading-relaxed mb-6">
-                "{t.content}"
+              <p className="font-display italic text-lg text-[#ddd] leading-[1.5] mb-10 flex-1 text-balance">
+                {t.content}
               </p>
 
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] flex items-center justify-center text-[#e8734a] font-semibold text-sm">
+              <div className="flex items-center gap-4 pt-6 border-t border-[#222]">
+                <div className="w-10 h-10 rounded-full border border-[#e8734a]/30 flex items-center justify-center font-sans font-semibold text-[#e8734a] text-base">
                   {t.name.charAt(0)}
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-[#f0f0f0]">
+                  <h4 className="font-sans font-semibold text-sm text-[#f0f0f0] leading-tight">
                     {t.name}
                   </h4>
-                  <p className="text-xs text-[#666]">{t.role}</p>
+                  <p className="font-mono text-[9px] text-[#666] uppercase tracking-[0.25em] mt-1">
+                    {t.role}
+                  </p>
                 </div>
               </div>
-            </div>
+            </motion.article>
           ))}
         </div>
       </div>

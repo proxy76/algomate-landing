@@ -7,7 +7,9 @@ import {
   ChevronDown,
   CheckCircle,
   AlertCircle,
-  Send,
+  ArrowRight,
+  Clock,
+  ListChecks,
 } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
 
@@ -38,9 +40,6 @@ const Signup: React.FC = () => {
     setStatus('loading');
 
     try {
-      // TODO: Replace with actual API call / email-sending logic
-      // Example:
-      // await axios.post(`${API_BASE_URL}/api/signup/`, formData);
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       setStatus('success');
@@ -50,176 +49,293 @@ const Signup: React.FC = () => {
     }
   };
 
+  const filledCount = Object.values(formData).filter(Boolean).length;
+
+  const inputBase =
+    'w-full bg-[#0e0e0e] border-2 py-4 pl-12 pr-4 text-base text-[#f0f0f0] placeholder:text-[#555] focus:outline-none transition-all duration-200 rounded-sm';
+
+  const borderIdle = 'border-[#2a2a2a] hover:border-[#444]';
+  const borderFocus = 'focus:border-[#e8734a] focus:bg-[#120c09] focus:shadow-[0_0_0_4px_rgba(232,115,74,0.08)]';
+
   return (
     <PageTransition>
-      <div className="min-h-screen text-[#f0f0f0] pt-24 pb-20">
-        <div className="max-w-lg mx-auto px-6">
+      <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
+        <div className="max-w-3xl mx-auto px-6">
           {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.7 }}
+            className="mb-16"
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-              Înscrie-te
-            </h1>
-            <p className="text-[#888] text-lg">
-              Completează formularul și te vom contacta în cel mai scurt timp.
-            </p>
+            <div className="flex items-baseline gap-3 md:gap-4 mb-6 md:mb-8">
+              <span className="font-mono text-[10px] md:text-[11px] tracking-[0.2em] md:tracking-[0.3em] text-[#e8734a] uppercase whitespace-nowrap">
+                § AlgoMate / Înscriere
+              </span>
+              <span className="h-px flex-1 bg-gradient-to-r from-[#333] via-[#222] to-transparent" />
+              <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#666] uppercase hidden md:inline">
+                Formular · 2026
+              </span>
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 md:gap-6 mb-8 md:mb-10">
+              <h1 className="font-display font-semibold text-[2.75rem] sm:text-6xl md:text-7xl text-[#f0f0f0] leading-[1.02] tracking-tight">
+                Înscrie-<em className="italic text-[#e8734a] font-normal">te.</em>
+              </h1>
+              <p className="font-mono text-[11px] md:text-xs text-[#888] md:max-w-xs uppercase tracking-wider leading-relaxed">
+                → Completează formularul și te vom contacta în cel mai scurt timp.
+              </p>
+            </div>
+
+            {/* Meta row */}
+            {status !== 'success' && (
+              <div className="pt-6 border-t border-[#222] space-y-3 md:space-y-0 md:flex md:flex-wrap md:items-center md:gap-x-8 md:gap-y-3">
+                <div className="flex items-center gap-5 md:gap-8">
+                  <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
+                    <ListChecks size={13} className="text-[#e8734a]" strokeWidth={1.75} />
+                    4 câmpuri
+                  </div>
+                  <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
+                    <Clock size={13} className="text-[#e8734a]" strokeWidth={1.75} />
+                    ~ 2 minute
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em] md:ml-auto">
+                  <span>Progres</span>
+                  <div className="flex gap-1 flex-1 md:flex-initial">
+                    {[0, 1, 2, 3].map((i) => (
+                      <span
+                        key={i}
+                        className={`h-1.5 flex-1 md:flex-initial md:w-6 transition-colors duration-300 ${
+                          i < filledCount ? 'bg-[#e8734a]' : 'bg-[#222]'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[#e8734a] tabular-nums">{filledCount}/4</span>
+                </div>
+              </div>
+            )}
           </motion.div>
 
-          {/* Form */}
+          {/* Form panel */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="bg-[#141414] border border-[#222] rounded-xl p-8"
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="relative border border-[#2a2a2a] bg-[#0c0c0c] px-5 sm:px-8 md:px-12 py-10 sm:py-12 md:py-14 rounded-sm"
           >
+            {/* Corner ticks */}
+            <span className="absolute -top-px -left-px h-3 w-3 border-t-2 border-l-2 border-[#e8734a]" aria-hidden />
+            <span className="absolute -top-px -right-px h-3 w-3 border-t-2 border-r-2 border-[#e8734a]" aria-hidden />
+            <span className="absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 border-[#e8734a]" aria-hidden />
+            <span className="absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 border-[#e8734a]" aria-hidden />
+
             {status === 'success' ? (
-              <div className="text-center py-8">
+              <div className="text-center py-10">
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 200 }}
-                  className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-5"
+                  initial={{ scale: 0, rotate: -30 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 180, damping: 14 }}
+                  className="w-20 h-20 border-2 border-emerald-500/60 bg-emerald-500/5 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-8"
                 >
-                  <CheckCircle size={32} />
+                  <CheckCircle size={36} strokeWidth={1.75} />
                 </motion.div>
-                <h3 className="text-xl font-semibold text-[#f0f0f0] mb-2">
-                  Înscrierea a fost trimisă!
+                <div className="font-mono text-[10px] tracking-[0.3em] text-emerald-400 uppercase mb-4">
+                  ◆ Confirmat
+                </div>
+                <h3 className="font-display font-semibold text-3xl md:text-4xl text-[#f0f0f0] mb-4 leading-tight tracking-tight">
+                  Înscrierea a fost <em className="italic text-[#e8734a] font-normal">trimisă.</em>
                 </h3>
-                <p className="text-sm text-[#888] mb-6">
+                <p className="text-[#bbb] mb-10 max-w-md mx-auto leading-relaxed">
                   Te vom contacta pe email-ul furnizat cu toate detaliile.
                 </p>
                 <button
                   onClick={() => setStatus('idle')}
-                  className="text-sm text-[#e8734a] hover:text-[#f08c5a] transition-colors"
+                  className="font-mono text-[11px] tracking-[0.3em] uppercase text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] pb-1 transition-colors"
                 >
-                  Trimite altă înscriere
+                  ← Trimite altă înscriere
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Name */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-[#888] uppercase tracking-wider">
-                    Nume Complet
-                  </label>
-                  <div className="relative">
-                    <User
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555]"
-                    />
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Popescu Andrei"
-                      className="w-full bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg py-3 pl-10 pr-4 text-sm text-[#f0f0f0] placeholder:text-[#444] focus:outline-none focus:border-[#e8734a]/50 transition-colors"
-                    />
+              <form onSubmit={handleSubmit}>
+                {/* Section marker */}
+                <div className="flex items-center gap-4 mb-10">
+                  <span className="font-mono text-[10px] tracking-[0.3em] text-[#e8734a] uppercase">
+                    /01 · Date personale
+                  </span>
+                  <span className="h-px flex-1 bg-[#222]" />
+                </div>
+
+                <div className="space-y-7 mb-14">
+                  {/* Name */}
+                  <div>
+                    <label htmlFor="name" className="flex items-center gap-2 text-sm font-medium text-[#e4e4e4] mb-2.5">
+                      <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-wider">01</span>
+                      Nume Complet
+                      <span className="text-[#e8734a]">*</span>
+                    </label>
+                    <div className="relative group">
+                      <User
+                        size={17}
+                        strokeWidth={1.75}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#666] group-focus-within:text-[#e8734a] transition-colors pointer-events-none"
+                      />
+                      <input
+                        id="name"
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        placeholder="Popescu Andrei"
+                        className={`${inputBase} ${borderIdle} ${borderFocus}`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label htmlFor="email" className="flex items-center gap-2 text-sm font-medium text-[#e4e4e4] mb-2.5">
+                      <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-wider">02</span>
+                      Email
+                      <span className="text-[#e8734a]">*</span>
+                    </label>
+                    <div className="relative group">
+                      <Mail
+                        size={17}
+                        strokeWidth={1.75}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#666] group-focus-within:text-[#e8734a] transition-colors pointer-events-none"
+                      />
+                      <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        placeholder="email@exemplu.com"
+                        className={`${inputBase} ${borderIdle} ${borderFocus}`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div>
+                    <label htmlFor="phone" className="flex items-center gap-2 text-sm font-medium text-[#e4e4e4] mb-2.5">
+                      <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-wider">03</span>
+                      Telefon
+                      <span className="text-[#e8734a]">*</span>
+                    </label>
+                    <div className="relative group">
+                      <Phone
+                        size={17}
+                        strokeWidth={1.75}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#666] group-focus-within:text-[#e8734a] transition-colors pointer-events-none"
+                      />
+                      <input
+                        id="phone"
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                        placeholder="07xx xxx xxx"
+                        className={`${inputBase} ${borderIdle} ${borderFocus}`}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Email */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-[#888] uppercase tracking-wider">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <Mail
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555]"
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      placeholder="email@exemplu.com"
-                      className="w-full bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg py-3 pl-10 pr-4 text-sm text-[#f0f0f0] placeholder:text-[#444] focus:outline-none focus:border-[#e8734a]/50 transition-colors"
-                    />
-                  </div>
+                {/* Section marker — course */}
+                <div className="flex items-center gap-4 mb-10">
+                  <span className="font-mono text-[10px] tracking-[0.3em] text-[#e8734a] uppercase">
+                    /02 · Program
+                  </span>
+                  <span className="h-px flex-1 bg-[#222]" />
                 </div>
 
-                {/* Phone */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-[#888] uppercase tracking-wider">
-                    Telefon
-                  </label>
-                  <div className="relative">
-                    <Phone
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#555]"
-                    />
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      placeholder="07xx xxx xxx"
-                      className="w-full bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg py-3 pl-10 pr-4 text-sm text-[#f0f0f0] placeholder:text-[#444] focus:outline-none focus:border-[#e8734a]/50 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Course Select */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-[#888] uppercase tracking-wider">
+                <div className="mb-12">
+                  <label htmlFor="course" className="flex items-center gap-2 text-sm font-medium text-[#e4e4e4] mb-2.5">
+                    <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-wider">04</span>
                     Cursul Dorit
+                    <span className="text-[#e8734a]">*</span>
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
                     <select
+                      id="course"
                       name="course"
                       value={formData.course}
                       onChange={handleChange}
                       required
-                      className="w-full bg-[#0e0e0e] border border-[#2a2a2a] rounded-lg py-3 pl-4 pr-10 text-sm text-[#f0f0f0] focus:outline-none focus:border-[#e8734a]/50 transition-colors appearance-none"
+                      className={`${inputBase} ${borderIdle} ${borderFocus} !pl-4 pr-12 appearance-none cursor-pointer ${
+                        !formData.course ? 'text-[#555]' : ''
+                      }`}
                     >
                       {courses.map((c) => (
-                        <option key={c.value} value={c.value} disabled={!c.value}>
+                        <option key={c.value} value={c.value} disabled={!c.value} className="bg-[#0a0a0a] text-[#f0f0f0]">
                           {c.label}
                         </option>
                       ))}
                     </select>
                     <ChevronDown
-                      size={16}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#555] pointer-events-none"
+                      size={18}
+                      strokeWidth={1.75}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#888] pointer-events-none group-focus-within:text-[#e8734a] transition-colors"
                     />
                   </div>
                 </div>
 
                 {/* Error */}
                 {status === 'error' && (
-                  <div className="flex items-center gap-2 text-red-400 text-sm">
-                    <AlertCircle size={14} />
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-3 text-red-400 text-sm mb-6 border border-red-500/40 bg-red-500/10 px-4 py-3 rounded-sm"
+                  >
+                    <AlertCircle size={16} strokeWidth={2} />
                     A apărut o eroare. Te rugăm să încerci din nou.
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Submit */}
                 <motion.button
                   type="submit"
                   disabled={status === 'loading'}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className="w-full bg-[#e8734a] hover:bg-[#d4622e] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg text-sm transition-colors duration-300 flex items-center justify-center gap-2"
+                  whileHover={{ y: -2 }}
+                  whileTap={{ y: 0 }}
+                  className="group w-full bg-[#e8734a] hover:bg-[#f08c5a] disabled:opacity-60 disabled:cursor-not-allowed text-[#0a0a0a] font-mono text-sm tracking-[0.2em] uppercase font-bold px-8 py-5 transition-colors duration-200 flex items-center justify-center gap-3 rounded-sm shadow-[0_0_0_1px_rgba(232,115,74,0.2),0_20px_40px_-20px_rgba(232,115,74,0.6)]"
                 >
                   {status === 'loading' ? (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <>
+                      <div className="w-4 h-4 border-[1.5px] border-[#0a0a0a]/40 border-t-[#0a0a0a] rounded-full animate-spin" />
+                      Se trimite...
+                    </>
                   ) : (
                     <>
                       Trimite Înscrierea
-                      <Send size={14} />
+                      <ArrowRight size={16} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
                 </motion.button>
+
+                <div className="mt-5 font-mono text-[10px] text-[#555] uppercase tracking-[0.25em] text-center leading-relaxed">
+                  ◆ Prin trimitere, accepți contactarea pe datele furnizate.
+                </div>
               </form>
             )}
+          </motion.div>
+
+          {/* Closing flourish */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="mt-16 flex items-center justify-center gap-4 font-mono text-[9px] tracking-[0.4em] text-[#444] uppercase"
+          >
+            <span className="h-px w-16 bg-[#222]" />
+            <span>◆ AlgoMate · MMXXVI ◆</span>
+            <span className="h-px w-16 bg-[#222]" />
           </motion.div>
         </div>
       </div>

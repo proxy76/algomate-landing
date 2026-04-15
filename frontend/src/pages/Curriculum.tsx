@@ -509,12 +509,7 @@ const TerminalNode: React.FC<{ label: string }> = ({ label }) => {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="relative mt-8 flex items-center gap-4 pl-16 md:justify-center md:pl-0"
     >
-      <span
-        className="absolute left-6 top-1/2 block h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#e8734a] bg-[#e8734a] md:left-1/2 shadow-[0_0_28px_rgba(232,115,74,0.7)]"
-        aria-hidden="true"
-      />
-
-      <div className="flex items-center gap-3 rounded-lg border border-[#e8734a]/40 bg-[#e8734a]/10 px-5 py-2.5">
+      <div className="relative z-10 flex items-center gap-3 rounded-lg border border-[#e8734a]/40 bg-[#e8734a]/10 px-5 py-2.5">
         <Flag size={14} className="text-[#e8734a]" />
         <span
           className="text-sm text-[#f0f0f0] tracking-tight"

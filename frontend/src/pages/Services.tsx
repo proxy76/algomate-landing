@@ -1,27 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Terminal, Code, Sigma, Calendar, Clock, Users, ArrowRight, Percent } from 'lucide-react';
+import { Terminal, Code, Sigma, Calendar, Clock, Users, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 
 const services = [
-  {
-    icon: Terminal,
-    title: "Informatică BAC",
-    tech: "C / C++",
-    price: "160 RON",
-    description:
-      "Pregătire completă pentru examenul de Bacalaureat la Informatică. Acoperim toți algoritmii, structurile de date și tipurile de subiecte din programa oficială.",
-    startDate: "15 August",
-    features: [
-      "Algoritmi fundamentali și avansați",
-      "Structuri de date (arbori, grafuri, liste)",
-      "Rezolvări complete de subiecte BAC",
-      "Simulări de examen săptămânale",
-      "Feedback personalizat pe cod",
-    ],
-    badge: null,
-  },
   {
     icon: Code,
     title: "Introducere în Informatică",
@@ -39,6 +22,23 @@ const services = [
       "Introducere în gândirea algoritmică",
     ],
     badge: "50% OFF pe Vară",
+  },
+  {
+    icon: Terminal,
+    title: "Informatică BAC",
+    tech: "C / C++",
+    price: "160 RON",
+    description:
+      "Pregătire completă pentru examenul de Bacalaureat la Informatică. Acoperim toți algoritmii, structurile de date și tipurile de subiecte din programa oficială.",
+    startDate: "15 August",
+    features: [
+      "Algoritmi fundamentali și avansați",
+      "Structuri de date (arbori, grafuri, liste)",
+      "Rezolvări complete de subiecte BAC",
+      "Simulări de examen săptămânale",
+      "Feedback personalizat pe cod",
+    ],
+    badge: null,
   },
   {
     icon: Sigma,
@@ -62,121 +62,178 @@ const services = [
 const Services: React.FC = () => {
   return (
     <PageTransition>
-      <div className="min-h-screen text-[#f0f0f0] pt-24 pb-20">
-        <div className="max-w-5xl mx-auto px-6">
+      <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
+        <div className="max-w-6xl mx-auto px-6">
           {/* Header */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="mb-24"
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">Servicii</h1>
-            <p className="text-[#888] max-w-xl mx-auto text-lg">
-              Trei programe de pregătire, fiecare adaptat nevoilor tale.
-            </p>
+            <div className="flex items-baseline gap-3 md:gap-4 mb-6 md:mb-8">
+              <span className="font-mono text-[10px] md:text-[11px] tracking-[0.2em] md:tracking-[0.3em] text-[#e8734a] uppercase whitespace-nowrap">
+                § AlgoMate / Servicii
+              </span>
+              <span className="h-px flex-1 bg-gradient-to-r from-[#333] via-[#222] to-transparent" />
+              <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#666] uppercase hidden md:inline">
+                Anul 2026
+              </span>
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 md:gap-6">
+              <h1 className="font-display font-semibold text-[3rem] sm:text-6xl md:text-7xl text-[#f0f0f0] leading-[1.02] tracking-tight">
+                Servicii<span className="text-[#e8734a]">.</span>
+              </h1>
+              <p className="font-mono text-[11px] md:text-xs text-[#888] md:max-w-xs uppercase tracking-wider leading-relaxed">
+                → Trei programe de pregătire, fiecare adaptat nevoilor tale.
+              </p>
+            </div>
           </motion.div>
 
-          {/* Service Cards */}
-          <div className="space-y-8">
+          {/* Service cards */}
+          <div className="border-t border-[#222]">
             {services.map((service, idx) => (
-              <motion.div
+              <motion.article
                 key={idx}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: idx * 0.15, duration: 0.6 }}
-                className="relative bg-[#141414] border border-[#222] rounded-xl p-8 md:p-10 group hover:border-[#333] transition-all duration-300"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ delay: idx * 0.1, duration: 0.6 }}
+                className={`relative px-5 sm:px-6 md:px-10 py-12 sm:py-14 md:py-20 border-b border-[#222] ${
+                  service.badge ? 'bg-[#e8734a]/[0.02]' : ''
+                }`}
               >
-                {/* Badge */}
-                {service.badge && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: idx * 0.15 + 0.3 }}
-                    className="absolute top-6 right-6 flex items-center gap-1.5 bg-[#e8734a]/10 text-[#e8734a] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#e8734a]/20"
-                  >
-                    <Percent size={12} />
-                    {service.badge}
-                  </motion.div>
-                )}
-
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Left side */}
-                  <div className="md:w-1/2">
-                    <div className="w-12 h-12 rounded-xl bg-[#e8734a]/10 flex items-center justify-center mb-5 text-[#e8734a]">
-                      <service.icon size={24} />
+                {/* Top strip */}
+                <div className="flex items-center justify-between gap-3 mb-8 md:mb-10 flex-wrap">
+                  <div className="flex items-center gap-4 md:gap-5">
+                    <span className="font-mono text-[10px] tracking-[0.25em] md:tracking-[0.3em] text-[#666] uppercase">
+                      / 00{idx + 1}
+                    </span>
+                    <service.icon
+                      size={22}
+                      strokeWidth={1.5}
+                      className={service.badge ? 'text-[#e8734a]' : 'text-[#888]'}
+                    />
+                  </div>
+                  {service.badge && (
+                    <div className="inline-flex items-center gap-2 bg-[#e8734a] text-[#0a0a0a] px-3 py-1.5 font-mono text-[10px] md:text-[11px] tracking-[0.15em] md:tracking-[0.2em] uppercase font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#0a0a0a] animate-pulse" />
+                      {service.badge}
                     </div>
+                  )}
+                </div>
 
-                    <h2 className="text-2xl font-bold text-[#f0f0f0] mb-1">{service.title}</h2>
-                    
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-sm text-[#e8734a] font-medium">{service.tech}</span>
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#333]" />
-                      <div className="flex items-center gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
+                  {/* Left — primary */}
+                  <div className="md:col-span-7">
+                    <h2 className="font-sans font-semibold text-[1.65rem] sm:text-3xl md:text-4xl text-[#f0f0f0] mb-3 leading-[1.15] tracking-tight">
+                      {service.title}
+                    </h2>
+                    <p className="font-mono text-[11px] text-[#e8734a] tracking-[0.3em] uppercase mb-8">
+                      {service.tech}
+                    </p>
+
+                    <p className="text-base text-[#bbb] leading-relaxed mb-10 max-w-xl">
+                      {service.description}
+                    </p>
+
+                    {/* Price */}
+                    <div className="mb-10 pb-10 border-b border-dashed border-[#222]">
+                      <div className="font-mono text-[10px] tracking-[0.3em] text-[#666] uppercase mb-3">
+                        Preț / ședință
+                      </div>
+                      <div className="flex items-baseline gap-3 md:gap-4 flex-wrap">
                         {service.discountPrice ? (
                           <>
-                            <span className="text-sm text-[#666] line-through decoration-[#e8734a]/80 decoration-2 font-medium">{service.price}</span>
-                            <span className="text-sm font-bold text-[#e8734a] bg-[#e8734a]/10 px-2 py-0.5 rounded-md border border-[#e8734a]/20 shadow-sm">{service.discountPrice}</span>
+                            <span className="font-display font-semibold text-[2.75rem] sm:text-5xl md:text-6xl text-[#e8734a] leading-none">
+                              {service.discountPrice}
+                            </span>
+                            <span className="font-display text-xl sm:text-2xl md:text-3xl text-[#555] line-through decoration-[#e8734a]/60 decoration-2 leading-none">
+                              {service.price}
+                            </span>
                           </>
                         ) : (
-                          <span className="text-sm font-medium text-[#ccc] bg-[#222] px-2 py-0.5 rounded-md border border-[#333] shadow-sm">{service.price}</span>
+                          <span className="font-display font-semibold text-[2.75rem] sm:text-5xl md:text-6xl text-[#f0f0f0] leading-none">
+                            {service.price}
+                          </span>
                         )}
                       </div>
                     </div>
 
-                    <p className="text-[#888] text-sm leading-relaxed mb-6">{service.description}</p>
-
-                    <div className="flex flex-wrap gap-3 mb-6">
-                      <div className="flex items-center gap-1.5 text-xs text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-3 py-1.5 rounded-lg">
-                        <Calendar size={12} />
-                        Începe: {service.startDate}
+                    {/* Meta */}
+                    <div className="flex flex-wrap gap-x-8 gap-y-4 mb-10">
+                      <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
+                        <Calendar size={13} className="text-[#e8734a]" strokeWidth={1.75} />
+                        Start · {service.startDate}
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-3 py-1.5 rounded-lg">
-                        <Clock size={12} />
+                      <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
+                        <Clock size={13} className="text-[#e8734a]" strokeWidth={1.75} />
                         2h / sesiune
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-[#999] bg-[#1a1a1a] border border-[#2a2a2a] px-3 py-1.5 rounded-lg">
-                        <Users size={12} />
+                      <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
+                        <Users size={13} className="text-[#e8734a]" strokeWidth={1.75} />
                         Grupe mici
                       </div>
                     </div>
 
                     <Link to="/inscriere">
                       <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="bg-[#e8734a] hover:bg-[#d4622e] text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors duration-300 flex items-center gap-2"
+                        whileHover={{ y: -2 }}
+                        whileTap={{ y: 0 }}
+                        className="bg-[#e8734a] hover:bg-[#f08c5a] text-[#0a0a0a] px-8 py-4 font-mono text-[11px] tracking-[0.25em] uppercase font-medium transition-colors duration-200 inline-flex items-center gap-3"
                       >
                         Înscrie-te
-                        <ArrowRight size={14} />
+                        <ArrowRight size={14} strokeWidth={2.5} />
                       </motion.button>
                     </Link>
                   </div>
 
-                  {/* Right side - Features */}
-                  <div className="md:w-1/2">
-                    <h4 className="text-xs font-medium text-[#666] uppercase tracking-wider mb-4">
-                      Ce vei învăța
-                    </h4>
-                    <ul className="space-y-3">
+                  {/* Right — features */}
+                  <div className="md:col-span-5 md:pl-10 pt-8 md:pt-0 border-t md:border-t-0 md:border-l border-dashed md:border-solid border-[#222]">
+                    <div className="flex items-center gap-3 mb-8">
+                      <span className="font-mono text-[10px] text-[#e8734a] uppercase tracking-[0.3em]">
+                        Ce vei învăța
+                      </span>
+                      <span className="h-px flex-1 bg-[#222]" />
+                    </div>
+                    <ul>
                       {service.features.map((feature, fIdx) => (
                         <motion.li
                           key={fIdx}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: idx * 0.15 + fIdx * 0.05 + 0.3 }}
-                          className="flex items-start gap-3 text-sm text-[#bbb]"
+                          initial={{ opacity: 0, x: 10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: idx * 0.1 + fIdx * 0.05 + 0.2, duration: 0.4 }}
+                          className="flex items-start gap-5 py-4 border-b border-dashed border-[#222] last:border-b-0"
                         >
-                          <span className="w-1 h-1 rounded-full bg-[#e8734a] mt-2 flex-shrink-0" />
-                          {feature}
+                          <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-[0.15em] pt-0.5 w-6 shrink-0">
+                            {String(fIdx + 1).padStart(2, '0')}
+                          </span>
+                          <span className="text-sm text-[#ccc] leading-relaxed flex-1">
+                            {feature}
+                          </span>
                         </motion.li>
                       ))}
                     </ul>
                   </div>
                 </div>
-              </motion.div>
+              </motion.article>
             ))}
           </div>
+
+          {/* Closing flourish */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="mt-16 flex items-center justify-center gap-4 font-mono text-[9px] tracking-[0.4em] text-[#444] uppercase"
+          >
+            <span className="h-px w-16 bg-[#222]" />
+            <span>◆ Fin · AlgoMate MMXXVI ◆</span>
+            <span className="h-px w-16 bg-[#222]" />
+          </motion.div>
         </div>
       </div>
     </PageTransition>

@@ -54,6 +54,8 @@ const InteractiveBackground: React.FC = () => {
 
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
+      const prevW = width;
+      const prevH = height;
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = width * dpr;
@@ -61,7 +63,13 @@ const InteractiveBackground: React.FC = () => {
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      spawnParticles();
+      // Skip respawn on initial mobile URL-bar toggle (width unchanged, small height delta).
+      // On desktop, width changes during real resizes, so this always respawns there.
+      const heightDelta = Math.abs(height - prevH);
+      const widthChanged = width !== prevW;
+      if (particlesRef.current.length === 0 || widthChanged || heightDelta > 150) {
+        spawnParticles();
+      }
     };
     resize();
 
@@ -143,28 +151,31 @@ const InteractiveBackground: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      {/* Gray base with subtle radial gradient */}
+    <>
+      {/* Gradient base — extends to the largest viewport so URL-bar area is covered */}
       <div
-        className="absolute inset-0"
+        className="fixed left-0 right-0 top-0 z-0 pointer-events-none"
         style={{
+          height: '100lvh',
+          minHeight: '100vh',
           background:
             'radial-gradient(ellipse at center, #1e1e1e 0%, #171717 50%, #111111 100%)',
         }}
+        aria-hidden
       />
 
-      {/* Subtle grid */}
-      <div
-        className="absolute inset-0 opacity-[0.025]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
-        }}
-      />
-
-      {/* Particle canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0" />
-    </div>
+      {/* Grid + particle canvas — stays at visual viewport so particles don't glitch */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <canvas ref={canvasRef} className="absolute inset-0" />
+      </div>
+    </>
   );
 };
 
