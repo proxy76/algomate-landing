@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 import {
   User,
   Mail,
   Phone,
+  MessageSquare,
   ChevronDown,
   CheckCircle,
   AlertCircle,
@@ -12,12 +14,13 @@ import {
   ListChecks,
 } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
+import API_BASE_URL from '../api';
 
 const courses = [
-  { value: '', label: 'Selectează cursul dorit' },
-  { value: 'informatica-bac', label: 'Informatică BAC (C/C++)' },
-  { value: 'intro-informatica', label: 'Introducere în Informatică (Python/C++)' },
-  { value: 'matematica-bac', label: 'Matematică BAC (M1/M2/M3)' },
+  { value: '', label: 'Selectează cursul dorit', backendValue: '' },
+  { value: 'informatica-bac', label: 'Informatică BAC (C/C++)', backendValue: 'Informatică BAC' },
+  { value: 'intro-informatica', label: 'Introducere în Informatică (Python/C++)', backendValue: 'Introducere în Informatică' },
+  { value: 'matematica-bac', label: 'Matematică BAC (M1/M2/M3)', backendValue: 'Matematică BAC' },
 ];
 
 const Signup: React.FC = () => {
@@ -26,11 +29,14 @@ const Signup: React.FC = () => {
     email: '',
     phone: '',
     course: '',
+    message: '',
+    isRobotVerified: false,
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -38,18 +44,35 @@ const Signup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setErrorMessage('');
+
+    const selectedCourse = courses.find((c) => c.value === formData.course);
+    const tutoringTypes = selectedCourse?.backendValue ? [selectedCourse.backendValue] : [];
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await axios.post(`${API_BASE_URL}/api/contact/`, {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
+        tutoring_types: tutoringTypes,
+        is_robot_verified: formData.isRobotVerified,
+        website: '',
+      });
 
       setStatus('success');
-      setFormData({ name: '', email: '', phone: '', course: '' });
-    } catch {
+      setFormData({ name: '', email: '', phone: '', course: '', message: '', isRobotVerified: false });
+    } catch (err) {
       setStatus('error');
+      if (axios.isAxiosError(err) && err.response?.status === 429) {
+        setErrorMessage('Prea multe încercări. Te rugăm să aștepți și să încerci din nou mai târziu.');
+      } else {
+        setErrorMessage('A apărut o eroare. Te rugăm să încerci din nou.');
+      }
     }
   };
 
-  const filledCount = Object.values(formData).filter(Boolean).length;
+  const filledCount = [formData.name, formData.email, formData.phone, formData.course, formData.message].filter(Boolean).length;
 
   const inputBase =
     'w-full bg-[#0e0e0e] border-2 py-4 pl-12 pr-4 text-base text-[#f0f0f0] placeholder:text-[#555] focus:outline-none transition-all duration-200 rounded-sm';
@@ -93,7 +116,7 @@ const Signup: React.FC = () => {
                 <div className="flex items-center gap-5 md:gap-8">
                   <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
                     <ListChecks size={13} className="text-[#e8734a]" strokeWidth={1.75} />
-                    4 câmpuri
+                    5 câmpuri
                   </div>
                   <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
                     <Clock size={13} className="text-[#e8734a]" strokeWidth={1.75} />
@@ -103,7 +126,7 @@ const Signup: React.FC = () => {
                 <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em] md:ml-auto">
                   <span>Progres</span>
                   <div className="flex gap-1 flex-1 md:flex-initial">
-                    {[0, 1, 2, 3].map((i) => (
+                    {[0, 1, 2, 3, 4].map((i) => (
                       <span
                         key={i}
                         className={`h-1.5 flex-1 md:flex-initial md:w-6 transition-colors duration-300 ${
@@ -112,7 +135,7 @@ const Signup: React.FC = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-[#e8734a] tabular-nums">{filledCount}/4</span>
+                  <span className="text-[#e8734a] tabular-nums">{filledCount}/5</span>
                 </div>
               </div>
             )}
@@ -255,35 +278,80 @@ const Signup: React.FC = () => {
                   <span className="h-px flex-1 bg-[#222]" />
                 </div>
 
-                <div className="mb-12">
-                  <label htmlFor="course" className="flex items-center gap-2 text-sm font-medium text-[#e4e4e4] mb-2.5">
-                    <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-wider">04</span>
-                    Cursul Dorit
-                    <span className="text-[#e8734a]">*</span>
-                  </label>
-                  <div className="relative group">
-                    <select
-                      id="course"
-                      name="course"
-                      value={formData.course}
-                      onChange={handleChange}
-                      required
-                      className={`${inputBase} ${borderIdle} ${borderFocus} !pl-4 pr-12 appearance-none cursor-pointer ${
-                        !formData.course ? 'text-[#555]' : ''
-                      }`}
-                    >
-                      {courses.map((c) => (
-                        <option key={c.value} value={c.value} disabled={!c.value} className="bg-[#0a0a0a] text-[#f0f0f0]">
-                          {c.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      size={18}
-                      strokeWidth={1.75}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#888] pointer-events-none group-focus-within:text-[#e8734a] transition-colors"
-                    />
+                <div className="space-y-7 mb-14">
+                  <div>
+                    <label htmlFor="course" className="flex items-center gap-2 text-sm font-medium text-[#e4e4e4] mb-2.5">
+                      <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-wider">04</span>
+                      Cursul Dorit
+                      <span className="text-[#e8734a]">*</span>
+                    </label>
+                    <div className="relative group">
+                      <select
+                        id="course"
+                        name="course"
+                        value={formData.course}
+                        onChange={handleChange}
+                        required
+                        className={`${inputBase} ${borderIdle} ${borderFocus} !pl-4 pr-12 appearance-none cursor-pointer ${
+                          !formData.course ? 'text-[#555]' : ''
+                        }`}
+                      >
+                        {courses.map((c) => (
+                          <option key={c.value} value={c.value} disabled={!c.value} className="bg-[#0a0a0a] text-[#f0f0f0]">
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={18}
+                        strokeWidth={1.75}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[#888] pointer-events-none group-focus-within:text-[#e8734a] transition-colors"
+                      />
+                    </div>
                   </div>
+
+                  {/* Message */}
+                  <div>
+                    <label htmlFor="message" className="flex items-center gap-2 text-sm font-medium text-[#e4e4e4] mb-2.5">
+                      <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-wider">05</span>
+                      Mesaj
+                      <span className="text-[#e8734a]">*</span>
+                    </label>
+                    <div className="relative group">
+                      <MessageSquare
+                        size={17}
+                        strokeWidth={1.75}
+                        className="absolute left-4 top-4 text-[#666] group-focus-within:text-[#e8734a] transition-colors pointer-events-none"
+                      />
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        required
+                        rows={4}
+                        maxLength={2000}
+                        placeholder="Spune-ne mai multe despre nevoile tale..."
+                        className={`${inputBase} ${borderIdle} ${borderFocus} resize-none`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Robot verification */}
+                <div className="mb-10">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={formData.isRobotVerified}
+                      onChange={(e) => setFormData({ ...formData, isRobotVerified: e.target.checked })}
+                      required
+                      className="w-5 h-5 bg-[#0e0e0e] border-2 border-[#2a2a2a] rounded-sm checked:bg-[#e8734a] checked:border-[#e8734a] focus:ring-2 focus:ring-[#e8734a]/30 cursor-pointer accent-[#e8734a]"
+                    />
+                    <span className="text-sm text-[#bbb] group-hover:text-[#ddd] transition-colors">
+                      Confirm că nu sunt un robot
+                    </span>
+                  </label>
                 </div>
 
                 {/* Error */}
@@ -294,7 +362,7 @@ const Signup: React.FC = () => {
                     className="flex items-center gap-3 text-red-400 text-sm mb-6 border border-red-500/40 bg-red-500/10 px-4 py-3 rounded-sm"
                   >
                     <AlertCircle size={16} strokeWidth={2} />
-                    A apărut o eroare. Te rugăm să încerci din nou.
+                    {errorMessage}
                   </motion.div>
                 )}
 

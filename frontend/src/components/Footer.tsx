@@ -65,14 +65,14 @@ const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm text-[#666] hover:text-[#e8734a] transition-colors">
+                <Link to="/termeni-si-conditii" className="text-sm text-[#666] hover:text-[#e8734a] transition-colors">
                   Termeni și Condiții
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-[#666] hover:text-[#e8734a] transition-colors">
+                <Link to="/politica-de-confidentialitate" className="text-sm text-[#666] hover:text-[#e8734a] transition-colors">
                   Politica de Confidențialitate
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
