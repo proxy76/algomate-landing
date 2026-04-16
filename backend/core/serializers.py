@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-ALLOWED_TUTORING_TYPES = {"Matematică BAC", "Informatică BAC"}
+ALLOWED_TUTORING_TYPES = {"Matematică BAC", "Informatică BAC", "Introducere în Informatică"}
 
 
 class ContactSerializer(serializers.Serializer):

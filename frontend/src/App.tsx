@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import Services from './pages/Services';
 import Curriculum from './pages/Curriculum';
 import Signup from './pages/Signup';
+import TermsAndConditions from './pages/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,14 @@ const router = createBrowserRouter([
       {
         path: '/inscriere',
         element: <Signup />,
+      },
+      {
+        path: '/termeni-si-conditii',
+        element: <TermsAndConditions />,
+      },
+      {
+        path: '/politica-de-confidentialitate',
+        element: <PrivacyPolicy />,
       },
     ],
   },
