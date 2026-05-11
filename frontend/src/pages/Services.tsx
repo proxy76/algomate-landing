@@ -9,8 +9,8 @@ const services = [
     icon: Code,
     title: "Introducere în Informatică",
     tech: "Python / C++",
-    price: "160 RON",
-    discountPrice: "80 RON",
+    price: "120 RON",
+    discountPrice: "60 RON",
     description:
       "Curs introductiv pentru clasa a 9-a. Învață bazele programării cu exerciții practice și proiecte reale care îți construiesc fundația pentru o carieră în tech.",
     startDate: "15 Iulie",
@@ -27,7 +27,7 @@ const services = [
     icon: Terminal,
     title: "Informatică BAC",
     tech: "C / C++",
-    price: "160 RON",
+    price: "120 RON",
     description:
       "Pregătire completă pentru examenul de Bacalaureat la Informatică. Acoperim toți algoritmii, structurile de date și tipurile de subiecte din programa oficială.",
     startDate: "15 August",
@@ -44,7 +44,7 @@ const services = [
     icon: Sigma,
     title: "Matematică BAC",
     tech: "M1 / M2 / M3",
-    price: "160 RON",
+    price: "120 RON",
     description:
       "Pregătire intensivă pentru BAC la Matematică, adaptată profilului tău. Metodă structurată cu accent pe înțelegere, nu memorare.",
     startDate: "15 August",
@@ -100,9 +100,8 @@ const Services: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ delay: idx * 0.1, duration: 0.6 }}
-                className={`relative px-5 sm:px-6 md:px-10 py-12 sm:py-14 md:py-20 border-b border-[#222] ${
-                  service.badge ? 'bg-[#e8734a]/[0.02]' : ''
-                }`}
+                className={`relative px-5 sm:px-6 md:px-10 py-12 sm:py-14 md:py-20 border-b border-[#222] ${service.badge ? 'bg-[#e8734a]/[0.02]' : ''
+                  }`}
               >
                 {/* Top strip */}
                 <div className="flex items-center justify-between gap-3 mb-8 md:mb-10 flex-wrap">

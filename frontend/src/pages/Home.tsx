@@ -35,9 +35,9 @@ const services = [
 ];
 
 const stats = [
-  { value: "98%", label: "Promovabilitate", meta: "Ex. Național" },
-  { value: "150+", label: "Elevi pregătiți", meta: "De la 2023" },
-  { value: "9.4", label: "Media notelor", meta: "La BAC" },
+  { value: "100%", label: "Promovabilitate", meta: "Ex. Național" },
+  { value: "34", label: "Premianți", meta: "Începând cu 2024" },
+  { value: "9.8", label: "Media notelor", meta: "La BAC" },
   { value: "3+", label: "Ani experiență", meta: "Meditații" },
 ];
 
@@ -103,9 +103,8 @@ const Home: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
-                  className={`group relative px-5 sm:px-6 md:px-8 pt-8 md:pt-10 pb-10 md:pb-12 border-b border-[#222] md:border-b-0 ${
-                    idx !== 0 ? 'md:border-l border-[#222]' : ''
-                  } ${service.badge ? 'bg-[#e8734a]/[0.02]' : ''} hover:bg-[#141414] transition-colors duration-500`}
+                  className={`group relative px-5 sm:px-6 md:px-8 pt-8 md:pt-10 pb-10 md:pb-12 border-b border-[#222] md:border-b-0 ${idx !== 0 ? 'md:border-l border-[#222]' : ''
+                    } ${service.badge ? 'bg-[#e8734a]/[0.02]' : ''} hover:bg-[#141414] transition-colors duration-500`}
                 >
                   {/* Counter row */}
                   <div className="flex items-start justify-between mb-10">
@@ -115,9 +114,8 @@ const Home: React.FC = () => {
                     <service.icon
                       size={20}
                       strokeWidth={1.5}
-                      className={`transition-colors duration-300 ${
-                        service.badge ? 'text-[#e8734a]' : 'text-[#555] group-hover:text-[#e8734a]'
-                      }`}
+                      className={`transition-colors duration-300 ${service.badge ? 'text-[#e8734a]' : 'text-[#555] group-hover:text-[#e8734a]'
+                        }`}
                     />
                   </div>
 

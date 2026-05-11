@@ -716,15 +716,13 @@ const TopicCard: React.FC<{
         visible: { opacity: 1, y: 0, x: 0 },
       }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className={`group relative ${
-        mirrorDesktop ? 'md:text-right' : ''
-      }`}
+      className={`group relative ${mirrorDesktop ? 'md:text-right' : ''
+        }`}
     >
       {/* Meta row */}
       <div
-        className={`mb-3 flex items-center gap-3 ${
-          mirrorDesktop ? 'md:flex-row-reverse' : ''
-        }`}
+        className={`mb-3 flex items-center gap-3 ${mirrorDesktop ? 'md:flex-row-reverse' : ''
+          }`}
       >
         <span
           className="text-[54px] leading-none text-[#e8734a] tabular-nums"
@@ -743,9 +741,8 @@ const TopicCard: React.FC<{
           / {String(total).padStart(2, '0')}
         </span>
         <span
-          className={`ml-auto text-[10px] tracking-[0.25em] uppercase text-[#666] hidden sm:inline-block ${
-            mirrorDesktop ? 'md:ml-0 md:mr-auto' : ''
-          }`}
+          className={`ml-auto text-[10px] tracking-[0.25em] uppercase text-[#666] hidden sm:inline-block ${mirrorDesktop ? 'md:ml-0 md:mr-auto' : ''
+            }`}
           style={{ fontFamily: '"JetBrains Mono", monospace' }}
         >
           {topic.duration}
@@ -763,9 +760,8 @@ const TopicCard: React.FC<{
         {/* Ambient inner glow on the trunk-facing side */}
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-y-0 w-24 opacity-60 ${
-            sideRight ? 'left-0' : 'md:right-0 left-0 md:left-auto'
-          }`}
+          className={`pointer-events-none absolute inset-y-0 w-24 opacity-60 ${sideRight ? 'left-0' : 'md:right-0 left-0 md:left-auto'
+            }`}
           style={{
             background: sideRight
               ? 'linear-gradient(to right, rgba(232,115,74,0.07), transparent)'
@@ -775,11 +771,10 @@ const TopicCard: React.FC<{
 
         {/* Corner tick — on the trunk-facing corner */}
         <span
-          className={`absolute top-3 h-3 w-3 border-[#e8734a]/60 ${
-            sideRight
-              ? 'left-3 border-l border-t'
-              : 'left-3 border-l border-t md:left-auto md:right-3 md:border-l-0 md:border-r'
-          }`}
+          className={`absolute top-3 h-3 w-3 border-[#e8734a]/60 ${sideRight
+            ? 'left-3 border-l border-t'
+            : 'left-3 border-l border-t md:left-auto md:right-3 md:border-l-0 md:border-r'
+            }`}
           aria-hidden="true"
         />
 
@@ -795,16 +790,14 @@ const TopicCard: React.FC<{
         </p>
 
         <ul
-          className={`relative space-y-2 text-[12.5px] text-[#bbb] ${
-            mirrorDesktop ? 'md:text-right' : ''
-          }`}
+          className={`relative space-y-2 text-[12.5px] text-[#bbb] ${mirrorDesktop ? 'md:text-right' : ''
+            }`}
         >
           {topic.items.map((item, i) => (
             <li
               key={i}
-              className={`flex items-start gap-2.5 ${
-                mirrorDesktop ? 'md:flex-row-reverse' : ''
-              }`}
+              className={`flex items-start gap-2.5 ${mirrorDesktop ? 'md:flex-row-reverse' : ''
+                }`}
             >
               <span
                 className="mt-[7px] h-1 w-1 flex-shrink-0 rounded-full bg-[#e8734a]/75"
@@ -844,11 +837,10 @@ const CourseTabs: React.FC<{
           <button
             key={course.id}
             onClick={() => onChange(course.id)}
-            className={`group relative flex-1 overflow-hidden rounded-xl px-5 py-4 text-left transition-colors duration-300 ${
-              isActive
-                ? 'bg-[#e8734a]/10'
-                : 'hover:bg-[#151515]'
-            }`}
+            className={`group relative flex-1 overflow-hidden rounded-xl px-5 py-4 text-left transition-colors duration-300 ${isActive
+              ? 'bg-[#e8734a]/10'
+              : 'hover:bg-[#151515]'
+              }`}
             aria-pressed={isActive}
           >
             {/* Active indicator — animated background */}
@@ -869,19 +861,17 @@ const CourseTabs: React.FC<{
 
             <div className="relative flex items-start gap-3">
               <span
-                className={`mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border transition-colors duration-300 ${
-                  isActive
-                    ? 'border-[#e8734a]/50 bg-[#e8734a]/15 text-[#e8734a]'
-                    : 'border-[#222] bg-[#0f0f0f] text-[#888] group-hover:text-[#ccc]'
-                }`}
+                className={`mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border transition-colors duration-300 ${isActive
+                  ? 'border-[#e8734a]/50 bg-[#e8734a]/15 text-[#e8734a]'
+                  : 'border-[#222] bg-[#0f0f0f] text-[#888] group-hover:text-[#ccc]'
+                  }`}
               >
                 <Icon size={16} />
               </span>
               <div className="flex flex-col">
                 <span
-                  className={`text-[15px] font-medium transition-colors duration-300 ${
-                    isActive ? 'text-[#f0f0f0]' : 'text-[#ccc]'
-                  }`}
+                  className={`text-[15px] font-medium transition-colors duration-300 ${isActive ? 'text-[#f0f0f0]' : 'text-[#ccc]'
+                    }`}
                   style={{ fontFamily: '"Fraunces", serif' }}
                 >
                   {course.label}
@@ -957,7 +947,7 @@ const Curriculum: React.FC = () => {
 
             <p className="mx-auto max-w-xl text-[15px] leading-relaxed text-[#888]">
               Fiecare program e o hartă detaliată. Alege-ți cursul și urmărește
-              exact ce vei studia, în ce ordine, și cât durează fiecare capitol.
+              exact ce vei studia, în ce ordine, și cât durează fiecare capitol. (Programele se pot schimba)
             </p>
 
             {/* Course tabs */}
