@@ -2,7 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Hero from '../components/Hero';
 import FeatureGrid from '../components/FeatureGrid';
-import Testimonials from '../components/Testimonials';
+// import Testimonials from '../components/Testimonials';
+import HowItWorks from '../components/HowItWorks';
 import CTASection from '../components/CTASection';
 import PageTransition from '../components/PageTransition';
 import { Link } from 'react-router-dom';
@@ -16,6 +17,7 @@ const services = [
     subtitle: "C / C++",
     description: "Algoritmi, structuri de date și rezolvări de subiecte pentru un punctaj maxim la BAC.",
     link: "/servicii",
+    badge: "50% OFF Vara",
   },
   {
     icon: Code,
@@ -31,6 +33,7 @@ const services = [
     subtitle: "M1 / M2 / M3",
     description: "Algebră, analiză și geometrie — metoda structurată pentru nota 10.",
     link: "/servicii",
+    badge: "50% OFF Vara",
   },
 ];
 
@@ -205,7 +208,8 @@ const Home: React.FC = () => {
           </div>
         </section>
 
-        <Testimonials />
+        {/* <Testimonials /> */}
+        <HowItWorks />
         <CTASection />
       </div>
     </PageTransition>
