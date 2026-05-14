@@ -28,6 +28,7 @@ const services = [
     title: "Informatică BAC",
     tech: "C / C++",
     price: "120 RON",
+    discountPrice: "60 RON",
     description:
       "Pregătire completă pentru examenul de Bacalaureat la Informatică. Acoperim toți algoritmii, structurile de date și tipurile de subiecte din programa oficială.",
     startDate: "15 August",
@@ -38,13 +39,14 @@ const services = [
       "Simulări de examen săptămânale",
       "Feedback personalizat pe cod",
     ],
-    badge: null,
+    badge: "50% OFF pe Vară",
   },
   {
     icon: Sigma,
     title: "Matematică BAC",
     tech: "M1 / M2 / M3",
     price: "120 RON",
+    discountPrice: "60 RON",
     description:
       "Pregătire intensivă pentru BAC la Matematică, adaptată profilului tău. Metodă structurată cu accent pe înțelegere, nu memorare.",
     startDate: "15 August",
@@ -55,7 +57,7 @@ const services = [
       "Rezolvări pas-cu-pas de subiecte oficiale",
       "Teste de evaluare periodice",
     ],
-    badge: null,
+    badge: "50% OFF pe Vară",
   },
 ];
 
