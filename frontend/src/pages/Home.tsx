@@ -6,8 +6,15 @@ import FeatureGrid from '../components/FeatureGrid';
 import HowItWorks from '../components/HowItWorks';
 import CTASection from '../components/CTASection';
 import PageTransition from '../components/PageTransition';
+import SEO from '../components/SEO';
+import FAQ from '../components/FAQ';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, Sigma, Terminal } from 'lucide-react';
+import {
+  organizationSchema,
+  faqSchema,
+  localBusinessSchema,
+} from '../seo/structuredData';
 
 
 const services = [
@@ -74,6 +81,12 @@ const SectionHeader: React.FC<{
 const Home: React.FC = () => {
   return (
     <PageTransition>
+      <SEO
+        title="AlgoMate — Meditații Matematică și Informatică BAC | București"
+        description="Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu 100% promovabilitate și media 9.8. Înscrieri deschise vara 2026. Reducere 50%."
+        path="/"
+        jsonLd={[organizationSchema, faqSchema, localBusinessSchema]}
+      />
       <div className="min-h-screen text-[#f0f0f0]">
         <Hero />
 
@@ -210,6 +223,7 @@ const Home: React.FC = () => {
 
         {/* <Testimonials /> */}
         <HowItWorks />
+        <FAQ />
         <CTASection />
       </div>
     </PageTransition>

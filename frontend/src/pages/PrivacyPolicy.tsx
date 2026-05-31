@@ -1,10 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
+import SEO from '../components/SEO';
 
 const PrivacyPolicy: React.FC = () => {
   return (
     <PageTransition>
+      <SEO
+        title="Politica de Confidențialitate | AlgoMate — Meditații BAC"
+        description="Politica de confidențialitate AlgoMate. Cum colectăm, folosim și protejăm datele personale în conformitate cu GDPR."
+        path="/politica-de-confidentialitate"
+      />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
         <div className="max-w-4xl mx-auto px-6">
           {/* Header */}

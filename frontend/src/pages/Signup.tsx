@@ -14,6 +14,7 @@ import {
   ListChecks,
 } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
+import SEO from '../components/SEO';
 import API_BASE_URL from '../api';
 
 const courses = [
@@ -82,6 +83,11 @@ const Signup: React.FC = () => {
 
   return (
     <PageTransition>
+      <SEO
+        title="Înscrie-te la Meditații BAC — Formular de Contact | AlgoMate"
+        description="Completează formularul și începe pregătirea pentru BAC. Locuri limitate, grupe mici. Reducere 50% pe vară 2026. Răspundem în 24h."
+        path="/inscriere"
+      />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
         <div className="max-w-3xl mx-auto px-6">
           {/* Header */}
@@ -103,7 +109,7 @@ const Signup: React.FC = () => {
 
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 md:gap-6 mb-8 md:mb-10">
               <h1 className="font-display font-semibold text-[2.75rem] sm:text-6xl md:text-7xl text-[#f0f0f0] leading-[1.02] tracking-tight">
-                Înscrie-<em className="italic text-[#e8734a] font-normal">te.</em>
+                Înscrie-te la <em className="italic text-[#e8734a] font-normal">meditații.</em>
               </h1>
               <p className="font-mono text-[11px] md:text-xs text-[#888] md:max-w-xs uppercase tracking-wider leading-relaxed">
                 → Completează formularul și te vom contacta în cel mai scurt timp.
