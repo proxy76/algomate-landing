@@ -125,7 +125,7 @@ const Hero: React.FC = () => {
                 transition={{ duration: 0.7, delay: 0.3 }}
                 className="block text-[#f0f0f0]"
               >
-                Investește în <em className="italic text-[#e8734a] font-normal">educația</em> ta.
+                Meditații de <em className="italic text-[#e8734a] font-normal">matematică</em> și <em className="italic text-[#e8734a] font-normal">informatică.</em>
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}

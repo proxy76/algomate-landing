@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
+import SEO from '../components/SEO';
 
 /* ----------------------------------------------------------------------------
  * Data
@@ -901,6 +902,11 @@ const Curriculum: React.FC = () => {
 
   return (
     <PageTransition>
+      <SEO
+        title="Curriculum Meditații — Programa Completă BAC Informatică & Matematică | AlgoMate"
+        description="Descoperă programa detaliată: algoritmi, structuri de date, C++, algebră, analiză matematică, integrale. Cursuri aliniate cu cerințele oficiale BAC."
+        path="/curriculum"
+      />
       <div className="relative min-h-screen overflow-x-hidden pt-24 text-[#f0f0f0]">
         {/* Blueprint grid background layer — adds schematic depth */}
         <div
@@ -941,8 +947,8 @@ const Curriculum: React.FC = () => {
               className="mb-5 text-[clamp(2.75rem,6vw,5rem)] leading-[0.95] tracking-[-0.03em] text-[#f0f0f0]"
               style={{ fontFamily: '"Fraunces", serif', fontWeight: 400 }}
             >
-              Harta drumului tău<br />
-              <span className="italic text-[#e8734a]">pas cu pas.</span>
+              Programa completă<br />
+              <span className="italic text-[#e8734a]">pentru BAC.</span>
             </h1>
 
             <p className="mx-auto max-w-xl text-[15px] leading-relaxed text-[#888]">

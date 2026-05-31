@@ -3,6 +3,12 @@ import { motion } from 'framer-motion';
 import { Terminal, Code, Sigma, Calendar, Clock, Users, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
+import SEO from '../components/SEO';
+import {
+  courseInformaticaBac,
+  courseIntroductionProgramming,
+  courseMatematicaBac,
+} from '../seo/structuredData';
 
 const services = [
   {
@@ -64,6 +70,12 @@ const services = [
 const Services: React.FC = () => {
   return (
     <PageTransition>
+      <SEO
+        title="Servicii Meditații BAC — Informatică C++, Matematică M1/M2/M3 | AlgoMate"
+        description="Meditații de informatică BAC (C/C++), introducere în programare (Python), și matematică BAC. Prețuri de la 60 RON/ședință, grupe mici, start vara 2026."
+        path="/servicii"
+        jsonLd={[courseInformaticaBac, courseIntroductionProgramming, courseMatematicaBac]}
+      />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
         <div className="max-w-6xl mx-auto px-6">
           {/* Header */}
@@ -85,7 +97,7 @@ const Services: React.FC = () => {
 
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 md:gap-6">
               <h1 className="font-display font-semibold text-[3rem] sm:text-6xl md:text-7xl text-[#f0f0f0] leading-[1.02] tracking-tight">
-                Servicii<span className="text-[#e8734a]">.</span>
+                Meditații <em className="italic text-[#e8734a] font-normal">BAC.</em>
               </h1>
               <p className="font-mono text-[11px] md:text-xs text-[#888] md:max-w-xs uppercase tracking-wider leading-relaxed">
                 → Trei programe de pregătire, fiecare adaptat nevoilor tale.

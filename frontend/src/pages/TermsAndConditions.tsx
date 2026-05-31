@@ -1,10 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
+import SEO from '../components/SEO';
 
 const TermsAndConditions: React.FC = () => {
   return (
     <PageTransition>
+      <SEO
+        title="Termeni și Condiții | AlgoMate — Meditații BAC"
+        description="Termenii și condițiile de utilizare a serviciilor de meditații AlgoMate. Informații despre înscriere, plăți, anulare și proprietate intelectuală."
+        path="/termeni-si-conditii"
+      />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
         <div className="max-w-4xl mx-auto px-6">
           {/* Header */}
