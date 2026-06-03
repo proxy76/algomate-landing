@@ -5,26 +5,12 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Base SEO (React 19 overrides per-page) -->
-    <title>AlgoMate — Meditații Matematică & Informatică BAC | București</title>
-    <meta name="description" content="Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu 100% promovabilitate. Înscrieri deschise vara 2026." />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://algomate.ro/" />
-
-    <!-- Open Graph (fallback, overridden per-page by SEO component) -->
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="ro_RO" />
-    <meta property="og:site_name" content="AlgoMate" />
-    <meta property="og:title" content="AlgoMate — Meditații Matematică & Informatică BAC" />
-    <meta property="og:description" content="Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu rezultate dovedite." />
-    <meta property="og:image" content="https://algomate.ro/og-image.png" />
-    <meta property="og:url" content="https://algomate.ro/" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="AlgoMate — Meditații BAC" />
-    <meta name="twitter:description" content="Pregătire premium de matematică și informatică pentru BAC." />
-    <meta name="twitter:image" content="https://algomate.ro/og-image.png" />
+    <!--
+      SEO meta tags (title, description, canonical, OG, Twitter) are
+      handled entirely by the React 19 <SEO /> component, which hoists
+      them into <head> at render time. The prerender script then bakes
+      the final HTML into static files. No fallback tags needed here.
+    -->
 
     <!-- Fonts — preconnect + load -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
