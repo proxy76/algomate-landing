@@ -25,6 +25,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://algomate.ro/multumim</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://algomate.ro/termeni-si-conditii</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>yearly</changefreq>

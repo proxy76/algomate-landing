@@ -14,6 +14,7 @@ const ROUTES = [
   '/servicii',
   '/curriculum',
   '/inscriere',
+  '/multumim',
   '/termeni-si-conditii',
   '/politica-de-confidentialitate'
 ];
