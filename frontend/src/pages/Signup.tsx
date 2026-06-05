@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import {
@@ -7,7 +8,6 @@ import {
   Phone,
   MessageSquare,
   ChevronDown,
-  CheckCircle,
   AlertCircle,
   ArrowRight,
   Clock,
@@ -25,6 +25,7 @@ const courses = [
 ];
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,7 +34,7 @@ const Signup: React.FC = () => {
     message: '',
     isRobotVerified: false,
   });
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (
@@ -61,8 +62,8 @@ const Signup: React.FC = () => {
         website: '',
       });
 
-      setStatus('success');
       setFormData({ name: '', email: '', phone: '', course: '', message: '', isRobotVerified: false });
+      navigate('/multumim');
     } catch (err) {
       setStatus('error');
       if (axios.isAxiosError(err) && err.response?.status === 429) {
@@ -117,7 +118,6 @@ const Signup: React.FC = () => {
             </div>
 
             {/* Meta row */}
-            {status !== 'success' && (
               <div className="pt-6 border-t border-[#222] space-y-3 md:space-y-0 md:flex md:flex-wrap md:items-center md:gap-x-8 md:gap-y-3">
                 <div className="flex items-center gap-5 md:gap-8">
                   <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
@@ -144,7 +144,6 @@ const Signup: React.FC = () => {
                   <span className="text-[#e8734a] tabular-nums">{filledCount}/5</span>
                 </div>
               </div>
-            )}
           </motion.div>
 
           {/* Form panel */}
@@ -160,33 +159,6 @@ const Signup: React.FC = () => {
             <span className="absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 border-[#e8734a]" aria-hidden />
             <span className="absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 border-[#e8734a]" aria-hidden />
 
-            {status === 'success' ? (
-              <div className="text-center py-10">
-                <motion.div
-                  initial={{ scale: 0, rotate: -30 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', stiffness: 180, damping: 14 }}
-                  className="w-20 h-20 border-2 border-emerald-500/60 bg-emerald-500/5 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-8"
-                >
-                  <CheckCircle size={36} strokeWidth={1.75} />
-                </motion.div>
-                <div className="font-mono text-[10px] tracking-[0.3em] text-emerald-400 uppercase mb-4">
-                  ◆ Confirmat
-                </div>
-                <h3 className="font-display font-semibold text-3xl md:text-4xl text-[#f0f0f0] mb-4 leading-tight tracking-tight">
-                  Înscrierea a fost <em className="italic text-[#e8734a] font-normal">trimisă.</em>
-                </h3>
-                <p className="text-[#bbb] mb-10 max-w-md mx-auto leading-relaxed">
-                  Te vom contacta pe email-ul furnizat cu toate detaliile.
-                </p>
-                <button
-                  onClick={() => setStatus('idle')}
-                  className="font-mono text-[11px] tracking-[0.3em] uppercase text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] pb-1 transition-colors"
-                >
-                  ← Trimite altă înscriere
-                </button>
-              </div>
-            ) : (
               <form onSubmit={handleSubmit}>
                 {/* Section marker */}
                 <div className="flex items-center gap-4 mb-10">
@@ -397,7 +369,6 @@ const Signup: React.FC = () => {
                   ◆ Prin trimitere, accepți contactarea pe datele furnizate.
                 </div>
               </form>
-            )}
           </motion.div>
 
           {/* Closing flourish */}

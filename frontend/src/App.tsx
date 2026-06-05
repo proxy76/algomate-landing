@@ -7,6 +7,7 @@ import Curriculum from './pages/Curriculum';
 import Signup from './pages/Signup';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import ThankYou from './pages/ThankYou';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: '/inscriere',
         element: <Signup />,
+      },
+      {
+        path: '/multumim',
+        element: <ThankYou />,
       },
       {
         path: '/termeni-si-conditii',
