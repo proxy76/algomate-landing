@@ -18,7 +18,7 @@ const faqItems = [
   {
     question: 'Cât costă meditațiile la AlgoMate?',
     answer:
-      'Prețul standard este de 120 RON/ședință. În perioada promoțională de vară 2026, beneficiezi de 50% reducere — doar 60 RON/ședință în grupe sau 80 RON/ședință individuală.',
+      'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 120 RON/ședință pentru meditații individuale.',
   },
   {
     question: 'Meditațiile sunt online sau fizic?',
@@ -38,7 +38,7 @@ const faqItems = [
   {
     question: 'Cât durează o sesiune de meditații?',
     answer:
-      'Fiecare sesiune durează 2 ore și se desfășoară în grupe mici pentru atenție personalizată.',
+      'Fiecare sesiune durează 2 ore și se desfășoară în grupe de maximum 3 elevi pentru atenție personalizată.',
   },
   {
     question: 'Pot începe meditațiile în timpul verii?',

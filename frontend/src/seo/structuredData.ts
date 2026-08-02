@@ -27,6 +27,27 @@ export const organizationSchema = {
 
 // ─── Course Schemas (for /servicii page) ─────────────────────────────────────
 
+/**
+ * Standard pricing, identical across all courses:
+ * 100 RON/ședință in groups of max 3 students, 120 RON/ședință one-on-one.
+ */
+const standardOffers = [
+  {
+    '@type': 'Offer',
+    name: 'Ședință în grupă (max 3 elevi)',
+    price: '100',
+    priceCurrency: 'RON',
+    availability: 'https://schema.org/InStock',
+  },
+  {
+    '@type': 'Offer',
+    name: 'Ședință individuală',
+    price: '120',
+    priceCurrency: 'RON',
+    availability: 'https://schema.org/InStock',
+  },
+];
+
 export const courseInformaticaBac = {
   '@context': 'https://schema.org',
   '@type': 'Course',
@@ -38,13 +59,7 @@ export const courseInformaticaBac = {
     name: 'AlgoMate',
     url: SITE_URL,
   },
-  offers: {
-    '@type': 'Offer',
-    price: '60',
-    priceCurrency: 'RON',
-    availability: 'https://schema.org/InStock',
-    validFrom: '2026-06-01',
-  },
+  offers: standardOffers,
   educationalLevel: 'Liceu',
   inLanguage: 'ro',
   hasCourseInstance: {
@@ -65,13 +80,7 @@ export const courseIntroductionProgramming = {
     name: 'AlgoMate',
     url: SITE_URL,
   },
-  offers: {
-    '@type': 'Offer',
-    price: '60',
-    priceCurrency: 'RON',
-    availability: 'https://schema.org/InStock',
-    validFrom: '2026-06-01',
-  },
+  offers: standardOffers,
   educationalLevel: 'Liceu',
   inLanguage: 'ro',
   hasCourseInstance: {
@@ -92,13 +101,7 @@ export const courseMatematicaBac = {
     name: 'AlgoMate',
     url: SITE_URL,
   },
-  offers: {
-    '@type': 'Offer',
-    price: '60',
-    priceCurrency: 'RON',
-    availability: 'https://schema.org/InStock',
-    validFrom: '2026-06-01',
-  },
+  offers: standardOffers,
   educationalLevel: 'Liceu',
   inLanguage: 'ro',
   hasCourseInstance: {
@@ -119,7 +122,7 @@ export const faqSchema = {
       name: 'Cât costă meditațiile la AlgoMate?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Prețul standard este de 120 RON/ședință. În perioada promoțională de vară 2026, beneficiezi de 50% reducere — doar 60 RON/ședință.',
+        text: 'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 120 RON/ședință pentru meditații individuale.',
       },
     },
     {
@@ -151,7 +154,7 @@ export const faqSchema = {
       name: 'Cât durează o sesiune de meditații?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Fiecare sesiune durează 2 ore și se desfășoară în grupe mici pentru atenție personalizată.',
+        text: 'Fiecare sesiune durează 2 ore și se desfășoară în grupe de maximum 3 elevi pentru atenție personalizată.',
       },
     },
     {
@@ -179,7 +182,7 @@ export const localBusinessSchema = {
     addressLocality: 'București',
     addressCountry: 'RO',
   },
-  priceRange: '60-120 RON',
+  priceRange: '100-120 RON',
   areaServed: {
     '@type': 'Country',
     name: 'Romania',

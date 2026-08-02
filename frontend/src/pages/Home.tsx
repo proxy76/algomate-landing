@@ -24,7 +24,6 @@ const services = [
     subtitle: "C / C++",
     description: "Algoritmi, structuri de date și rezolvări de subiecte pentru un punctaj maxim la BAC.",
     link: "/servicii",
-    badge: "50% OFF Vara",
   },
   {
     icon: Code,
@@ -32,7 +31,6 @@ const services = [
     subtitle: "Python / C++",
     description: "Bazele programării pentru clasa a 9-a. Construiește fundația unei cariere în tech.",
     link: "/servicii",
-    badge: "50% OFF Vara",
   },
   {
     icon: Sigma,
@@ -40,7 +38,6 @@ const services = [
     subtitle: "M1 / M2 / M3",
     description: "Algebră, analiză și geometrie — metoda structurată pentru nota 10.",
     link: "/servicii",
-    badge: "50% OFF Vara",
   },
 ];
 
@@ -83,7 +80,7 @@ const Home: React.FC = () => {
     <PageTransition>
       <SEO
         title="AlgoMate — Meditații Matematică și Informatică BAC | București"
-        description="Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu 100% promovabilitate și media 9.8. Înscrieri deschise vara 2026. Reducere 50%."
+        description="Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu 100% promovabilitate și media 9.8. 100 RON/ședință în grupe de max 3 elevi, 120 RON individual."
         path="/"
         jsonLd={[organizationSchema, faqSchema, localBusinessSchema]}
       />
@@ -120,7 +117,7 @@ const Home: React.FC = () => {
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
                   className={`group relative px-5 sm:px-6 md:px-8 pt-8 md:pt-10 pb-10 md:pb-12 border-b border-[#222] md:border-b-0 ${idx !== 0 ? 'md:border-l border-[#222]' : ''
-                    } ${service.badge ? 'bg-[#e8734a]/[0.02]' : ''} hover:bg-[#141414] transition-colors duration-500`}
+                    } hover:bg-[#141414] transition-colors duration-500`}
                 >
                   {/* Counter row */}
                   <div className="flex items-start justify-between mb-10">
@@ -130,17 +127,9 @@ const Home: React.FC = () => {
                     <service.icon
                       size={20}
                       strokeWidth={1.5}
-                      className={`transition-colors duration-300 ${service.badge ? 'text-[#e8734a]' : 'text-[#555] group-hover:text-[#e8734a]'
-                        }`}
+                      className="text-[#555] group-hover:text-[#e8734a] transition-colors duration-300"
                     />
                   </div>
-
-                  {service.badge && (
-                    <div className="inline-flex items-center gap-2 mb-5 bg-[#e8734a] text-[#0a0a0a] px-3 py-1.5 font-mono text-[11px] tracking-[0.2em] uppercase font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#0a0a0a] animate-pulse" />
-                      {service.badge}
-                    </div>
-                  )}
 
                   <h3 className="font-sans font-semibold text-xl md:text-2xl text-[#f0f0f0] mb-2 leading-[1.2] tracking-tight">
                     {service.title}
