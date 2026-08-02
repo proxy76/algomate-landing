@@ -12,47 +12,11 @@ import {
 
 const services = [
   {
-    icon: Code,
-    title: "Introducere în Informatică",
-    tech: "Python / C++",
-    price: "120 RON",
-    discountPrice: "60 RON",
-    description:
-      "Curs introductiv pentru clasa a 9-a. Învață bazele programării cu exerciții practice și proiecte reale care îți construiesc fundația pentru o carieră în tech.",
-    startDate: "15 Iulie",
-    features: [
-      "Fundamentele programării (variabile, condiții, bucle)",
-      "Funcții și modularizare",
-      "Lucru cu fișiere și structuri de date",
-      "Proiecte practice ghidate",
-      "Introducere în gândirea algoritmică",
-    ],
-    badge: "50% OFF pe Vară",
-  },
-  {
-    icon: Terminal,
-    title: "Informatică BAC",
-    tech: "C / C++",
-    price: "120 RON",
-    discountPrice: "60 RON",
-    description:
-      "Pregătire completă pentru examenul de Bacalaureat la Informatică. Acoperim toți algoritmii, structurile de date și tipurile de subiecte din programa oficială.",
-    startDate: "15 August",
-    features: [
-      "Algoritmi fundamentali și avansați",
-      "Structuri de date (arbori, grafuri, liste)",
-      "Rezolvări complete de subiecte BAC",
-      "Simulări de examen săptămânale",
-      "Feedback personalizat pe cod",
-    ],
-    badge: "50% OFF pe Vară",
-  },
-  {
     icon: Sigma,
     title: "Matematică BAC",
     tech: "M1 / M2 / M3",
-    price: "120 RON",
-    discountPrice: "60 RON",
+    priceGroup: "100 RON",
+    priceIndividual: "120 RON",
     description:
       "Pregătire intensivă pentru BAC la Matematică, adaptată profilului tău. Metodă structurată cu accent pe înțelegere, nu memorare.",
     startDate: "15 August",
@@ -63,7 +27,40 @@ const services = [
       "Rezolvări pas-cu-pas de subiecte oficiale",
       "Teste de evaluare periodice",
     ],
-    badge: "50% OFF pe Vară",
+  },
+  {
+    icon: Code,
+    title: "Introducere în Informatică",
+    tech: "Python / C++",
+    priceGroup: "100 RON",
+    priceIndividual: "120 RON",
+    description:
+      "Curs introductiv pentru clasa a 9-a. Învață bazele programării cu exerciții practice și proiecte reale care îți construiesc fundația pentru o carieră în tech.",
+    startDate: "15 Iulie",
+    features: [
+      "Fundamentele programării (variabile, condiții, bucle)",
+      "Funcții și modularizare",
+      "Lucru cu fișiere și structuri de date",
+      "Proiecte practice ghidate",
+      "Introducere în gândirea algoritmică",
+    ],
+  },
+  {
+    icon: Terminal,
+    title: "Informatică BAC",
+    tech: "C / C++",
+    priceGroup: "100 RON",
+    priceIndividual: "120 RON",
+    description:
+      "Pregătire completă pentru examenul de Bacalaureat la Informatică. Acoperim toți algoritmii, structurile de date și tipurile de subiecte din programa oficială.",
+    startDate: "15 August",
+    features: [
+      "Algoritmi fundamentali și avansați",
+      "Structuri de date (arbori, grafuri, liste)",
+      "Rezolvări complete de subiecte BAC",
+      "Simulări de examen săptămânale",
+      "Feedback personalizat pe cod",
+    ],
   },
 ];
 
@@ -72,9 +69,9 @@ const Services: React.FC = () => {
     <PageTransition>
       <SEO
         title="Servicii Meditații BAC — Informatică C++, Matematică M1/M2/M3 | AlgoMate"
-        description="Meditații de informatică BAC (C/C++), introducere în programare (Python), și matematică BAC. Prețuri de la 60 RON/ședință, grupe mici, start vara 2026."
+        description="Meditații de matematică BAC (M1/M2/M3), informatică BAC (C/C++) și introducere în programare (Python). 100 RON/ședință în grupe de max 3 elevi, 120 RON individual."
         path="/servicii"
-        jsonLd={[courseInformaticaBac, courseIntroductionProgramming, courseMatematicaBac]}
+        jsonLd={[courseMatematicaBac, courseIntroductionProgramming, courseInformaticaBac]}
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
         <div className="max-w-6xl mx-auto px-6">
@@ -114,8 +111,7 @@ const Services: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ delay: idx * 0.1, duration: 0.6 }}
-                className={`relative px-5 sm:px-6 md:px-10 py-12 sm:py-14 md:py-20 border-b border-[#222] ${service.badge ? 'bg-[#e8734a]/[0.02]' : ''
-                  }`}
+                className="relative px-5 sm:px-6 md:px-10 py-12 sm:py-14 md:py-20 border-b border-[#222]"
               >
                 {/* Top strip */}
                 <div className="flex items-center justify-between gap-3 mb-8 md:mb-10 flex-wrap">
@@ -123,18 +119,8 @@ const Services: React.FC = () => {
                     <span className="font-mono text-[10px] tracking-[0.25em] md:tracking-[0.3em] text-[#666] uppercase">
                       / 00{idx + 1}
                     </span>
-                    <service.icon
-                      size={22}
-                      strokeWidth={1.5}
-                      className={service.badge ? 'text-[#e8734a]' : 'text-[#888]'}
-                    />
+                    <service.icon size={22} strokeWidth={1.5} className="text-[#e8734a]" />
                   </div>
-                  {service.badge && (
-                    <div className="inline-flex items-center gap-2 bg-[#e8734a] text-[#0a0a0a] px-3 py-1.5 font-mono text-[10px] md:text-[11px] tracking-[0.15em] md:tracking-[0.2em] uppercase font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#0a0a0a] animate-pulse" />
-                      {service.badge}
-                    </div>
-                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
@@ -153,24 +139,27 @@ const Services: React.FC = () => {
 
                     {/* Price */}
                     <div className="mb-10 pb-10 border-b border-dashed border-[#222]">
-                      <div className="font-mono text-[10px] tracking-[0.3em] text-[#666] uppercase mb-3">
+                      <div className="font-mono text-[10px] tracking-[0.3em] text-[#666] uppercase mb-5">
                         Preț / ședință
                       </div>
-                      <div className="flex items-baseline gap-3 md:gap-4 flex-wrap">
-                        {service.discountPrice ? (
-                          <>
-                            <span className="font-display font-semibold text-[2.75rem] sm:text-5xl md:text-6xl text-[#e8734a] leading-none">
-                              {service.discountPrice}
-                            </span>
-                            <span className="font-display text-xl sm:text-2xl md:text-3xl text-[#555] line-through decoration-[#e8734a]/60 decoration-2 leading-none">
-                              {service.price}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="font-display font-semibold text-[2.75rem] sm:text-5xl md:text-6xl text-[#f0f0f0] leading-none">
-                            {service.price}
-                          </span>
-                        )}
+                      <div className="flex flex-wrap items-end gap-x-8 md:gap-x-10 gap-y-6">
+                        <div>
+                          <div className="font-display font-semibold text-[2.75rem] sm:text-5xl md:text-6xl text-[#e8734a] leading-none">
+                            {service.priceGroup}
+                          </div>
+                          <div className="font-mono text-[10px] tracking-[0.2em] text-[#999] uppercase mt-3">
+                            Grupă · max 3 elevi
+                          </div>
+                        </div>
+                        <span className="hidden sm:block w-px h-16 bg-[#222] mb-1" />
+                        <div>
+                          <div className="font-display font-semibold text-[2rem] sm:text-4xl md:text-[2.75rem] text-[#f0f0f0] leading-none">
+                            {service.priceIndividual}
+                          </div>
+                          <div className="font-mono text-[10px] tracking-[0.2em] text-[#999] uppercase mt-3">
+                            Individual
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -186,7 +175,7 @@ const Services: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#ccc] uppercase tracking-[0.2em]">
                         <Users size={13} className="text-[#e8734a]" strokeWidth={1.75} />
-                        Grupe mici
+                        Grupe de max 3
                       </div>
                     </div>
 

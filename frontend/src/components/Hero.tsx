@@ -100,7 +100,7 @@ const Hero: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            {/* Monospace promo tag */}
+            {/* Monospace status tag */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -110,7 +110,7 @@ const Hero: React.FC = () => {
               <span className="hidden sm:inline-block h-px w-8 bg-[#e8734a]/40" />
               <span className="w-1.5 h-1.5 rounded-full bg-[#e8734a] animate-pulse" />
               <span className="font-mono text-[9px] md:text-[10px] tracking-[0.25em] md:tracking-[0.3em] text-[#e8734a] uppercase">
-                [ Reducere 50% · Vara 2026 ]
+                [ Înscrieri deschise · Anul 2026 ]
               </span>
               <span className="hidden sm:inline-block h-px w-8 bg-[#e8734a]/40" />
             </motion.div>
