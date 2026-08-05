@@ -25,6 +25,43 @@ export const organizationSchema = {
   sameAs: [],
 };
 
+// ─── Person Schema (the instructor section on the homepage) ─────────────────
+
+/**
+ * Pairs with the Instructor component. The credentials below MUST stay in sync
+ * with the copy rendered in Instructor.tsx — inconsistent structured data is
+ * penalised by Google.
+ */
+export const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Răzvan Rădulescu',
+  jobTitle: 'Instructor și fondator AlgoMate',
+  description:
+    'Student la Universitatea Politehnica din București și programator, premiant la olimpiade și concursuri naționale de Informatică. 2 ani de meditații de matematică și informatică, cu rezultate la Bacalaureat și Evaluare Națională.',
+  image: `${SITE_URL}/instructor-razvan.jpg`,
+  email: 'algomate.razvan@gmail.com',
+  alumniOf: {
+    '@type': 'CollegeOrUniversity',
+    name: 'Universitatea Politehnica din București',
+  },
+  worksFor: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+  },
+  knowsAbout: [
+    'Matematică',
+    'Informatică',
+    'Algoritmi',
+    'C++',
+    'Python',
+    'Pregătire Bacalaureat',
+    'Evaluare Națională',
+  ],
+  knowsLanguage: 'ro',
+};
+
 // ─── Course Schemas (for /servicii page) ─────────────────────────────────────
 
 /**
@@ -139,6 +176,14 @@ export const faqSchema = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Oferim meditații de Informatică BAC (C/C++), Matematică BAC (M1/M2/M3) și cursuri introductive de programare (Python/C++) pentru clasa a 9-a.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Cine predă meditațiile?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Toate ședințele sunt susținute de Răzvan Rădulescu, fondatorul AlgoMate — student la Universitatea Politehnica din București, programator și premiant la olimpiade și concursuri naționale de Informatică, cu 2 ani de experiență în meditații.',
       },
     },
     {
