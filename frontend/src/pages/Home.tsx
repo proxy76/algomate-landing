@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import FeatureGrid from '../components/FeatureGrid';
 // import Testimonials from '../components/Testimonials';
 import HowItWorks from '../components/HowItWorks';
+import Instructor from '../components/Instructor';
 import CTASection from '../components/CTASection';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
@@ -14,10 +15,18 @@ import {
   organizationSchema,
   faqSchema,
   localBusinessSchema,
+  personSchema,
 } from '../seo/structuredData';
 
 
 const services = [
+  {
+    icon: Sigma,
+    title: "Matematică BAC",
+    subtitle: "M1 / M2 / M3",
+    description: "Algebră, analiză și geometrie — metoda structurată pentru nota 10.",
+    link: "/servicii",
+  },
   {
     icon: Terminal,
     title: "Informatică BAC",
@@ -32,20 +41,13 @@ const services = [
     description: "Bazele programării pentru clasa a 9-a. Construiește fundația unei cariere în tech.",
     link: "/servicii",
   },
-  {
-    icon: Sigma,
-    title: "Matematică BAC",
-    subtitle: "M1 / M2 / M3",
-    description: "Algebră, analiză și geometrie — metoda structurată pentru nota 10.",
-    link: "/servicii",
-  },
 ];
 
 const stats = [
   { value: "100%", label: "Promovabilitate", meta: "Ex. Național" },
   { value: "34", label: "Premianți", meta: "Începând cu 2024" },
   { value: "9.8", label: "Media notelor", meta: "La BAC" },
-  { value: "3+", label: "Ani experiență", meta: "Meditații" },
+  { value: "2", label: "Ani experiență", meta: "Meditații" },
 ];
 
 const SectionHeader: React.FC<{
@@ -82,7 +84,7 @@ const Home: React.FC = () => {
         title="AlgoMate — Meditații Matematică și Informatică BAC | București"
         description="Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu 100% promovabilitate și media 9.8. 100 RON/ședință în grupe de max 3 elevi, 120 RON individual."
         path="/"
-        jsonLd={[organizationSchema, faqSchema, localBusinessSchema]}
+        jsonLd={[organizationSchema, personSchema, faqSchema, localBusinessSchema]}
       />
       <div className="min-h-screen text-[#f0f0f0]">
         <Hero />
@@ -154,27 +156,29 @@ const Home: React.FC = () => {
           </div>
         </section>
 
+        <HowItWorks />
+        <Instructor />
         <FeatureGrid />
 
-        {/* § 03 — Rezultate */}
-        <section className="py-16 md:py-24 relative z-10">
+        {/* § 05 — Rezultate */}
+        <section className="py-16 md:py-24 relative z-10" id="rezultate">
           <div className="max-w-6xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.7 }}
-              className="mb-16"
             >
-              <div className="flex items-baseline gap-3 md:gap-4 mb-8">
-                <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#e8734a] uppercase whitespace-nowrap">
-                  § 03
-                </span>
-                <span className="h-px flex-1 bg-gradient-to-r from-[#333] via-[#222] to-transparent" />
-                <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#666] uppercase hidden md:inline">
-                  Rezultate / Cifre
-                </span>
-              </div>
+              <SectionHeader
+                number="05"
+                kicker="Rezultate / Cifre"
+                title={
+                  <>
+                    Rezultate, în <em className="italic text-[#e8734a] font-normal">cifre.</em>
+                  </>
+                }
+                subtitle="Fiecare număr vine dintr-un elev care a intrat în examen pregătit."
+              />
             </motion.div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 border-y border-[#222]">
@@ -211,7 +215,6 @@ const Home: React.FC = () => {
         </section>
 
         {/* <Testimonials /> */}
-        <HowItWorks />
         <FAQ />
         <CTASection />
       </div>

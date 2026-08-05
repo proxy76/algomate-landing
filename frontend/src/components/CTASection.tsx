@@ -24,7 +24,7 @@ const CTASection: React.FC = () => {
           <div className="inline-flex items-center gap-2 md:gap-3 mb-10 md:mb-12">
             <span className="h-px w-8 md:w-12 bg-[#e8734a]/40" />
             <span className="font-mono text-[10px] tracking-[0.3em] md:tracking-[0.4em] text-[#e8734a] uppercase">
-              § 05 · Începe
+              § 07 · Începe
             </span>
             <span className="h-px w-8 md:w-12 bg-[#e8734a]/40" />
           </div>

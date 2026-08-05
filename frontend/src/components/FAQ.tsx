@@ -31,6 +31,11 @@ const faqItems = [
       'Oferim meditații de Informatică BAC (C/C++), Matematică BAC (M1/M2/M3) și cursuri introductive de programare (Python/C++) pentru clasa a 9-a.',
   },
   {
+    question: 'Cine predă meditațiile?',
+    answer:
+      'Toate ședințele sunt susținute de Răzvan Rădulescu, fondatorul AlgoMate — student la Universitatea Politehnica din București, programator și premiant la olimpiade și concursuri naționale de Informatică, cu 2 ani de experiență în meditații.',
+  },
+  {
     question: 'Care este rata de promovabilitate?',
     answer:
       'Rata noastră de promovabilitate este de 100% la Examenul Național, cu o medie a notelor de 9.8 la BAC.',
@@ -120,7 +125,7 @@ const FAQ: React.FC = () => {
           <div className="mb-14 md:mb-20">
             <div className="flex items-baseline gap-3 md:gap-4 mb-6 md:mb-8">
               <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#e8734a] uppercase whitespace-nowrap">
-                § 05
+                § 06
               </span>
               <span className="h-px flex-1 bg-gradient-to-r from-[#333] via-[#222] to-transparent" />
               <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#666] uppercase hidden md:inline">
