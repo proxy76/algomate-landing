@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import FeatureGrid from '../components/FeatureGrid';
 // import Testimonials from '../components/Testimonials';
 import HowItWorks from '../components/HowItWorks';
+import InlineSignup from '../components/InlineSignup';
 import Instructor from '../components/Instructor';
 import CTASection from '../components/CTASection';
 import PageTransition from '../components/PageTransition';
@@ -157,6 +158,7 @@ const Home: React.FC = () => {
         </section>
 
         <HowItWorks />
+        <InlineSignup />
         <Instructor />
         <FeatureGrid />
 
