@@ -28,7 +28,7 @@ const credentials = [
   },
   {
     icon: Users,
-    title: '2 ani de meditații, cu rezultate inedite la BAC și Evaluare Națională',
+    title: '2 ani de meditații, cu rezultate deosebite la BAC și Evaluare Națională',
     meta: 'Predare',
   },
 ];
@@ -134,7 +134,7 @@ const Instructor: React.FC = () => {
               </p>
               <p>
                 De <span className="text-[#e4e4e4]">2 ani predau meditații</span> de
-                matematică și informatică, cu rezultate inedite la Bacalaureat și Evaluare
+                matematică și informatică, cu rezultate deosebite la Bacalaureat și Evaluare
                 Națională. Nu predau după un manual: explic de ce funcționează un algoritm
                 sau o demonstrație, până când elevul poate reconstrui singur raționamentul.
               </p>
