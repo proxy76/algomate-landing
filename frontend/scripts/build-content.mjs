@@ -21,6 +21,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -44,6 +45,61 @@ const STATIC_PAGES = [
 ];
 
 const REQUIRED = ['title', 'description', 'publishDate', 'category'];
+
+/**
+ * Rendered HTML is injected with dangerouslySetInnerHTML, and marked passes
+ * inline HTML straight through — a <script> in a .md file would otherwise
+ * end up in the page. Posts may be drafted by a model that read an untrusted
+ * source, so the markup is whitelisted here rather than trusted because it
+ * came from the repo. Allow-list covers what markdown legitimately produces.
+ */
+const SANITIZE_OPTIONS = {
+  allowedTags: [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p', 'a', 'ul', 'ol', 'li', 'blockquote', 'hr', 'br',
+    'strong', 'em', 'del', 'sup', 'sub',
+    'code', 'pre', 'img',
+    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+  ],
+  allowedAttributes: {
+    // target/rel must be listed or the transform below has them stripped again.
+    a: ['href', 'title', 'target', 'rel'],
+    img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
+    code: ['class'], // marked emits language-xxx for fenced blocks
+    th: ['colspan', 'rowspan'],
+    td: ['colspan', 'rowspan'],
+  },
+  allowedSchemes: ['http', 'https', 'mailto'],
+  // No inline styles, no event handlers, no data: URIs.
+  allowedSchemesAppliedToAttributes: ['href', 'src'],
+  transformTags: {
+    a: (tagName, attribs) => {
+      const href = attribs.href || '';
+      const external = /^https?:\/\//i.test(href) && !href.includes('algomate.ro');
+      return {
+        tagName,
+        attribs: external
+          ? { ...attribs, target: '_blank', rel: 'noopener noreferrer' }
+          : attribs,
+      };
+    },
+  },
+};
+
+/**
+ * Comparing lengths would flag every post, because sanitize-html also
+ * normalises entities and attribute quoting. Look for the constructs that
+ * actually matter instead, so the warning stays worth reading.
+ */
+const DANGEROUS = /<\s*(script|iframe|object|embed|style|form|link|meta)\b|\son\w+\s*=|javascript:/i;
+
+function renderMarkdown(md) {
+  const raw = marked.parse(md, { async: false });
+  return {
+    clean: sanitizeHtml(raw, SANITIZE_OPTIONS),
+    stripped: DANGEROUS.test(raw),
+  };
+}
 
 /** YYYY-MM-DD in UTC, so scheduling doesn't drift with the build machine. */
 function todayISO() {
@@ -104,6 +160,12 @@ function readPosts() {
     }
 
     const words = content.trim().split(/\s+/).length;
+    const { clean, stripped } = renderMarkdown(content);
+
+    // Worth surfacing: markup was removed, so the source had HTML in it.
+    if (stripped) {
+      console.log(`  ! "${slug}" contained HTML that was stripped — check the source`);
+    }
 
     published.push({
       slug,
@@ -120,7 +182,7 @@ function readPosts() {
       category: data.category,
       tags: Array.isArray(data.tags) ? data.tags : [],
       readingMinutes: Math.max(1, Math.round(words / 200)),
-      html: marked.parse(content, { async: false }),
+      html: clean,
     });
   }
 
