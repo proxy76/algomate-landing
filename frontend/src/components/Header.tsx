@@ -7,6 +7,7 @@ const navLinks = [
   { name: 'Acasă', href: '/' },
   { name: 'Servicii', href: '/servicii' },
   { name: 'Curriculum', href: '/curriculum' },
+  { name: 'Blog', href: '/blog' },
   { name: 'Înscrie-te', href: '/inscriere' },
 ];
 

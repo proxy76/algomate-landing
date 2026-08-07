@@ -9,15 +9,22 @@ const __dirname = path.dirname(__filename);
 
 const PORT = 3456;
 const DIST_DIR = path.resolve(__dirname, 'dist');
-const ROUTES = [
-  '/',
-  '/servicii',
-  '/curriculum',
-  '/inscriere',
-  '/multumim',
-  '/termeni-si-conditii',
-  '/politica-de-confidentialitate'
-];
+
+/**
+ * Routes come from scripts/build-content.mjs, which knows both the static
+ * pages and every published blog post. Keeping the list in one generated
+ * file means a new post is prerendered without editing this file.
+ */
+const ROUTES_FILE = path.resolve(__dirname, '.generated-routes.json');
+
+if (!fs.existsSync(ROUTES_FILE)) {
+  console.error(
+    `Missing ${path.basename(ROUTES_FILE)}. Run "npm run content" before prerendering.`
+  );
+  process.exit(1);
+}
+
+const ROUTES = JSON.parse(fs.readFileSync(ROUTES_FILE, 'utf-8'));
 
 /**
  * Deduplicate <head> tags.

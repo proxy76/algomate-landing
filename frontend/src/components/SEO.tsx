@@ -15,6 +15,8 @@ interface SEOProps {
   path: string;
   /** Optional Open Graph image URL */
   ogImage?: string;
+  /** og:type — "article" for blog posts, "website" everywhere else */
+  type?: 'website' | 'article';
   /** Optional JSON-LD structured data object(s) */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
@@ -27,6 +29,7 @@ const SEO: React.FC<SEOProps> = ({
   description,
   path,
   ogImage = DEFAULT_OG_IMAGE,
+  type = 'website',
   jsonLd,
 }) => {
   const canonicalUrl = `${SITE_URL}${path}`;
@@ -45,7 +48,7 @@ const SEO: React.FC<SEOProps> = ({
       <meta name="robots" content="index, follow" />
 
       {/* Open Graph */}
-      <meta property="og:type" content="website" />
+      <meta property="og:type" content={type} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
