@@ -82,6 +82,8 @@ a visitor sees is prerendered HTML produced at build time.
 - HTML sanitisation of rendered post content
 - Optional per-post cover image (`coverImage`), also used as the share card
 - One published post: `2026-08-07-admitere-liceu-2027.md`
+- **Deployed and crawlable.** nginx serves the prerendered output directly;
+  `frontend/scripts/check-live-seo.mjs` passes against production (see §4.3.1)
 
 ### Not built
 
@@ -193,10 +195,15 @@ cat /etc/caddy/Caddyfile 2>/dev/null
 Report: which server, the docroot for the site, and whether it points at a
 `dist/` directory directly or at a copy.
 
-### 4.3.1 CONFIRMED BUG — redirects leak `http://…:8080` (fix this first)
+### 4.3.1 RESOLVED 2026-08-15 — redirects leaked `http://…:8080`
 
-Measured against production on 2026-08-15. **Every URL in the sitemap except
-the homepage** 301-redirects to a downgraded origin:
+**Fixed and verified in production. Kept because the failure is easy to
+reintroduce**: any change that puts `$uri/` back into `try_files`, or that
+removes `absolute_redirect off`, brings it straight back, and nothing about
+the symptom points at the cause.
+
+Originally measured on 2026-08-15. **Every URL in the sitemap except the
+homepage** 301-redirected to a downgraded origin:
 
 ```
 https://algomate.ro/blog                  301 → http://algomate.ro:8080/blog/
@@ -223,10 +230,14 @@ also means the `https://algomate.ro/` Search Console property will not report
 on the URLs Google actually crawled, because a different scheme and port is a
 different origin.
 
-### 4.3.2 CONFIRMED BUG — unknown URLs return 200, not 404
+### 4.3.2 RESOLVED 2026-08-15 — unknown URLs returned 200, not 404
 
-Also measured on 2026-08-15. There is an SPA fallback in front of the static
-files, so **every unknown URL serves the homepage byte-for-byte with a 200**:
+Fixed by the same change as 4.3.1. Kept for the same reason: re-adding an SPA
+fallback is the obvious-looking thing to do to a React site, and it is wrong
+here.
+
+There was an SPA fallback in front of the static files, so **every unknown URL
+served the homepage byte-for-byte with a 200**:
 
 ```
 /nu-exista-deloc    200   77599 bytes — identical to /
@@ -243,7 +254,10 @@ on a site that has a crawl budget to spare for actual articles.
 The site is fully prerendered. It has no use for an SPA fallback at all — the
 same `try_files … =404` below fixes this and the redirect together.
 
-**Fix — serve the file directly, no redirect at all.** In the `server` block:
+**The fix that was applied — serve the file directly, no redirect at all.**
+The live `server` block now reads as below; `deploy/nginx/algomate.conf.example`
+carries the full version reconciled against production. The one line that
+caused both bugs was `try_files $uri $uri/ /index.html;`.
 
 ```nginx
 server {
@@ -286,8 +300,16 @@ unknown URLs 404, that no redirect leaks a different scheme or port, and that
 posts are indexable without JavaScript. It exits non-zero on failure, so it
 can gate a deploy.
 
-**Baseline before the fix: 16 failures.** After the fix it should be zero.
-Test the enrollment form by hand as well — the script does not cover `/api/`.
+**Verified 2026-08-15: 0 failures**, checked independently from a second
+machine. Before the fix it reported 16. Also confirmed by hand after the
+reload, since `=404` is the kind of change that breaks things silently:
+`/blog/` and other trailing-slash variants still return 200 (so any
+already-indexed URL survives) and both variants declare the same canonical;
+`/assets/*.js` and `.css`, `/favicon.svg`, `/og-image.png`,
+`/instructor-razvan.jpg`, `/robots.txt` and `/sitemap.xml` all still 200.
+
+Run this after any nginx or deploy change. Test the enrollment form by hand as
+well — the script does not cover `/api/`.
 
 ### 4.4 Is the Django backend on this box?
 
