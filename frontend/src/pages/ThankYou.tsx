@@ -12,6 +12,9 @@ const ThankYou: React.FC = () => {
         title="Mulțumim pentru Înscriere — AlgoMate"
         description="Înscrierea ta a fost trimisă cu succes. Te vom contacta în cel mai scurt timp cu toate detaliile necesare."
         path="/multumim"
+        /* Nobody searches for a confirmation screen; keeping it out of the
+           index also keeps a thin page off the site's quality signal. */
+        noindex
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24 flex items-center justify-center">
         <div className="max-w-2xl mx-auto px-6 w-full">
