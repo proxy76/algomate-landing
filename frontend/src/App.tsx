@@ -8,6 +8,8 @@ import Signup from './pages/Signup';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ThankYou from './pages/ThankYou';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,14 @@ const router = createBrowserRouter([
       {
         path: '/inscriere',
         element: <Signup />,
+      },
+      {
+        path: '/blog',
+        element: <Blog />,
+      },
+      {
+        path: '/blog/:slug',
+        element: <BlogPost />,
       },
       {
         path: '/multumim',

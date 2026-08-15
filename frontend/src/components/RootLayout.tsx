@@ -9,12 +9,21 @@ const RootLayout: React.FC = () => {
   const location = useLocation();
   const outlet = useOutlet();
 
+  /**
+   * The particle field is atmosphere, and it earns that on short pages.
+   * Behind a long article it runs through the text and costs legibility,
+   * so article routes get a plain ground instead.
+   */
+  /* Trailing slash is optional: prerendered routes are served as
+     /blog/<slug>/ from their directory, the SPA router uses /blog/<slug>. */
+  const isArticle = /^\/blog\/[^/]+\/?$/.test(location.pathname);
+
   return (
     <div className="min-h-screen text-[#f0f0f0] font-sans overflow-x-hidden">
       {/* ScrollRestoration is the magic bullet for React Router v7 scroll jumping */}
       <ScrollRestoration />
-      
-      <InteractiveBackground />
+
+      {!isArticle && <InteractiveBackground />}
       <Header />
       
       <main className="relative z-10 w-full min-h-screen">

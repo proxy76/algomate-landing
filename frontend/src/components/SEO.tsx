@@ -15,6 +15,15 @@ interface SEOProps {
   path: string;
   /** Optional Open Graph image URL */
   ogImage?: string;
+  /** og:type — "article" for blog posts, "website" everywhere else */
+  type?: 'website' | 'article';
+  /**
+   * Keep the page out of the index. For pages that are only meaningful as the
+   * end of a flow — a confirmation screen has no search intent behind it, and
+   * indexing one leaks a thin page into the site's quality signal. Links are
+   * still followed.
+   */
+  noindex?: boolean;
   /** Optional JSON-LD structured data object(s) */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
@@ -27,6 +36,8 @@ const SEO: React.FC<SEOProps> = ({
   description,
   path,
   ogImage = DEFAULT_OG_IMAGE,
+  type = 'website',
+  noindex = false,
   jsonLd,
 }) => {
   const canonicalUrl = `${SITE_URL}${path}`;
@@ -42,10 +53,10 @@ const SEO: React.FC<SEOProps> = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
-      <meta name="robots" content="index, follow" />
+      <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
 
       {/* Open Graph */}
-      <meta property="og:type" content="website" />
+      <meta property="og:type" content={type} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
