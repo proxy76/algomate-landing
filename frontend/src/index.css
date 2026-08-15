@@ -33,6 +33,163 @@
   }
 }
 
+/* ─── Article prose ──────────────────────────────────────────
+   Styles the HTML that scripts/build-content.mjs renders from
+   markdown. Kept hand-written rather than pulling in the
+   typography plugin, so the scale matches the rest of the site. */
+
+.prose-algomate {
+  color: #b8b8b8;
+  font-size: 1.0625rem;
+  line-height: 1.78;
+}
+
+.prose-algomate > * + * {
+  margin-top: 1.5em;
+}
+
+.prose-algomate h2 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-size: clamp(1.6rem, 3.2vw, 2.1rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #f0f0f0;
+  margin-top: 2.75em;
+  margin-bottom: 0.1em;
+  padding-top: 1.75rem;
+  border-top: 1px solid #1e1e1e;
+}
+
+.prose-algomate h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.2rem;
+  line-height: 1.3;
+  color: #e8e8e8;
+  margin-top: 2.25em;
+  margin-bottom: 0.2em;
+}
+
+.prose-algomate strong {
+  color: #ededed;
+  font-weight: 600;
+}
+
+.prose-algomate em {
+  font-style: italic;
+}
+
+.prose-algomate a {
+  color: #e8734a;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232, 115, 74, 0.3);
+  transition: border-color 0.2s;
+}
+
+.prose-algomate a:hover {
+  border-bottom-color: rgba(232, 115, 74, 0.9);
+}
+
+.prose-algomate ul,
+.prose-algomate ol {
+  padding-left: 0;
+  list-style: none;
+}
+
+.prose-algomate li {
+  position: relative;
+  padding-left: 1.75rem;
+  margin-top: 0.7em;
+}
+
+/* Accent tick instead of a bullet — same marker language as the page rules. */
+.prose-algomate ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.78em;
+  width: 0.6rem;
+  height: 1px;
+  background: #e8734a;
+  opacity: 0.7;
+}
+
+.prose-algomate ol {
+  counter-reset: prose-counter;
+}
+
+.prose-algomate ol > li {
+  counter-increment: prose-counter;
+}
+
+.prose-algomate ol > li::before {
+  content: counter(prose-counter, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.28em;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: #e8734a;
+}
+
+.prose-algomate blockquote {
+  border-left: 1px solid rgba(232, 115, 74, 0.35);
+  padding-left: 1.5rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: #999;
+}
+
+.prose-algomate hr {
+  border: 0;
+  border-top: 1px solid #1e1e1e;
+  margin-top: 3em;
+  margin-bottom: 3em;
+}
+
+.prose-algomate code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: #e8a07a;
+  background: #131313;
+  border: 1px solid #222;
+  padding: 0.1em 0.4em;
+}
+
+.prose-algomate pre {
+  background: #0d0d0d;
+  border: 1px solid #222;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.prose-algomate pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: #d8d8d8;
+}
+
+/* Images inside the body. The masthead cover is styled on the component;
+   this is for ![]() in the markdown, which would otherwise overflow. */
+.prose-algomate img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #222;
+}
+
+/* The closing source note each article ends with. */
+.prose-algomate hr + p {
+  font-size: 0.85rem;
+  color: #6a6a6a;
+  line-height: 1.7;
+}
+
 :root {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   line-height: 1.5;
