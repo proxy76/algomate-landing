@@ -63,7 +63,9 @@ const Blog: React.FC = () => {
           {/* Contents */}
           {posts.length === 0 ? (
             <div className="border-y border-[#222] py-20 text-center">
-              <p className="font-display italic text-lg text-[#777]">
+              {/* Same reason as the article standfirst: font-display pins
+                  opsz to 144 and thins out badly at this size. */}
+              <p className="text-lg text-[#999]">
                 Primul articol e pe drum.
               </p>
               <Link
