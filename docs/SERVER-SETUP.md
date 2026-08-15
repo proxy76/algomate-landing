@@ -193,6 +193,73 @@ cat /etc/caddy/Caddyfile 2>/dev/null
 Report: which server, the docroot for the site, and whether it points at a
 `dist/` directory directly or at a copy.
 
+### 4.3.1 CONFIRMED BUG — redirects leak `http://…:8080` (fix this first)
+
+Measured against production on 2026-08-15. **Every URL in the sitemap except
+the homepage** 301-redirects to a downgraded origin:
+
+```
+https://algomate.ro/blog                  301 → http://algomate.ro:8080/blog/
+https://algomate.ro/blog/admitere-liceu-2027
+                                          301 → http://algomate.ro:8080/blog/admitere-liceu-2027/
+https://algomate.ro/servicii              301 → http://algomate.ro:8080/servicii/
+…and so on for /curriculum, /inscriere, /termeni-si-conditii,
+   /politica-de-confidentialitate
+```
+
+Note the two changes: **`https` → `http`**, and **port 8080 exposed**. The
+site sits behind Cloudflare, which terminates TLS and forwards to nginx on
+8080. nginx then builds its directory-index redirect from its *own* listening
+scheme and port instead of the public origin, because `absolute_redirect` is
+on by default.
+
+**Why this matters more than it looks.** The page served at the 8080 URL
+declares `<link rel="canonical" href="https://algomate.ro/blog/…">` — which
+301s straight back to the 8080 URL. So Google sees a canonical that points at
+a redirect, and a redirect that points at a non-canonical origin. That is a
+textbook reason for pages to sit in Search Console as *"Page with redirect"*
+or *"Duplicate, Google chose a different canonical"* and never get indexed. It
+also means the `https://algomate.ro/` Search Console property will not report
+on the URLs Google actually crawled, because a different scheme and port is a
+different origin.
+
+**Fix — serve the file directly, no redirect at all.** In the `server` block:
+
+```nginx
+server {
+    listen 8080;
+    server_name algomate.ro www.algomate.ro;
+    root /srv/algomate/dist;          # adjust to the real docroot
+
+    # Do not emit scheme/host/port in redirects; nginx is not the public origin.
+    absolute_redirect off;
+    port_in_redirect off;
+
+    # /blog serves /blog/index.html as a 200 — no trailing-slash redirect, so
+    # the served URL matches the canonical the page prints.
+    location / {
+        try_files $uri $uri.html $uri/index.html =404;
+    }
+}
+```
+
+`try_files … =404` is also what stops unknown URLs becoming soft 404s. Do
+**not** use an SPA fallback (`try_files $uri /index.html`) — the site is fully
+prerendered and does not need one, and it would make every mistyped URL return
+200 with a blank page, which Google treats as a soft 404.
+
+Verify after reloading nginx — the first line must be `200`, not `301`:
+
+```bash
+for u in / /blog /blog/admitere-liceu-2027 /servicii; do
+  printf '%-32s ' "$u"
+  curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' \
+    -A 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' \
+    "https://algomate.ro$u"
+done
+curl -s -o /dev/null -w '%{http_code}\n' https://algomate.ro/nu-exista   # must be 404
+```
+
 ### 4.4 Is the Django backend on this box?
 
 The contact form posts to `${VITE_API_URL}/api/contact/`. If the backend isn't

@@ -53,7 +53,18 @@ const SEO: React.FC<SEOProps> = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
-      <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
+      {/* max-image-preview:large is what makes a page eligible for a large
+          thumbnail in Search and for Discover at all; the default is a small
+          preview, which Discover does not surface. max-snippet:-1 lifts the
+          text-preview cap. Pointless on a noindex page. */}
+      <meta
+        name="robots"
+        content={
+          noindex
+            ? 'noindex, follow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+        }
+      />
 
       {/* Open Graph */}
       <meta property="og:type" content={type} />
