@@ -223,6 +223,26 @@ also means the `https://algomate.ro/` Search Console property will not report
 on the URLs Google actually crawled, because a different scheme and port is a
 different origin.
 
+### 4.3.2 CONFIRMED BUG — unknown URLs return 200, not 404
+
+Also measured on 2026-08-15. There is an SPA fallback in front of the static
+files, so **every unknown URL serves the homepage byte-for-byte with a 200**:
+
+```
+/nu-exista-deloc    200   77599 bytes — identical to /
+/blog/slug-inventat 200   77599 bytes — identical to /
+/wp-login.php       200   77599 bytes — identical to /
+```
+
+Google calls this a soft 404. Every mistyped link, every stale backlink, every
+bot probing for `/wp-login.php` becomes a 200 that has to be crawled and then
+discarded. The homepage canonical on those responses stops them being indexed
+as duplicates, which is the one saving grace, but it still burns crawl budget
+on a site that has a crawl budget to spare for actual articles.
+
+The site is fully prerendered. It has no use for an SPA fallback at all — the
+same `try_files … =404` below fixes this and the redirect together.
+
 **Fix — serve the file directly, no redirect at all.** In the `server` block:
 
 ```nginx
@@ -248,17 +268,26 @@ server {
 prerendered and does not need one, and it would make every mistyped URL return
 200 with a blank page, which Google treats as a soft 404.
 
-Verify after reloading nginx — the first line must be `200`, not `301`:
+A fuller reference block, with notes on what must be preserved from the
+existing config, is in **`deploy/nginx/algomate.conf.example`**. Read the
+warning at the top of it: it was written from outside the box and does not
+include the `/api/` proxy the enrollment form needs. Do not paste it over the
+live config — apply the four directives to what is already there.
+
+**Verify after reloading nginx:**
 
 ```bash
-for u in / /blog /blog/admitere-liceu-2027 /servicii; do
-  printf '%-32s ' "$u"
-  curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' \
-    -A 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' \
-    "https://algomate.ro$u"
-done
-curl -s -o /dev/null -w '%{http_code}\n' https://algomate.ro/nu-exista   # must be 404
+node frontend/scripts/check-live-seo.mjs https://algomate.ro
 ```
+
+That script probes the live site as Googlebot and checks the things a build
+cannot: that every sitemap URL is a direct 200 whose canonical matches, that
+unknown URLs 404, that no redirect leaks a different scheme or port, and that
+posts are indexable without JavaScript. It exits non-zero on failure, so it
+can gate a deploy.
+
+**Baseline before the fix: 16 failures.** After the fix it should be zero.
+Test the enrollment form by hand as well — the script does not cover `/api/`.
 
 ### 4.4 Is the Django backend on this box?
 
