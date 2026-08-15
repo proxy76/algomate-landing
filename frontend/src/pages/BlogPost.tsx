@@ -100,7 +100,12 @@ const BlogPost: React.FC = () => {
                 {post.title}
               </h1>
 
-              <p className="font-display italic text-lg md:text-xl text-[#999] leading-relaxed">
+              {/* Standfirst. Deliberately not font-display: that utility pins
+                  opsz to 144, Fraunces' display cut, whose hairlines thin out
+                  to nothing at reading size — and italic made it worse. The
+                  body face at the prose colour also carries the eye into the
+                  article instead of breaking the tone at the first paragraph. */}
+              <p className="text-lg md:text-xl text-[#b8b8b8] leading-relaxed">
                 {post.description}
               </p>
 
