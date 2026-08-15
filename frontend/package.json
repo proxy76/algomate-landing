@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "content": "node scripts/build-content.mjs",
+    "check:live": "node scripts/check-live-seo.mjs",
     "dev": "npm run content && vite",
     "build": "npm run content && tsc -b && vite build && node prerender.js",
     "lint": "eslint .",
