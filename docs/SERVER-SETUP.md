@@ -62,7 +62,8 @@ landing/
 │   ├── prerender.js       Playwright-based static prerenderer
 │   ├── src/
 │   └── package.json
-└── docs/SERVER-SETUP.md   this file
+├── docs/SERVER-SETUP.md        this file
+└── docs/PUBLISHING-POSTS.md    how to take one post live
 ```
 
 The site is a **static build**. There is no server-side rendering. Everything
@@ -79,6 +80,7 @@ a visitor sees is prerendered HTML produced at build time.
 - **Blog system**: markdown in `frontend/content/posts/*.md`, compiled at build
   time to typed data + sitemap + prerender route list
 - HTML sanitisation of rendered post content
+- Optional per-post cover image (`coverImage`), also used as the share card
 - One published post: `2026-08-07-admitere-liceu-2027.md`
 
 ### Not built
@@ -435,11 +437,21 @@ tags: [".."]             # optional → JSON-LD keywords
 updatedDate: 2026-09-02  # optional → "Actualizat" + sitemap lastmod
 slug: "custom-slug"      # optional, defaults to filename minus date prefix
 draft: true              # optional — never publishes
+coverImage: /blog/x.jpg  # optional header image; must exist under public/
+coverAlt: "..."          # optional; omit when the image is decorative
 ---
 ```
 
 Filename `YYYY-MM-DD-slug.md` → URL `/blog/slug`. The date prefix is stripped
 from the URL; it exists so the directory sorts chronologically.
+
+`coverImage` is rendered above the article body in a fixed 16:9 box, and is
+also used as the post's `og:image` and JSON-LD `image`. The path must be
+root-relative and the file must exist under `public/` — both are checked at
+build time, because a typo would break the share card as well as the page.
+
+**The full publishing procedure is `PUBLISHING-POSTS.md`.** Follow it when the
+task is "publish this post" rather than "understand the pipeline".
 
 **Malformed frontmatter fails the build.** That is deliberate — a bad post
 stops the deploy instead of publishing broken. It also means a bad generated
