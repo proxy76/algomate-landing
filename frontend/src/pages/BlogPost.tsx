@@ -24,6 +24,7 @@ const BlogPost: React.FC = () => {
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.description,
+    ...(post.coverImage ? { image: `${SITE_URL}${post.coverImage}` } : {}),
     datePublished: post.publishDate,
     dateModified: post.updatedDate || post.publishDate,
     inLanguage: 'ro',
@@ -48,6 +49,8 @@ const BlogPost: React.FC = () => {
         description={post.description}
         path={`/blog/${post.slug}`}
         type="article"
+        /* Falls back to the site-wide card when the post has no cover. */
+        ogImage={post.coverImage ? `${SITE_URL}${post.coverImage}` : undefined}
         jsonLd={articleSchema}
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
@@ -108,12 +111,36 @@ const BlogPost: React.FC = () => {
               )}
             </motion.header>
 
+            {/* Cover — optional, set via `coverImage` in the post frontmatter. */}
+            {post.coverImage && (
+              <motion.figure
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.1 }}
+                className="max-w-3xl mb-12 md:mb-16"
+              >
+                <img
+                  src={post.coverImage}
+                  alt={post.coverAlt}
+                  /* Fixed box: the intrinsic size isn't known at build time, and
+                     a header image that reflows the article is worse than a crop. */
+                  className="w-full aspect-[16/9] object-cover border border-[#222]"
+                  /* Above the fold on every article — this is the LCP element. */
+                  loading="eager"
+                  fetchPriority="high"
+                />
+              </motion.figure>
+            )}
+
             {/* Body */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.15 }}
-              className="prose-algomate max-w-3xl border-t border-[#222] pt-12 md:pt-14"
+              /* The cover already separates masthead from body; a rule under it reads as clutter. */
+              className={`prose-algomate max-w-3xl ${
+                post.coverImage ? '' : 'border-t border-[#222] pt-12 md:pt-14'
+              }`}
               /* Rendered at build time from repo-controlled markdown. */
               dangerouslySetInnerHTML={{ __html: post.html }}
             />

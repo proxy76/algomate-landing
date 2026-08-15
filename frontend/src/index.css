@@ -175,6 +175,14 @@
   color: #d8d8d8;
 }
 
+/* Images inside the body. The masthead cover is styled on the component;
+   this is for ![]() in the markdown, which would otherwise overflow. */
+.prose-algomate img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #222;
+}
+
 /* The closing source note each article ends with. */
 .prose-algomate hr + p {
   font-size: 0.85rem;
