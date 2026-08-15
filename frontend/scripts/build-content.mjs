@@ -26,20 +26,26 @@ import sanitizeHtml from 'sanitize-html';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const POSTS_DIR = path.join(ROOT, 'content', 'posts');
+const PUBLIC_DIR = path.join(ROOT, 'public');
 const OUT_TS = path.join(ROOT, 'src', 'content', 'posts.generated.ts');
-const OUT_SITEMAP = path.join(ROOT, 'public', 'sitemap.xml');
+const OUT_SITEMAP = path.join(PUBLIC_DIR, 'sitemap.xml');
 const OUT_ROUTES = path.join(ROOT, '.generated-routes.json');
 
 const SITE_URL = 'https://algomate.ro';
 
-/** Pages that exist regardless of content, with their sitemap weighting. */
+/**
+ * Pages that exist regardless of content, with their sitemap weighting.
+ * `noindex: true` still gets prerendered and served — it is only kept out of
+ * the sitemap, to match the robots meta the page itself emits. Submitting a
+ * URL you tell crawlers not to index is a contradictory signal.
+ */
 const STATIC_PAGES = [
   { path: '/', changefreq: 'weekly', priority: '1.0' },
   { path: '/servicii', changefreq: 'monthly', priority: '0.9' },
   { path: '/curriculum', changefreq: 'monthly', priority: '0.8' },
   { path: '/inscriere', changefreq: 'monthly', priority: '0.8' },
   { path: '/blog', changefreq: 'weekly', priority: '0.9' },
-  { path: '/multumim', changefreq: 'yearly', priority: '0.3' },
+  { path: '/multumim', changefreq: 'yearly', priority: '0.3', noindex: true },
   { path: '/termeni-si-conditii', changefreq: 'yearly', priority: '0.3' },
   { path: '/politica-de-confidentialitate', changefreq: 'yearly', priority: '0.3' },
 ];
@@ -101,6 +107,37 @@ function renderMarkdown(md) {
   };
 }
 
+/**
+ * Optional header image. Referenced root-relative from public/, e.g.
+ * /blog/admitere.jpg, and checked against the filesystem here: the cover is
+ * also the og:image, so a typo would degrade every share of the post as well
+ * as leaving a broken masthead. Failing the build is cheaper than finding out
+ * from a preview card.
+ *
+ * coverAlt is optional on purpose — a header image that only restates the
+ * headline is decorative, and an empty alt is the correct markup for that.
+ */
+function resolveCover(file, data) {
+  const src = data.coverImage;
+  if (src === undefined || src === null || src === '') {
+    return { coverImage: null, coverAlt: '' };
+  }
+
+  if (typeof src !== 'string' || !src.startsWith('/')) {
+    fail(file, `coverImage must be a path rooted in public/, e.g. "/blog/name.jpg" — got "${src}"`);
+  }
+
+  const onDisk = path.join(PUBLIC_DIR, src.replace(/^\/+/, ''));
+  if (!fs.existsSync(onDisk)) {
+    fail(file, `coverImage "${src}" not found — expected a file at ${path.relative(ROOT, onDisk)}`);
+  }
+
+  return {
+    coverImage: src,
+    coverAlt: typeof data.coverAlt === 'string' ? data.coverAlt : '',
+  };
+}
+
 /** YYYY-MM-DD in UTC, so scheduling doesn't drift with the build machine. */
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -151,6 +188,10 @@ function readPosts() {
       fail(file, `slug must be lowercase letters, digits and hyphens, got "${slug}"`);
     }
 
+    // Validated before the publish gate, so a broken path surfaces while the
+    // post is still a draft rather than on the morning it goes live.
+    const { coverImage, coverAlt } = resolveCover(file, data);
+
     const reason =
       data.draft === true ? 'draft' : publishDate > today ? `scheduled ${publishDate}` : null;
 
@@ -181,6 +222,8 @@ function readPosts() {
         : null,
       category: data.category,
       tags: Array.isArray(data.tags) ? data.tags : [],
+      coverImage,
+      coverAlt,
       readingMinutes: Math.max(1, Math.round(words / 200)),
       html: clean,
     });
@@ -210,6 +253,10 @@ export interface Post {
   updatedDate: string | null;
   category: string;
   tags: string[];
+  /** Header image, root-relative to public/. Null when the post has none. */
+  coverImage: string | null;
+  /** Empty when the image is decorative — see resolveCover in build-content.mjs. */
+  coverAlt: string;
   readingMinutes: number;
   /** Rendered at build time; no markdown parser ships to the browser. */
   html: string;
@@ -229,7 +276,7 @@ function writeSitemap(posts) {
   const today = todayISO();
 
   const entries = [
-    ...STATIC_PAGES.map((p) => ({
+    ...STATIC_PAGES.filter((p) => !p.noindex).map((p) => ({
       loc: `${SITE_URL}${p.path}`,
       lastmod: today,
       changefreq: p.changefreq,
