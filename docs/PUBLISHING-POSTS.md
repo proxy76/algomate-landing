@@ -190,12 +190,17 @@ not enough, because it is not read at runtime.
 
 So publishing is always: commit → push → **build on the server**.
 
-Use `deploy/rebuild.sh` for that build if it is installed (SERVER-SETUP §5.2).
-It matters more than it looks: a plain `npm run build` on the server empties
-`dist/` while nginx is serving it, and a crawler landing in that window gets
-an error. That is not hypothetical — it is what put a *"Server error (5xx)"*
-notice in Search Console on 2026-08-17. `rebuild.sh` builds to a staging
-directory and swaps a symlink, so the live site never appears half-built.
+**Build with `deploy/rebuild.sh`. If it is not installed yet, install it before
+you deploy** — steps in SERVER-SETUP §5.2, and check whether
+`/srv/algomate/current` exists to tell.
+
+This matters more than it looks. A plain `npm run build` on the server empties
+`dist/` while nginx is serving that same directory, so anything fetching the
+site mid-build gets an error. That is not hypothetical: it is what put a
+*"Server error (5xx)"* notice in Search Console on 2026-08-17, from a single
+deploy. `rebuild.sh` builds to a staging directory, refuses to publish output
+that failed to prerender, and swaps a symlink in one rename — the live site is
+never half-built, and rollback is another swap.
 
 Afterwards, confirm the post is actually reachable:
 
