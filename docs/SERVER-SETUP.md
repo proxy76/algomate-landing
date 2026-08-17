@@ -444,9 +444,48 @@ echo "rebuild ok: $(date -Is)"
 > with Răzvan that nobody edits files directly on the server first. If they
 > do, use `git pull --ff-only` instead and let it fail loudly on divergence.
 
-Building **in place** means the site is briefly mid-build while Vite writes
-`dist/`. If that matters, build to a temp dir and swap a symlink. For a site
-with this traffic, in-place at 03:00 is fine — but flag the tradeoff.
+> **Superseded — use `deploy/rebuild.sh` from the repo instead.** The script
+> above builds in place, and the note that follows was wrong.
+
+The original note here said building in place was fine at this traffic level,
+and that the tradeoff was only worth flagging. That reasoning was about human
+visitors. It ignored the one client whose experience decides whether the site
+gets indexed at all: **Googlebot crawls at any hour, and does not retry
+politely.**
+
+What actually happened, 2026-08-15: an in-place rebuild emptied `dist/` while
+Vite repopulated it. `index.html` was briefly absent, and the nginx config at
+the time ended `try_files` with `/index.html`, so nginx internally redirected
+to a file that did not exist, looped, and returned **500**. Googlebot hit that
+window, and on 2026-08-17 Search Console reported *"Server error (5xx)"* as a
+reason pages were not being indexed.
+
+The `=404` fix in §4.3.1 means that window now serves 404s rather than 500s.
+That is less alarming and no less damaging — a 404 on the homepage, seen by a
+crawler, gets pages dropped.
+
+`deploy/rebuild.sh` fixes the cause rather than the symptom: it builds into
+`/srv/algomate/releases/<stamp>/`, sanity-checks the output, and publishes by
+replacing a symlink in a single rename. No request can observe a half-built
+site, a failed build never goes live, and rollback is another symlink swap.
+
+It requires one nginx change:
+
+```nginx
+root /srv/algomate/current;      # was /srv/algomate/frontend/dist
+```
+
+First install:
+
+```bash
+sudo -u <service-user> mkdir -p /srv/algomate/releases
+sudo install -o <service-user> -g <service-user> -m 750 \
+     /srv/algomate/repo/deploy/rebuild.sh /srv/algomate/bin/rebuild.sh
+sudo -u <service-user> /srv/algomate/bin/rebuild.sh        # creates /srv/algomate/current
+# only now point nginx at the symlink, then:
+sudo nginx -t && sudo systemctl reload nginx
+node /srv/algomate/repo/frontend/scripts/check-live-seo.mjs https://algomate.ro
+```
 
 ### 5.3 The systemd units
 
