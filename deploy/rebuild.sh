@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 #
-# Daily rebuild + atomic publish for algomate.ro.
+# Deploy script for algomate.ro — pull, build, publish atomically.
 # Install at /srv/algomate/bin/rebuild.sh, owned by the service user, chmod 750.
 #
-# This is what makes scheduled posts publish: the publishDate gate is evaluated
-# at build time, so a post dated today only appears once a build runs today.
+# Run by hand for every deploy. There is no timer: post scheduling was dropped
+# (SERVER-SETUP §3.1), so nothing needs to run on a schedule. The value here is
+# atomic publishing, which matters on a manual deploy just as much.
 #
 # WHY THE SYMLINK DANCE
 #

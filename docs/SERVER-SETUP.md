@@ -88,7 +88,10 @@ a visitor sees is prerendered HTML produced at build time.
 ### Not built
 
 - **No AI/LLM integration of any kind.** No SDK, no API calls, nothing.
-- No recurring rebuild — so **scheduled posts do not publish** (see §3.1)
+- No recurring rebuild, **by decision** — post scheduling was dropped (§3.1).
+  Deploys are manual; never date a post in the future
+- Deploys still rebuild in place, which is what caused the 5xx (§5.2).
+  `deploy/rebuild.sh` fixes that and is not yet installed
 - No mock-exam generation
 - No RSS, no pagination, no tag pages
 
@@ -102,20 +105,30 @@ a visitor sees is prerendered HTML produced at build time.
 
 ## 3. Architecture decision, and why
 
-### 3.1 Why a recurring rebuild is mandatory
+### 3.1 Scheduled posts — dropped by decision (2026-08-17)
+
+**Răzvan decided not to schedule posts. Do not set up a recurring rebuild.**
+Earlier revisions of this document called one mandatory; that was written when
+scheduling was still the plan.
+
+The mechanics, because they still constrain how posts work:
 
 A post publishes when **both** hold, evaluated **at build time**:
 
 - frontmatter `draft` is not `true`
 - frontmatter `publishDate` is today or earlier (UTC)
 
-Because that check runs during the build and the output is static, a post
-dated the 14th **does not appear on the 14th** — it appears the next time a
-build runs on or after the 14th.
+The output is static and nothing on the server watches the calendar, so a post
+dated the 14th does not appear on the 14th. It appears the next time a build
+runs on or after the 14th — and with no recurring rebuild, that is whenever
+someone next deploys.
 
-So scheduling only works if something rebuilds on a schedule. That is the
-single most valuable thing to set up, and it is independent of anything to do
-with AI or exams.
+**The consequence to remember: never give a post a future `publishDate`.** It
+will not publish late, it will simply not publish. The build prints
+`· holding "<slug>" (scheduled YYYY-MM-DD)` and carries on, which is easy to
+miss. Date posts today or earlier.
+
+This does **not** make `deploy/rebuild.sh` unnecessary — see §5.
 
 ### 3.2 Why generation runs on this server, not in GitHub Actions
 
@@ -377,10 +390,16 @@ rejected for lack of a key. A timeout or DNS failure is the actual problem.
 
 ---
 
-## 5. PART B — set up the daily rebuild
+## 5. PART B — the deploy script
 
-**Do this once §4.1–4.3 are answered and Răzvan approves.** It is useful on
-its own, independent of exams or AI.
+**Scope changed 2026-08-17.** This section used to be "set up the daily
+rebuild". Scheduling is dropped (§3.1), so **there is no timer to install** —
+skip §5.3 and §5.4 unless that decision is reversed.
+
+What remains is worth doing on its own: **§5.2, the deploy script.** Its value
+was never the schedule. It is that publishing is atomic, so a deploy cannot
+serve a half-built site — which is what caused the Search Console 5xx, on a
+manual deploy, with no timer involved.
 
 ### 5.1 Build the site by hand first
 
@@ -487,7 +506,13 @@ sudo nginx -t && sudo systemctl reload nginx
 node /srv/algomate/repo/frontend/scripts/check-live-seo.mjs https://algomate.ro
 ```
 
-### 5.3 The systemd units
+### 5.3 The systemd units — NOT NEEDED
+
+Scheduling was dropped (§3.1). **Do not install these.** Kept only so the
+design is recoverable if that decision is ever reversed; if it is, note that
+`rebuild.sh` is safe to run on a timer precisely because publishing is atomic.
+
+
 
 `/etc/systemd/system/algomate-rebuild.service`:
 
@@ -539,7 +564,11 @@ systemctl start algomate-rebuild.service   # test it once, now
 journalctl -u algomate-rebuild.service -n 50 --no-pager
 ```
 
-### 5.4 Verify scheduling actually works
+### 5.4 Verify scheduling actually works — NOT NEEDED
+
+Scheduling was dropped (§3.1). Retained for the same reason as §5.3. The one
+line still worth knowing: a future-dated post logs `· holding` and never
+publishes, so date posts today or earlier.
 
 Prove it end to end rather than assuming:
 
