@@ -71,9 +71,14 @@ Validate before building:
 
 **A post goes live only when `draft` is not `true` AND `publishDate` is today
 or earlier (UTC).** Held posts print `· holding "<slug>" (draft)` or
-`(scheduled YYYY-MM-DD)` in the build log and produce no page. If Răzvan wants
-it live *now*, `publishDate` must be today or in the past — a future date on a
-server with no recurring rebuild means it never publishes at all.
+`(scheduled YYYY-MM-DD)` in the build log and produce no page.
+
+**Never set a future `publishDate`.** Post scheduling was dropped as an idea
+(SERVER-SETUP §3.1) and there is no recurring rebuild, so a future-dated post
+does not publish late — it does not publish at all. Nothing on the server
+watches the calendar; the date is only ever read during a build. If a post is
+meant to go live, date it today or earlier. If you are handed one dated in the
+future, say so rather than silently publishing it early.
 
 ---
 
@@ -178,14 +183,25 @@ file was added.
 
 ## 6. Deploy
 
-Whatever the deploy path is (see `SERVER-SETUP.md` §4.2 — it may still be
-unrecorded), **the build must run on the server after the commit lands**.
-Copying the markdown across is not enough; it is not read at runtime.
+**Deploys are manual. There is no timer** — post scheduling was dropped
+(SERVER-SETUP §3.1). Pushing to `main` publishes nothing on its own; a build
+must run on the server after the commit lands. Copying the markdown across is
+not enough, because it is not read at runtime.
 
-If a daily rebuild timer has been set up by then, a post dated today publishes
-on the next run and you only need to push. If it has not — which is the state
-as of this writing — you must trigger a build yourself, and any post dated in
-the future will simply never appear.
+So publishing is always: commit → push → **build on the server**.
+
+Use `deploy/rebuild.sh` for that build if it is installed (SERVER-SETUP §5.2).
+It matters more than it looks: a plain `npm run build` on the server empties
+`dist/` while nginx is serving it, and a crawler landing in that window gets
+an error. That is not hypothetical — it is what put a *"Server error (5xx)"*
+notice in Search Console on 2026-08-17. `rebuild.sh` builds to a staging
+directory and swaps a symlink, so the live site never appears half-built.
+
+Afterwards, confirm the post is actually reachable:
+
+```bash
+node frontend/scripts/check-live-seo.mjs https://algomate.ro
+```
 
 ---
 

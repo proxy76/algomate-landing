@@ -19,9 +19,13 @@ frontmatter contract, cover images, the sanitiser warning, and what "publish"
 actually requires.
 
 The one thing to internalise: posts are compiled at **build time**. A markdown
-file sitting in the folder is not live, and a post dated in the future never
-publishes unless a build runs on or after that date. `npm run content`
-regenerates post data; `npm run build` does that plus the full static build.
+file sitting in the folder is not live, and pushing to `main` does not publish
+it — a build must run on the server. `npm run content` regenerates post data;
+`npm run build` does that plus the full static build.
+
+**Never date a post in the future.** Scheduling was dropped and there is no
+recurring rebuild, so a future `publishDate` means the post never appears at
+all rather than appearing later.
 
 Generated and gitignored — never commit these:
 `frontend/src/content/posts.generated.ts`, `frontend/.generated-routes.json`,
@@ -29,10 +33,13 @@ Generated and gitignored — never commit these:
 
 ## Server and deployment
 
-`docs/SERVER-SETUP.md` — current state, the mandatory daily rebuild (designed,
-**not yet deployed**), and the design for the weekly mock-exam job (not built,
-blocked on unknowns). It also records known issues that should be left alone
-unless asked, including pre-existing npm advisories.
+`docs/SERVER-SETUP.md` — current state, the nginx config and the two indexing
+bugs it fixed, and `deploy/rebuild.sh`, which publishes atomically instead of
+rebuilding in place (**written, not yet installed**). Post scheduling and the
+daily timer were **dropped by decision** — do not set them up. The weekly
+mock-exam job is designed but not built and blocked on unknowns. The doc also
+records known issues to leave alone unless asked, including pre-existing npm
+advisories.
 
 ## Conventions
 
