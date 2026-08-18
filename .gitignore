@@ -3,6 +3,10 @@
 Thumbs.db
 *.swp
 
+# MSYS/Cygwin crash dumps. Land anywhere a shell was run from; one reached
+# public/ and shipped to dist/ before this was ignored.
+*.stackdump
+
 # Editors
 .vscode/
 .idea/
