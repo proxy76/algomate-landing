@@ -494,17 +494,13 @@ It requires one nginx change:
 root /srv/algomate/current;      # was /srv/algomate/frontend/dist
 ```
 
-First install:
+**First install: follow `deploy/INSTALL.md`.** It is the same procedure written
+as literal commands with expected output at each step, including how to find
+the checkout if the default path is wrong, and rollback for both failure modes.
 
-```bash
-sudo -u <service-user> mkdir -p /srv/algomate/releases
-sudo install -o <service-user> -g <service-user> -m 750 \
-     /srv/algomate/repo/deploy/rebuild.sh /srv/algomate/bin/rebuild.sh
-sudo -u <service-user> /srv/algomate/bin/rebuild.sh        # creates /srv/algomate/current
-# only now point nginx at the symlink, then:
-sudo nginx -t && sudo systemctl reload nginx
-node /srv/algomate/repo/frontend/scripts/check-live-seo.mjs https://algomate.ro
-```
+Ordering matters and is not obvious: the script must run successfully **once
+before** nginx is repointed, because the symlink it publishes to has to exist
+before anything is asked to serve from it. Repoint first and the site 404s.
 
 ### 5.3 The systemd units — NOT NEEDED
 
