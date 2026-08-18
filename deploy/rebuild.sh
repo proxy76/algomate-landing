@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 #
 # Deploy script for algomate.ro — pull, build, publish atomically.
-# Install at /srv/algomate/bin/rebuild.sh, owned by the service user, chmod 750.
+#
+# Install a COPY at /srv/algomate-deploy/bin/rebuild.sh — outside the checkout.
+# Running it from inside the repo is unsafe: bash reads a script incrementally,
+# and `git reset --hard` below rewrites the file mid-execution.
 #
 # Run by hand for every deploy. There is no timer: post scheduling was dropped
 # (SERVER-SETUP §3.1), so nothing needs to run on a schedule. The value here is
@@ -30,18 +33,54 @@
 # while rather than deleted immediately.
 #
 # REQUIRES nginx to serve the symlink, not the build directory:
-#     root /srv/algomate/current;
+#     root /srv/algomate-deploy/current;
 # (was: root /srv/algomate/frontend/dist)
+#
+# PATHS: the defaults below are inferred from the live nginx `root`, which was
+# /srv/algomate/frontend/dist — so the checkout is /srv/algomate. They are not
+# confirmed. Every one is overridable from the environment, and the preflight
+# below refuses to run rather than guessing:
+#
+#     REPO=/actual/path /srv/algomate/bin/rebuild.sh
+#
+# Releases live OUTSIDE the checkout on purpose. Putting them inside it puts
+# build output in the path of `git reset --hard` and `git clean`.
 
 set -euo pipefail
 
-REPO=/srv/algomate/repo
-BRANCH=main
-RELEASES=/srv/algomate/releases
-CURRENT=/srv/algomate/current
-KEEP=5
+REPO="${REPO:-/srv/algomate}"
+BRANCH="${BRANCH:-main}"
+DEPLOY_ROOT="${DEPLOY_ROOT:-/srv/algomate-deploy}"
+RELEASES="$DEPLOY_ROOT/releases"
+CURRENT="$DEPLOY_ROOT/current"
+KEEP="${KEEP:-5}"
 
-log() { echo "[$(date -Is)] $*"; }
+log()  { echo "[$(date -Is)] $*"; }
+die()  { echo "[$(date -Is)] FATAL: $*" >&2; exit 1; }
+
+# ── Preflight ───────────────────────────────────────────────────────────────
+# Fail with a specific, actionable message rather than half-deploying. Each
+# check names what to do about it.
+
+[ -d "$REPO" ] || die "REPO=$REPO does not exist.
+  Find the checkout with:  sudo find /srv /var/www /opt -maxdepth 3 -name package.json -path '*frontend*'
+  Then re-run as:          REPO=/the/real/path $0"
+
+git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1 \
+  || die "REPO=$REPO is not a git checkout. See the hint above."
+
+[ -f "$REPO/frontend/package.json" ] || die \
+  "No frontend/package.json under REPO=$REPO — wrong directory."
+
+command -v npm >/dev/null || die "npm not on PATH for user $(id -un).
+  Systemd and cron do not load a login shell; use an absolute path or set PATH."
+
+mkdir -p "$RELEASES" 2>/dev/null \
+  || die "Cannot create $RELEASES as $(id -un). Create it and chown to this user."
+
+[ -w "$DEPLOY_ROOT" ] || die "$DEPLOY_ROOT is not writable by $(id -un)."
+
+log "repo=$REPO  branch=$BRANCH  deploy_root=$DEPLOY_ROOT"
 
 # ── Source ──────────────────────────────────────────────────────────────────
 cd "$REPO"
@@ -102,8 +141,12 @@ fi
 log "rebuild ok"
 
 # ── Rollback ────────────────────────────────────────────────────────────────
-# To go back to the previous release:
-#     ls -1dt /srv/algomate/releases/*/     # pick the one you want
-#     ln -sfn /srv/algomate/releases/<stamp> /srv/algomate/current.tmp
-#     mv -Tf /srv/algomate/current.tmp /srv/algomate/current
-# No nginx reload needed; the symlink is resolved per request.
+# To go back to a previous release — no rebuild, no nginx reload, the symlink
+# is resolved per request:
+#
+#     ls -1dt /srv/algomate-deploy/releases/*/          # pick one
+#     ln -sfn /srv/algomate-deploy/releases/<stamp> /srv/algomate-deploy/current.tmp
+#     mv -Tf  /srv/algomate-deploy/current.tmp        /srv/algomate-deploy/current
+#
+# Then confirm:
+#     node /srv/algomate/frontend/scripts/check-live-seo.mjs https://algomate.ro

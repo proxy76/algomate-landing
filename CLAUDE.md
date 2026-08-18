@@ -22,13 +22,11 @@ This is not hypothetical. It happened on 2026-08-15 and put a *"Server error
 (5xx)"* notice in Search Console on 2026-08-17. The nginx `=404` change made
 the window serve 404s instead of 500s — quieter, not fixed.
 
-If you are about to build or deploy on the server, install it first. Two steps,
-both in `docs/SERVER-SETUP.md` §5.2:
-
-1. install `deploy/rebuild.sh` at `/srv/algomate/bin/rebuild.sh` and run it
-   once — this creates `/srv/algomate/current`
-2. point nginx at the symlink: `root /srv/algomate/current;` (currently
-   `/srv/algomate/frontend/dist`), then `nginx -t && systemctl reload nginx`
+If you are about to build or deploy on the server, install it first.
+**Follow `deploy/INSTALL.md` literally, step by step** — it is written as exact
+commands with the expected output for each, precisely so it does not have to be
+reasoned out. Do not improvise a shortcut; the ordering matters (the nginx
+change must come *after* the first successful run, or the site 404s).
 
 Afterwards, deploys are `rebuild.sh` and nothing else. Verify any deploy with:
 
