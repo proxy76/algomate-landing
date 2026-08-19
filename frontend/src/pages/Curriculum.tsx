@@ -1043,7 +1043,7 @@ const Curriculum: React.FC = () => {
           </div>
 
           <h2 className="mt-16 mb-5 font-display text-2xl font-semibold tracking-tight text-[#f0f0f0] md:text-3xl">
-            Matematică: M1, M2 sau M3?
+            Ce programă de matematică dai
           </h2>
           <div className="space-y-5 leading-relaxed text-[#b8b8b8]">
             <p>
@@ -1051,21 +1051,31 @@ const Curriculum: React.FC = () => {
               funcție de profilul liceului, iar elevul nu alege — profilul decide pentru el.
               Este cea mai frecventă confuzie la începutul pregătirii.
             </p>
+            <p>
+              Vei auzi frecvent denumirile „M1”, „M2” și „M3”. Sunt prescurtări din vorbirea
+              curentă, folosite inconsecvent de la un liceu la altul — programa
+              științelor naturii apare uneori ca „M1-2”. Mai jos folosim numele profilului,
+              pentru că acela e neechivoc.
+            </p>
           </div>
 
           <dl className="mt-8 border-t border-[#222]">
             {[
               {
-                t: 'M1 — mate-info',
+                t: 'Matematică-informatică',
                 d: 'Programa cea mai amplă, pentru filiera teoretică, profil real, specializarea matematică-informatică. Include analiză matematică extinsă și algebră superioară. Este și varianta cerută la majoritatea admiterilor la facultăți tehnice.',
               },
               {
-                t: 'M2 — științe ale naturii',
-                d: 'Pentru profilul real, specializarea științe ale naturii. Acoperă aceleași domenii mari, dar cu mai puțină profunzime la analiză și fără o parte din capitolele de algebră.',
+                t: 'Științele naturii',
+                d: 'Pentru profilul real, specializarea științe ale naturii — profilul cunoscut și ca bio-chimie. Acoperă aceleași domenii mari ca mate-info, dar cu mai puțină profunzime la analiză matematică.',
               },
               {
-                t: 'M3 — tehnologic și pedagogic',
-                d: 'Programa cea mai restrânsă, pentru filiera tehnologică și profilul pedagogic. Accentul cade pe aplicații și pe calcul, mai puțin pe demonstrație.',
+                t: 'Tehnologic',
+                d: 'Pentru filiera tehnologică, indiferent de domeniul de pregătire. Accentul cade pe aplicații și pe calcul, mai puțin pe demonstrație.',
+              },
+              {
+                t: 'Pedagogic',
+                d: 'Pentru profilul pedagogic din filiera vocațională. Programa cea mai restrânsă dintre cele patru, centrată pe noțiunile de bază și pe aplicarea lor directă.',
               },
             ].map((m) => (
               <div key={m.t} className="border-b border-[#222] py-6">

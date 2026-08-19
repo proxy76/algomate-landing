@@ -1,6 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Terminal, Code, Sigma, Calendar, Clock, Users, ArrowRight } from 'lucide-react';
+import {
+  Terminal,
+  Code,
+  Sigma,
+  Calendar,
+  Clock,
+  Users,
+  ArrowRight,
+  ChevronDown,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
@@ -226,10 +235,11 @@ const Services: React.FC = () => {
               </p>
               <p>
                 Programele acoperă <strong className="text-[#e4e4e4] font-medium">matematică
-                M1, M2 și M3</strong>, <strong className="text-[#e4e4e4] font-medium">informatică
-                în C și C++</strong>, și un curs de introducere în programare pentru clasa a
-                IX-a. Se lucrează în grupe de maximum trei elevi sau individual, în ședințe de
-                două ore.
+                pentru toate profilurile</strong> — mate-info, științele naturii, tehnologic
+                și pedagogic — <strong className="text-[#e4e4e4] font-medium">informatică în C
+                și C++</strong>, și un curs de introducere în programare pentru clasa a IX-a.
+                Se lucrează în grupe de maximum trei elevi sau individual, în ședințe de două
+                ore.
               </p>
               <p>
                 Mai jos găsești ce se predă la fiecare program, prețul, cum decurge efectiv o
@@ -520,17 +530,23 @@ const Services: React.FC = () => {
             <SectionLabel>Întrebări frecvente</SectionLabel>
             <div className="max-w-3xl border-t border-[#222]">
               {faqs.map((f) => (
-                <details key={f.q} className="group border-b border-[#222] py-6">
-                  <summary className="flex items-start gap-5 cursor-pointer list-none font-sans font-medium text-[1.05rem] text-[#e4e4e4] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#e8734a]">
+                <details key={f.q} className="group border-b border-[#222]">
+                  {/* The affordance lives on the whole row, not on a small
+                      glyph: full-width hover ground, a chevron in a circle on
+                      the right where accordions are expected to put it, and
+                      padding on the summary so the hit area is the row. */}
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 rounded-sm px-4 py-6 transition-colors duration-200 hover:bg-[#141414] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#e8734a] [&::-webkit-details-marker]:hidden">
+                    <span className="font-sans text-[1.05rem] font-medium text-[#d8d8d8] transition-colors group-hover:text-white group-open:text-white">
+                      {f.q}
+                    </span>
                     <span
-                      className="text-[#e8734a] font-mono text-sm shrink-0 pt-1 transition-transform duration-300 group-open:rotate-45"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-[#333] text-[#e8734a] transition-all duration-300 group-hover:border-[#e8734a]/60 group-hover:bg-[#e8734a]/10 group-open:rotate-180"
                       aria-hidden
                     >
-                      +
+                      <ChevronDown size={15} strokeWidth={2} />
                     </span>
-                    <span className="flex-1">{f.q}</span>
                   </summary>
-                  <p className="text-[0.95rem] text-[#999] leading-relaxed mt-4 pl-9 max-w-2xl">
+                  <p className="max-w-2xl px-4 pb-7 text-[0.95rem] leading-relaxed text-[#999]">
                     {f.a}
                   </p>
                 </details>
