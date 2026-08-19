@@ -214,6 +214,11 @@ body {
   min-height: 100vh;
   background-color: var(--color-bg-primary);
   overscroll-behavior: none;
+  /* Chrome keeps a "scroll anchor" element and shifts scrollTop to hold it
+     steady when content above the viewport changes. During a route swap that
+     is content changing by a whole page, so it fights the scroll-to-top in
+     PageTransition. Worst on the longest pages, i.e. on mobile. */
+  overflow-anchor: none;
 }
 
 ::selection {
