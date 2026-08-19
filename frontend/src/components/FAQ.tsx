@@ -18,7 +18,7 @@ const faqItems = [
   {
     question: 'Cât costă meditațiile la AlgoMate?',
     answer:
-      'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 120 RON/ședință pentru meditații individuale.',
+      'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 150 RON/ședință pentru meditații individuale.',
   },
   {
     question: 'Meditațiile sunt online sau fizic?',

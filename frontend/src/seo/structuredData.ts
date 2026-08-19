@@ -66,7 +66,7 @@ export const personSchema = {
 
 /**
  * Standard pricing, identical across all courses:
- * 100 RON/ședință in groups of max 3 students, 120 RON/ședință one-on-one.
+ * 100 RON/ședință in groups of max 3 students, 150 RON/ședință one-on-one.
  */
 const standardOffers = [
   {
@@ -79,7 +79,7 @@ const standardOffers = [
   {
     '@type': 'Offer',
     name: 'Ședință individuală',
-    price: '120',
+    price: '150',
     priceCurrency: 'RON',
     availability: 'https://schema.org/InStock',
   },
@@ -159,7 +159,7 @@ export const faqSchema = {
       name: 'Cât costă meditațiile la AlgoMate?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 120 RON/ședință pentru meditații individuale.',
+        text: 'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 150 RON/ședință pentru meditații individuale.',
       },
     },
     {
@@ -213,6 +213,68 @@ export const faqSchema = {
   ],
 };
 
+/**
+ * FAQ for /servicii. Deliberately different questions from `faqSchema` on the
+ * homepage — two pages emitting the same FAQPage is a duplicate signal, and
+ * the questions people ask on a pricing page are not the ones they ask on a
+ * landing page. Every answer here must match the visible text on the page;
+ * schema that disagrees with the page is a manual-action risk.
+ */
+export const servicesFaqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Care este diferența dintre meditațiile în grupă și cele individuale?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'În grupă (maximum 3 elevi, 100 RON/ședință) elevii lucrează pe aceeași programă și învață și din întrebările celorlalți. Individual (150 RON/ședință) ritmul și conținutul se adaptează complet elevului, ceea ce ajută când sunt lacune mari de recuperat sau când pregătirea vizează un obiectiv specific, cum ar fi o olimpiadă.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Cât durează o ședință de meditații?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'O ședință durează 2 ore, de regulă o dată pe săptămână. În perioada de dinaintea examenului, frecvența poate crește la două ședințe pe săptămână.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Elevul meu stă foarte prost la matematică. Are sens să înceapă acum?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Da, dacă mai este timp până la examen. Prima ședință este o evaluare a nivelului real, iar planul de recuperare pornește de la ce lipsește efectiv, nu de la programa clasei. Recuperarea unor lacune acumulate în mai mulți ani cere însă timp: cu câteva săptămâni înainte de examen se poate consolida ce există deja, nu se poate construi de la zero.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Cum se desfășoară o ședință online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Ședințele au loc prin videoconferință, cu tablă digitală partajată pe care se scrie în timp real. Pentru informatică se lucrează direct în cod, cu compilare și rulare pe loc. La final, elevul primește notițele ședinței și tema pentru acasă.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Ce se întâmplă dacă elevul lipsește de la o ședință?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'O ședință anunțată cu cel puțin 24 de ore înainte se reprogramează fără costuri. La meditațiile în grupă, elevul primește materialele și tema ședinței pierdute.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Cu cât timp înainte de BAC ar trebui începută pregătirea?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Ideal, din septembrie–octombrie al clasei a XII-a, ceea ce lasă timp pentru parcurgerea întregii programe și pentru simulări. Pregătirea începută în primăvară rămâne utilă, dar se concentrează pe tipurile de subiecte care aduc cele mai multe puncte, nu pe acoperirea completă a materiei.',
+      },
+    },
+  ],
+};
+
 // ─── Local Business Schema (for București targeting) ─────────────────────────
 
 export const localBusinessSchema = {
@@ -227,7 +289,7 @@ export const localBusinessSchema = {
     addressLocality: 'București',
     addressCountry: 'RO',
   },
-  priceRange: '100-120 RON',
+  priceRange: '100-150 RON',
   areaServed: {
     '@type': 'Country',
     name: 'Romania',
