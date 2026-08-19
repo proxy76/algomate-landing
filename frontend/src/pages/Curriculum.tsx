@@ -15,6 +15,7 @@ import {
   ArrowDown,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 
@@ -1011,6 +1012,166 @@ const Curriculum: React.FC = () => {
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* Written explanation. The roadmap above is interactive and mostly
+            labels; this is where the page actually explains itself — to a
+            parent deciding, and to a crawler that cannot click a tab. */}
+        <section className="relative mx-auto max-w-3xl px-6 pb-24 pt-28 md:pt-36">
+          <div className="mb-10 flex items-baseline gap-4">
+            <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.3em] text-[#e8734a]">
+              Cum e construită programa
+            </span>
+            <span className="h-px flex-1 bg-[#222]" />
+          </div>
+
+          <div className="space-y-5 leading-relaxed text-[#b8b8b8]">
+            <p>
+              Programa de mai sus urmează{' '}
+              <strong className="font-medium text-[#e4e4e4]">
+                programa oficială de examen publicată de Ministerul Educației
+              </strong>
+              , nu manualul unei anumite edituri. Ordinea capitolelor este însă diferită de
+              cea din manual: se începe cu noțiunile de care depind cele mai multe subiecte,
+              nu cu cele care apar primele în carte.
+            </p>
+            <p>
+              Motivul e practic. Un elev care intră în pregătire în februarie nu mai are timp
+              să parcurgă totul în ordinea din manual. Dacă primele capitole acoperite sunt
+              cele care apar an de an în subiecte, fiecare ședință adaugă puncte, chiar dacă
+              materia nu ajunge să fie parcursă integral.
+            </p>
+          </div>
+
+          <h2 className="mt-16 mb-5 font-display text-2xl font-semibold tracking-tight text-[#f0f0f0] md:text-3xl">
+            Ce programă de matematică dai
+          </h2>
+          <div className="space-y-5 leading-relaxed text-[#b8b8b8]">
+            <p>
+              La Bacalaureat nu există o singură probă de matematică. Programa diferă în
+              funcție de profilul liceului, iar elevul nu alege — profilul decide pentru el.
+              Este cea mai frecventă confuzie la începutul pregătirii.
+            </p>
+            <p>
+              Vei auzi frecvent denumirile „M1”, „M2” și „M3”. Sunt prescurtări din vorbirea
+              curentă, folosite inconsecvent de la un liceu la altul — programa
+              științelor naturii apare uneori ca „M1-2”. Mai jos folosim numele profilului,
+              pentru că acela e neechivoc.
+            </p>
+          </div>
+
+          <dl className="mt-8 border-t border-[#222]">
+            {[
+              {
+                t: 'Matematică-informatică',
+                d: 'Programa cea mai amplă, pentru filiera teoretică, profil real, specializarea matematică-informatică. Include analiză matematică extinsă și algebră superioară. Este și varianta cerută la majoritatea admiterilor la facultăți tehnice.',
+              },
+              {
+                t: 'Științele naturii',
+                d: 'Pentru profilul real, specializarea științe ale naturii — profilul cunoscut și ca bio-chimie. Acoperă aceleași domenii mari ca mate-info, dar cu mai puțină profunzime la analiză matematică.',
+              },
+              {
+                t: 'Tehnologic',
+                d: 'Pentru filiera tehnologică, indiferent de domeniul de pregătire. Accentul cade pe aplicații și pe calcul, mai puțin pe demonstrație.',
+              },
+              {
+                t: 'Pedagogic',
+                d: 'Pentru profilul pedagogic din filiera vocațională. Programa cea mai restrânsă dintre cele patru, centrată pe noțiunile de bază și pe aplicarea lor directă.',
+              },
+            ].map((m) => (
+              <div key={m.t} className="border-b border-[#222] py-6">
+                <dt className="mb-2 font-sans text-[1.05rem] font-semibold text-[#e4e4e4]">
+                  {m.t}
+                </dt>
+                <dd className="text-[0.95rem] leading-relaxed text-[#999]">{m.d}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <p className="mt-6 text-[0.9rem] leading-relaxed text-[#777]">
+            Denumirile și conținutul exact se stabilesc anual prin ordin de ministru. Înainte
+            de a-ți construi planul de pregătire, verifică programa în vigoare pe{' '}
+            <a
+              href="https://www.edu.ro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-b border-[#e8734a]/30 text-[#e8734a] transition-colors hover:border-[#e8734a]"
+            >
+              edu.ro
+            </a>
+            .
+          </p>
+
+          <h2 className="mt-16 mb-5 font-display text-2xl font-semibold tracking-tight text-[#f0f0f0] md:text-3xl">
+            Informatică: ce se cere efectiv
+          </h2>
+          <div className="space-y-5 leading-relaxed text-[#b8b8b8]">
+            <p>
+              Proba de informatică se susține în{' '}
+              <strong className="font-medium text-[#e4e4e4]">C/C++ sau Pascal</strong>, la
+              alegerea elevului. Pregătirea de aici se face în C++, care este și limbajul
+              folosit la olimpiade și la admiterile la facultățile de profil — deci efortul
+              se reciclează.
+            </p>
+            <p>
+              Ce contează cel mai mult la această probă nu este numărul de noțiuni, ci
+              capacitatea de a scrie cod care compilează și se comportă corect pe cazurile
+              limită. Din acest motiv, fiecare capitol se încheie cu probleme rulate efectiv,
+              nu doar citite: un algoritm înțeles teoretic și un algoritm implementat corect
+              sunt două lucruri diferite, iar examenul îl notează pe al doilea.
+            </p>
+            <p>
+              Structurile de date — vectori, matrice, liste, arbori, grafuri — și
+              recursivitatea sunt zonele care aduc cele mai multe puncte și, în același timp,
+              cele în care se pierd cele mai multe. Le alocăm cel mai mult timp.
+            </p>
+          </div>
+
+          <h2 className="mt-16 mb-5 font-display text-2xl font-semibold tracking-tight text-[#f0f0f0] md:text-3xl">
+            Evaluarea Națională
+          </h2>
+          <div className="space-y-5 leading-relaxed text-[#b8b8b8]">
+            <p>
+              Pentru clasa a VIII-a, pregătirea urmează programa de Evaluare Națională la
+              matematică: algebră, geometrie plană și noțiuni de geometrie în spațiu. Structura
+              subiectelor este stabilă de la an la an, ceea ce face ca lucrul pe modele
+              oficiale să fie deosebit de eficient.
+            </p>
+            <p>
+              Din 2027 intervine o schimbare la admiterea la liceu, care nu modifică
+              Evaluarea Națională în sine, dar schimbă miza ei. Am scris separat{' '}
+              <Link
+                to="/blog/admitere-liceu-2027"
+                className="border-b border-[#e8734a]/30 text-[#e8734a] transition-colors hover:border-[#e8734a]"
+              >
+                despre ce se schimbă la admiterea din 2027
+              </Link>
+              .
+            </p>
+          </div>
+
+          <div className="mt-16 border-t border-[#222] pt-10">
+            <p className="mb-7 leading-relaxed text-[#b8b8b8]">
+              Programa arată ce se studiază. Dacă vrei să vezi cum decurge efectiv o ședință,
+              cât costă și în ce format,{' '}
+              <Link
+                to="/servicii"
+                className="border-b border-[#e8734a]/30 text-[#e8734a] transition-colors hover:border-[#e8734a]"
+              >
+                detaliile programelor de meditații
+              </Link>{' '}
+              sunt pe pagina de servicii.
+            </p>
+            <Link
+              to="/inscriere"
+              className="group inline-flex items-center gap-3 border-b border-[#e8734a]/20 pb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[#e8734a] transition-all duration-300 hover:border-[#e8734a]/80"
+            >
+              Rezervă prima ședință
+              <span className="transition-transform group-hover:translate-x-1" aria-hidden>
+                →
+              </span>
+            </Link>
+          </div>
+        </section>
       </div>
     </PageTransition>
   );
