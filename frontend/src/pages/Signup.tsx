@@ -86,7 +86,7 @@ const Signup: React.FC = () => {
     <PageTransition>
       <SEO
         title="Înscrie-te la Meditații BAC — Formular de Contact | AlgoMate"
-        description="Completează formularul și începe pregătirea pentru BAC. Locuri limitate, grupe de max 3 elevi. 100 RON/ședință în grupă, 120 RON individual. Răspundem în 24h."
+        description="Completează formularul și începe pregătirea pentru BAC. Locuri limitate, grupe de max 3 elevi. 100 RON/ședință în grupă, 150 RON individual. Răspundem în 24h."
         path="/inscriere"
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
