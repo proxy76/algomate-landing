@@ -1,20 +1,34 @@
 ---
-title: "BAC 2026, Matematică M_tehnologic — Varianta 4 rezolvată pas cu pas"
-description: "Rezolvare completă a variantei 4 de la proba E. c) Matematică M_tehnologic, Bacalaureat 2026: toate cele trei subiecte, cu explicații, metode alternative și greșelile care costă puncte."
+title: "Rezolvare subiect Mate BAC M2 august 2026 — M_tehnologic, varianta 4"
+description: "Subiectul de matematică M2 (M_tehnologic) dat la Bacalaureat în sesiunea august 2026, rezolvat integral: toate cele 15 cerințe, cu explicații pas cu pas, metode alternative și greșelile care costă puncte."
 publishDate: 2026-08-20
-slug: "rezolvare-bac-2026-matematica-tehnologic-varianta-4"
+slug: "rezolvare-subiect-mate-bac-m2-august-2026"
 category: "Examene"
 math: true
 tags:
   - Bacalaureat 2026
+  - Sesiunea august 2026
+  - Matematică M2
   - Matematică M_tehnologic
   - Subiecte rezolvate
   - Meditații matematică
 ---
 
-Varianta 4 la proba E. c) — Matematică M_tehnologic, Bacalaureat 2026 — este un subiect „de manual” în cel mai bun sens: nu are nicio capcană spectaculoasă, dar verifică exact acele opt–zece automatisme care decid dacă ieși cu 6 sau cu 9.
+**Acesta este subiectul de matematică dat în sesiunea specială din august 2026** — a doua sesiune a Bacalaureatului 2026, cunoscută și ca sesiunea de toamnă. Proba: E. c) Matematică **M_tehnologic**, numită în vorbirea curentă și **M2**, varianta 4.
+
+Este un subiect „de manual” în cel mai bun sens: nu are nicio capcană spectaculoasă, dar verifică exact acele opt–zece automatisme care decid dacă ieși cu 6 sau cu 9.
 
 Mai jos ai toate cele 15 cerințe rezolvate, cu raționamentul explicat, nu doar cu rezultatul. Recomandarea mea: rezolvă întâi singur, cronometrat, apoi citește. O rezolvare citită înainte de a fi încercată nu te învață aproape nimic.
+
+## Despre ce sesiune și ce programă este vorba
+
+Ca să nu fie confuzie — la Bacalaureat sunt mai multe probe de matematică, iar în fiecare an sunt două sesiuni:
+
+- **Sesiunea**: august 2026, a doua sesiune (de toamnă) a Bacalaureatului 2026. Prima sesiune are loc în iunie–iulie.
+- **Proba**: E. c) Matematică **M_tehnologic** — programa pentru filiera tehnologică. Este programa căreia i se spune curent **M2**. Dacă ești la mate-info sau la științele naturii, ai altă programă și alt subiect.
+- **Varianta**: 4.
+
+Subiectele și baremele oficiale se publică pe [subiecte.edu.ro](https://subiecte.edu.ro) după fiecare probă.
 
 ## Cum arată proba
 
@@ -365,7 +379,7 @@ Asta înseamnă că **pregătirea eficientă nu este „să știi toată matemat
 
 ## Vrei să lucrezi variantele cu cineva lângă tine?
 
-La [AlgoMate](https://algomate.ro/) facem **meditații de matematică pentru Bacalaureat** — M1, M2 și M_tehnologic — online, cu accent exact pe ce ai citit mai sus: variante complete, cronometrate, corectate pe barem și reluate până când raționamentul devine automat.
+La [AlgoMate](https://algomate.ro/) facem **meditații de matematică pentru Bacalaureat** — pentru toate programele, de la mate-info până la tehnologic și pedagogic — online, cu accent exact pe ce ai citit mai sus: variante complete, cronometrate, corectate pe barem și reluate până când raționamentul devine automat.
 
 - Ședințe individuale sau în grupe de maximum 3 elevi;
 - Materiale digitale incluse și teme de consolidare după fiecare sesiune;
@@ -377,4 +391,4 @@ Dacă ești în anul terminal, îți recomand și articolul despre [calendarul e
 
 ---
 
-*Rezolvările de mai sus sunt varianta mea de lucru pentru subiectul E. c) Matematică M_tehnologic, Varianta 4, Bacalaureat 2026, publicat de Centrul Național pentru Curriculum și Evaluare. Baremul oficial poate accepta și alte metode corecte. Subiectele și baremele originale sunt disponibile pe [subiecte.edu.ro](https://subiecte.edu.ro).*
+*Rezolvările de mai sus sunt varianta mea de lucru pentru subiectul E. c) Matematică M_tehnologic (M2), Varianta 4, dat în sesiunea august 2026 a Bacalaureatului, publicat de Centrul Național pentru Curriculum și Evaluare. Baremul oficial poate accepta și alte metode corecte. Subiectele și baremele originale sunt disponibile pe [subiecte.edu.ro](https://subiecte.edu.ro).*
