@@ -123,6 +123,92 @@ but get no size validation.
 
 ---
 
+## 3.5 Maths and callout boxes
+
+Opt in per post, in the frontmatter:
+
+```yaml
+math: true
+```
+
+**Off by default, deliberately.** Without the flag a `$` in ordinary prose is
+just a dollar sign; with it, `$...$` starts parsing as LaTeX. Never add the
+flag to a post that talks about prices.
+
+### LaTeX
+
+`$inline$` and `$$display$$`, rendered by KaTeX **at build time** — no maths
+JavaScript ships, and the formulas are in the prerendered HTML, so they are
+readable with JS disabled and by crawlers.
+
+```markdown
+Funcția $f(x) = 2x - 3$ este de gradul I.
+
+$$
+A(a) = \begin{pmatrix} 1 & a-1 \\ 3a-3 & 3a-2 \end{pmatrix}
+$$
+```
+
+Useful for exam solutions: `\frac{a}{b}`, `\sqrt{x}`, `x^{2}`, `x_{1}`,
+`\begin{pmatrix}...\end{pmatrix}` (`&` separates columns, `\\` separates
+rows), `\int_0^1`, `\lim_{x \to 0}`, `\implies`, `\neq`, `\mathbb{R}`,
+`\mathcal{M}`, `\cdot`.
+
+Romanian decimals need `{,}` — write `1{,}2`, not `1,2`, or the comma gets
+spaced as a list separator.
+
+**A malformed formula fails the build** with the file and the offending LaTeX,
+rather than shipping a red error into the page.
+
+Two things that do not work inside `$...$`: unicode symbols with no maths
+glyph (`✔`, emoji — KaTeX warns and drops them; put them in the prose
+instead), and inline maths spanning a line break.
+
+### Callout boxes
+
+Four variants, styled distinctly. Content inside is normal markdown — lists,
+bold and maths all work.
+
+```markdown
+:::solutie
+Pașii rezolvării. $$2a - 3 - 5 = 4 \implies a = 6$$
+:::
+
+:::raspuns
+$a = 6$
+:::
+
+:::atentie Procentul se aplică prețului vechi
+Text opțional după numele casetei devine subtitlu.
+:::
+
+:::alternativa
+Metoda scurtă, pentru cine o preferă.
+:::
+```
+
+| Variant | Aliases | Reads as |
+|---|---|---|
+| `solutie` | `rezolvare` | Filled block — the worked solution |
+| `raspuns` | — | Bright panel — the final answer, scannable |
+| `atentie` | `greseala` | Amber caution — a mistake that costs points |
+| `alternativa` | `metoda` | Quiet dashed aside — secondary method |
+
+An unknown variant name fails the build rather than rendering an unstyled box.
+
+### Why maths bypasses the sanitiser
+
+KaTeX emits inline `style` attributes and a MathML tree, which the allow-list
+in `build-content.mjs` strips by design. Rather than loosening it — `style` is
+the last attribute you want to grant untrusted markdown — formulas are pulled
+out before parsing, replaced with a nonce-tagged placeholder, and substituted
+back **after** sanitisation. Author HTML is still sanitised exactly as
+strictly as before; verified with `<script>`, `onerror=`, `javascript:` hrefs
+and a `position:fixed` overlay, all stripped. **Do not "fix" this by adding
+`style` to `allowedAttributes`.**
+
+---
+
 ## 4. Build and check
 
 ```bash
