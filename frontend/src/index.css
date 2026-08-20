@@ -1,4 +1,9 @@
 @import "tailwindcss";
+/* KaTeX stylesheet. Formulas are rendered to HTML at build time, so no maths
+   JavaScript ships — but the glyph positioning depends on this CSS, and the
+   fonts it references are only fetched by browsers that actually meet a
+   formula. Vite fingerprints and bundles both. */
+@import "katex/dist/katex.min.css";
 
 @theme {
   /* Anthropic-inspired grey + orange palette */
@@ -181,6 +186,113 @@
   max-width: 100%;
   height: auto;
   border: 1px solid #222;
+}
+
+/* ─── Maths ──────────────────────────────────────────────────
+   Formulas are KaTeX output, rendered at build time. Only posts with
+   `math: true` in the frontmatter contain any. */
+
+/* A display formula can easily be wider than a phone — an integral with a
+   long integrand, or a 3-column matrix. Scroll it inside its own box rather
+   than letting it widen the article. */
+.prose-algomate .math-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+  margin: 1.75em 0;
+}
+
+.prose-algomate .katex {
+  /* KaTeX defaults to 1.21em, which oversizes next to this body scale. */
+  font-size: 1.08em;
+  color: #e4e4e4;
+}
+
+.prose-algomate .katex-display {
+  margin: 0;
+}
+
+/* ─── Callout boxes ──────────────────────────────────────────
+   Four variants, deliberately different in kind rather than only in hue:
+   a filled block, a bright panel, a caution tint, and a recessive aside.
+   They should be tellable apart at a glance while scrolling. */
+
+.prose-algomate .callout {
+  margin: 2em 0;
+  padding: 1.4rem 1.6rem;
+}
+
+.prose-algomate .callout > *:first-of-type {
+  margin-top: 0;
+}
+.prose-algomate .callout > *:last-child {
+  margin-bottom: 0;
+}
+
+.prose-algomate .callout__label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+/* 1. Soluție — the worked solution. A substantial filled block; this is
+      where the reader spends the most time, so it gets the most room. */
+.prose-algomate .callout--solutie {
+  background: #101010;
+  border: 1px solid #262626;
+}
+.prose-algomate .callout--solutie .callout__label {
+  color: #e8734a;
+}
+
+/* 2. Răspuns final — the result. Compact and bright, so a student scanning
+      for the answer finds it without reading the derivation. */
+.prose-algomate .callout--raspuns {
+  background: rgba(232, 115, 74, 0.09);
+  border: 1px solid rgba(232, 115, 74, 0.42);
+  padding: 1.15rem 1.6rem;
+}
+.prose-algomate .callout--raspuns .callout__label {
+  color: #f08c5a;
+  margin-bottom: 0.6rem;
+}
+/* :not(.callout__label) or this also enlarges the label, which is a mono
+   eyebrow and must stay the same size across all four variants. */
+.prose-algomate .callout--raspuns p:not(.callout__label) {
+  font-size: 1.1rem;
+  color: #f0f0f0;
+}
+.prose-algomate .callout--raspuns .katex {
+  font-size: 1.2em;
+  color: #f7f7f7;
+}
+
+/* 3. Atenție — a caution. Amber, a different hue family from the site's
+      orange, so "careful" never reads as "answer". */
+.prose-algomate .callout--atentie {
+  background: rgba(212, 163, 64, 0.07);
+  border: 1px solid rgba(212, 163, 64, 0.3);
+}
+.prose-algomate .callout--atentie .callout__label {
+  color: #d4a340;
+}
+
+/* 4. Metodă alternativă — secondary by design. No fill, dashed edge, muted
+      label: present for the reader who wants it, quiet for the one who
+      does not. */
+.prose-algomate .callout--alternativa {
+  background: none;
+  border: 1px dashed #2e2e2e;
+}
+.prose-algomate .callout--alternativa .callout__label {
+  color: #7d7d7d;
+}
+.prose-algomate .callout--alternativa p:not(.callout__label),
+.prose-algomate .callout--alternativa li {
+  color: #999;
+  font-size: 0.97em;
 }
 
 /* The closing source note each article ends with. */
