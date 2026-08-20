@@ -185,115 +185,163 @@ $$x + 3y = 1, \quad x + 4y = 3, \quad z + 3t = 9, \quad z + 4t = 10$$
 Rezultă $y = 2$, $x = -5$, $t = 1$, $z = 6$ — același răspuns, cu ceva mai mult calcul.
 :::
 
-### 2. Polinomul f = X³ − 3X² − 2X + m
+### 2. Polinomul $f = X^3 - 3X^2 - 2X + m$
 
-**a) Pentru m = 9, arătați că f(−1) = 7**
+**a) Pentru $m = 9$, arătați că $f(-1) = 7$**
 
-f(−1) = (−1)³ − 3 · (−1)² − 2 · (−1) + 9 = −1 − 3 + 2 + 9 = **7** ✔
+:::solutie
+$$f(-1) = (-1)^3 - 3 \cdot (-1)^2 - 2 \cdot (-1) + 9 = -1 - 3 + 2 + 9 = 7$$
+:::
 
-Atenție la semne: (−1)² = +1, deci −3 · (−1)² = −3, iar −2 · (−1) = +2.
+:::atentie Semnele la puteri
+$(-1)^2 = +1$, deci $-3 \cdot (-1)^2 = -3$, iar $-2 \cdot (-1) = +2$. Aici se pierd puncte pe calcul, nu pe metodă.
+:::
 
-**b) Determinați m pentru care 2 este rădăcină a lui f**
+**b) Determinați $m$ pentru care $2$ este rădăcină a lui $f$**
 
-„2 este rădăcină” înseamnă exact f(2) = 0:
+:::solutie
+„$2$ este rădăcină” înseamnă exact $f(2) = 0$:
 
-8 − 12 − 4 + m = 0 → m − 8 = 0 → **m = 8**
+$$8 - 12 - 4 + m = 0 \implies m - 8 = 0 \implies m = 8$$
+:::
 
-**c) Restul împărțirii lui f la g = X − 4 este 14. Determinați rădăcinile lui f**
+:::raspuns
+$m = 8$
+:::
 
-Aici se folosește **teorema restului**: restul împărțirii lui f la X − 4 este f(4). Nu ai nevoie de nicio împărțire efectivă.
+**c) Restul împărțirii lui $f$ la $g = X - 4$ este $14$. Determinați rădăcinile lui $f$**
 
-f(4) = 64 − 48 − 8 + m = m + 8 = 14 → **m = 6**
+Aici se folosește **teorema restului**: restul împărțirii lui $f$ la $X - 4$ este $f(4)$. Nu ai nevoie de nicio împărțire efectivă.
 
-Deci f = X³ − 3X² − 2X + 6. Descompunem prin grupare:
+:::solutie
+$$f(4) = 64 - 48 - 8 + m = m + 8 = 14 \implies m = 6$$
 
-f = X²(X − 3) − 2(X − 3) = (X − 3)(X² − 2)
+Deci $f = X^3 - 3X^2 - 2X + 6$. Descompunem prin grupare:
 
-Rădăcinile sunt **x₁ = 3, x₂ = √2, x₃ = −√2**.
+$$f = X^2(X - 3) - 2(X - 3) = (X - 3)(X^2 - 2)$$
+:::
+
+:::raspuns
+$x_1 = 3$, $x_2 = \sqrt{2}$, $x_3 = -\sqrt{2}$
+:::
 
 ---
 
 ## Subiectul al III-lea
 
-### 1. f : (−3, +∞) → ℝ, f(x) = (x² − 5)/(x + 3)
+### 1. $f : (-3, +\infty) \to \mathbb{R}$, $f(x) = \dfrac{x^2 - 5}{x + 3}$
 
-**a) Arătați că f′(x) = (x² + 6x + 5)/(x + 3)²**
+**a) Arătați că $f'(x) = \dfrac{x^2 + 6x + 5}{(x + 3)^2}$**
 
-Aplicăm regula de derivare a câtului, (u/v)′ = (u′v − uv′)/v², cu u = x² − 5 și v = x + 3:
+:::solutie
+Aplicăm regula de derivare a câtului, $\left(\frac{u}{v}\right)' = \frac{u'v - uv'}{v^2}$, cu $u = x^2 - 5$ și $v = x + 3$:
 
-f′(x) = [2x(x + 3) − (x² − 5) · 1] / (x + 3)²
+$$f'(x) = \frac{2x(x + 3) - (x^2 - 5) \cdot 1}{(x + 3)^2}$$
 
-Numărătorul: 2x² + 6x − x² + 5 = **x² + 6x + 5**
+Numărătorul:
 
-Deci f′(x) = (x² + 6x + 5)/(x + 3)², pentru orice x ∈ (−3, +∞). ✔
+$$2x^2 + 6x - x^2 + 5 = x^2 + 6x + 5$$
 
-Greșeala care apare cel mai des: uitarea parantezei la −(x² − 5), care transformă +5 în −5 și strică tot restul subiectului.
+Deci $f'(x) = \dfrac{x^2 + 6x + 5}{(x + 3)^2}$, pentru orice $x \in (-3, +\infty)$. ✔
+:::
 
-**b) Ecuația tangentei în punctul de abscisă x = −1**
+:::atentie Paranteza de la scădere
+Greșeala care apare cel mai des: uitarea parantezei la $-(x^2 - 5)$, care transformă $+5$ în $-5$ și strică tot restul subiectului.
+:::
 
-Ecuația tangentei este y − f(x₀) = f′(x₀)(x − x₀), cu x₀ = −1.
+**b) Ecuația tangentei în punctul de abscisă $x = -1$**
 
-f(−1) = ((−1)² − 5)/(−1 + 3) = (1 − 5)/2 = **−2**
+:::solutie
+Ecuația tangentei este $y - f(x_0) = f'(x_0)(x - x_0)$, cu $x_0 = -1$.
 
-f′(−1) = ((−1)² + 6(−1) + 5)/((−1 + 3)²) = (1 − 6 + 5)/4 = **0**
+$$f(-1) = \frac{(-1)^2 - 5}{-1 + 3} = \frac{1 - 5}{2} = -2$$
 
-Panta fiind 0, tangenta este orizontală:
+$$f'(-1) = \frac{(-1)^2 + 6(-1) + 5}{(-1 + 3)^2} = \frac{1 - 6 + 5}{4} = 0$$
 
-y − (−2) = 0 · (x + 1) → **y = −2**
+Panta fiind $0$, tangenta este orizontală:
 
-(Cu alte cuvinte, x = −1 este punct de extrem local al funcției — de aceea derivata se anulează acolo.)
+$$y - (-2) = 0 \cdot (x + 1) \implies y = -2$$
+:::
+
+:::raspuns
+$y = -2$
+:::
+
+Cu alte cuvinte, $x = -1$ este punct de extrem local al funcției — de aceea derivata se anulează acolo.
 
 **c) Ecuația asimptotei oblice**
 
-Asimptota oblică spre +∞ are forma y = mx + n, cu:
+:::solutie
+Asimptota oblică spre $+\infty$ are forma $y = mx + n$, cu:
 
-m = lim (x→+∞) f(x)/x = lim (x² − 5)/(x² + 3x) = **1**
+$$m = \lim_{x \to +\infty} \frac{f(x)}{x} = \lim_{x \to +\infty} \frac{x^2 - 5}{x^2 + 3x} = 1$$
 
-n = lim (x→+∞) [f(x) − x] = lim [(x² − 5 − x² − 3x)/(x + 3)] = lim (−3x − 5)/(x + 3) = **−3**
+$$n = \lim_{x \to +\infty} \big(f(x) - x\big) = \lim_{x \to +\infty} \frac{x^2 - 5 - x^2 - 3x}{x + 3} = \lim_{x \to +\infty} \frac{-3x - 5}{x + 3} = -3$$
+:::
 
-Deci asimptota oblică este **y = x − 3**.
+:::raspuns
+$y = x - 3$
+:::
 
-*Verificare elegantă, în 10 secunde:* împarte polinoamele. Cum x² − 5 = (x + 3)(x − 3) + 4, avem f(x) = x − 3 + 4/(x + 3). Termenul 4/(x + 3) tinde la 0, deci graficul se lipește de dreapta y = x − 3. Aceeași concluzie, fără limite.
+:::alternativa Verificare în 10 secunde
+Împarte polinoamele. Cum $x^2 - 5 = (x + 3)(x - 3) + 4$, avem:
 
-### 2. f : (−2, +∞) → ℝ, f(x) = eˣ/(x + 2)
+$$f(x) = x - 3 + \frac{4}{x + 3}$$
 
-**a) Arătați că ∫₀¹ (x + 2) · f(x) dx = e − 1**
+Termenul $\frac{4}{x+3}$ tinde la $0$, deci graficul se lipește de dreapta $y = x - 3$. Aceeași concluzie, fără limite.
+:::
 
-Cheia este să simplifici **înainte** de a integra:
+### 2. $f : (-2, +\infty) \to \mathbb{R}$, $f(x) = \dfrac{e^x}{x + 2}$
 
-(x + 2) · f(x) = (x + 2) · eˣ/(x + 2) = eˣ
+**a) Arătați că $\displaystyle\int_0^1 (x + 2) f(x)\,dx = e - 1$**
 
-∫₀¹ eˣ dx = eˣ |₀¹ = e¹ − e⁰ = **e − 1** ✔
+Cheia este să simplifici **înainte** de a integra.
 
-**b) Arătați că ∫₀⁶ f(x)/eˣ dx = 2ln2**
+:::solutie
+$$(x + 2) f(x) = (x + 2) \cdot \frac{e^x}{x + 2} = e^x$$
 
+$$\int_0^1 e^x\,dx = e^x \Big|_0^1 = e^1 - e^0 = e - 1$$
+:::
+
+**b) Arătați că $\displaystyle\int_0^6 \frac{f(x)}{e^x}\,dx = 2\ln 2$**
+
+:::solutie
 Aceeași idee de simplificare:
 
-f(x)/eˣ = eˣ / [(x + 2) · eˣ] = 1/(x + 2)
+$$\frac{f(x)}{e^x} = \frac{e^x}{(x + 2) e^x} = \frac{1}{x + 2}$$
 
-∫₀⁶ 1/(x + 2) dx = ln(x + 2) |₀⁶ = ln8 − ln2 = ln(8/2) = ln4 = **2ln2** ✔
+$$\int_0^6 \frac{1}{x + 2}\,dx = \ln(x + 2) \Big|_0^6 = \ln 8 - \ln 2 = \ln\frac{8}{2} = \ln 4 = 2\ln 2$$
+:::
 
-(Modulul din ln|x + 2| dispare pentru că pe intervalul [0, 6] avem x + 2 > 0.)
+:::atentie Unde dispare modulul
+Primitiva este $\ln|x + 2|$, dar pe intervalul $[0, 6]$ avem $x + 2 > 0$, deci modulul se poate scoate fără discuție. Pe un interval care conține $-2$ nu ai voie.
+:::
 
-**c) Determinați a real pentru care ∫₀¹ (a − 1/f(x)) dx = 4/e**
+**c) Determinați $a$ real pentru care $\displaystyle\int_0^1 \left(a - \frac{1}{f(x)}\right) dx = \frac{4}{e}$**
 
+:::solutie
 Mai întâi, inversul funcției:
 
-1/f(x) = (x + 2)/eˣ = (x + 2)e^(−x)
+$$\frac{1}{f(x)} = \frac{x + 2}{e^x} = (x + 2)e^{-x}$$
 
-Această integrală se face **prin părți**, cu u = x + 2 și v′ = e^(−x), deci v = −e^(−x):
+Această integrală se face **prin părți**, cu $u = x + 2$ și $v' = e^{-x}$, deci $v = -e^{-x}$:
 
-∫ (x + 2)e^(−x) dx = −(x + 2)e^(−x) + ∫ e^(−x) dx = −(x + 2)e^(−x) − e^(−x) = −(x + 3)e^(−x)
+$$\int (x + 2)e^{-x}\,dx = -(x + 2)e^{-x} + \int e^{-x}\,dx = -(x + 2)e^{-x} - e^{-x} = -(x + 3)e^{-x}$$
 
-Evaluăm între 0 și 1:
+Evaluăm între $0$ și $1$:
 
-∫₀¹ (x + 2)e^(−x) dx = [−(x + 3)e^(−x)]₀¹ = −4/e − (−3) = **3 − 4/e**
+$$\int_0^1 (x + 2)e^{-x}\,dx = \Big[-(x + 3)e^{-x}\Big]_0^1 = -\frac{4}{e} + 3 = 3 - \frac{4}{e}$$
 
-Revenim la ecuație, folosind liniaritatea integralei (∫₀¹ a dx = a):
+Revenim la ecuație, folosind liniaritatea integralei $\left(\int_0^1 a\,dx = a\right)$:
 
-a − (3 − 4/e) = 4/e → a = 4/e + 3 − 4/e → **a = 3**
+$$a - \left(3 - \frac{4}{e}\right) = \frac{4}{e} \implies a = \frac{4}{e} + 3 - \frac{4}{e} \implies a = 3$$
+:::
 
-Frumusețea cerinței: termenii cu 4/e se anulează, iar răspunsul iese număr întreg. Dacă îți iese ceva urât, ai greșit semnul la integrarea prin părți.
+:::raspuns
+$a = 3$
+:::
+
+Frumusețea cerinței: termenii cu $\frac{4}{e}$ se anulează, iar răspunsul iese număr întreg. Dacă îți iese ceva urât, ai greșit semnul la integrarea prin părți.
 
 ---
 
@@ -302,7 +350,7 @@ Frumusețea cerinței: termenii cu 4/e se anulează, iar răspunsul iese număr 
 Dacă te uiți la cinci variante consecutive, vezi același schelet:
 
 1. **Subiectul I** — calcul cu fracții, o funcție de gradul I, o ecuație exponențială sau logaritmică simplă, un procent, o distanță în reperul xOy, un triunghi dreptunghic.
-2. **Subiectul al II-lea, punctul 1** — un determinant 2×2, o verificare de egalitate matriceală și o ecuație cu matrice rezolvată prin inversă.
+2. **Subiectul al II-lea, punctul 1** — un determinant $2 \times 2$, o verificare de egalitate matriceală și o ecuație cu matrice rezolvată prin inversă.
 3. **Subiectul al II-lea, punctul 2** — valoarea polinomului într-un punct, teorema restului (Bézout) și o descompunere prin grupare.
 4. **Subiectul al III-lea** — derivata unui cât, tangenta la grafic, asimptota oblică, apoi două integrale în care simplificarea se vede din prima și una prin părți.
 
@@ -312,7 +360,7 @@ Asta înseamnă că **pregătirea eficientă nu este „să știi toată matemat
 
 - **Paranteza uitată la scădere** — la derivata câtului și la scăderea de polinoame. Se pierd 5 puncte pentru un semn.
 - **Procentul aplicat greșit** — la exercițiul cu scumpirea, se raportează la prețul *vechi*.
-- **Ordinea la înmulțirea matricelor** — A · B ≠ B · A. Dacă X apare la stânga, înmulțești cu inversa tot la dreapta.
+- **Ordinea la înmulțirea matricelor** — $A \cdot B \neq B \cdot A$. Dacă $X$ apare la stânga, înmulțești cu inversa tot la dreapta.
 - **Rezultat neîncadrat sau nefinalizat** — la cerințele „Arătați că…”, trebuie să ajungi explicit la forma cerută. Corectorul nu completează el ultimul rând.
 
 ## Vrei să lucrezi variantele cu cineva lângă tine?
