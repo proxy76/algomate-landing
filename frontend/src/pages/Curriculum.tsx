@@ -832,19 +832,26 @@ const CourseTabs: React.FC<{
   onChange: (id: Course['id']) => void;
 }> = ({ active, onChange }) => {
   return (
-    <div className="mx-auto mt-10 flex w-full max-w-3xl flex-col gap-2 rounded-2xl border border-[#222] bg-[#0d0d0d]/80 p-2 backdrop-blur-sm sm:flex-row">
+    <div
+      role="tablist"
+      aria-label="Programe"
+      className="mx-auto mt-10 flex w-full max-w-3xl flex-col gap-2 rounded-2xl border border-[#222] bg-[#0d0d0d]/80 p-2 backdrop-blur-sm sm:flex-row"
+    >
       {COURSES.map((course) => {
         const isActive = active === course.id;
         const Icon = course.icon;
         return (
           <button
             key={course.id}
+            id={`course-tab-${course.id}`}
             onClick={() => onChange(course.id)}
             className={`group relative flex-1 overflow-hidden rounded-xl px-5 py-4 text-left transition-colors duration-300 ${isActive
               ? 'bg-[#e8734a]/10'
               : 'hover:bg-[#151515]'
               }`}
-            aria-pressed={isActive}
+            role="tab"
+            aria-selected={isActive}
+            aria-controls={`course-panel-${course.id}`}
           >
             {/* Active indicator — animated background */}
             {isActive && (
@@ -1000,19 +1007,32 @@ const Curriculum: React.FC = () => {
           </motion.div>
         </section>
 
-        {/* Roadmap — re-mounted on course switch so all animations replay */}
+        {/* Roadmap — all three courses are rendered, only the active one shown.
+            This used to mount just the active course so its animations replayed
+            on every switch, which meant the prerendered page carried the
+            syllabus for `mate-bac` and nothing else: the chapter titles for
+            informatics — the page's best keywords — were absent from the HTML
+            entirely. Hiding with CSS keeps them in the document. */}
         <div className="relative mt-20">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <Roadmap course={active} />
-            </motion.div>
-          </AnimatePresence>
+          {COURSES.map((course) => {
+            const isActive = course.id === activeId;
+            return (
+              <div
+                key={course.id}
+                id={`course-panel-${course.id}`}
+                role="tabpanel"
+                aria-labelledby={`course-tab-${course.id}`}
+                hidden={!isActive}
+              >
+                {/* No remount on switch, and none is needed: the scroll-reveal
+                    animations are IntersectionObserver-driven, and the observers
+                    do fire once a hidden panel gets layout. Verified by driving
+                    the built page in a browser — the incoming roadmap animates
+                    in exactly as it does on production. */}
+                <Roadmap course={course} />
+              </div>
+            );
+          })}
         </div>
 
         {/* Written explanation. The roadmap above is interactive and mostly
