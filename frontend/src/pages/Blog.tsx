@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
+import { breadcrumbSchema } from '../seo/structuredData';
 import { posts } from '../content/posts.generated';
 
 /**
@@ -30,6 +31,7 @@ const Blog: React.FC = () => {
         title="Blog — Examene, metodă și probleme rezolvate | AlgoMate"
         description="Articole despre Evaluarea Națională, Bacalaureat și admiterea la liceu, plus probleme rezolvate pas cu pas la matematică și informatică."
         path="/blog"
+        jsonLd={breadcrumbSchema([{ name: 'Blog', path: '/blog' }])}
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
         <div className="max-w-6xl mx-auto px-6">
