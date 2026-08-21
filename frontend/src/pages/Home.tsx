@@ -18,6 +18,7 @@ import {
   localBusinessSchema,
   personSchema,
 } from '../seo/structuredData';
+import { pricingSummary } from '../config/pricing';
 
 
 const services = [
@@ -83,7 +84,7 @@ const Home: React.FC = () => {
     <PageTransition>
       <SEO
         title="AlgoMate — Meditații Matematică și Informatică BAC | București"
-        description="Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu 100% promovabilitate și media 9.8. 100 RON/ședință în grupe de max 3 elevi, 150 RON individual."
+        description={`Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu 100% promovabilitate și media 9.8. ${pricingSummary}`}
         path="/"
         jsonLd={[organizationSchema, personSchema, faqSchema, localBusinessSchema]}
       />
