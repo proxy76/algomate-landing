@@ -423,20 +423,39 @@ easiest thing to forget in this codebase.
 no post matches them closely enough — the informatics page links to `/blog`
 instead. Wire real links in as Phase 3 produces the posts.
 
-### Phase 3 — content engine
+### Phase 3 — content engine — STARTED 2026-08-21
 
-Two posts per week. Use the 2026-08-20 worked-solution post as the template —
-that format (full official exam problem, solved step by step, alternative
-methods, common point-losing mistakes) is exactly what the aggregators cannot
-produce.
+Two posts per week. Two exist so far, both tier 1:
+
+- `/blog/recursivitate-bac-informatica-cerinte-rezolvate`
+- `/blog/matrice-bac-informatica-parcurgeri`
 
 Priority order, matching §1.2:
 
-1. Solved informatics BAC problems, C++ (the tier-1 opening)
-2. Solved maths BAC subjects, per profile M1/M2/M3, per session
+1. Solved informatics problems, C++ (the tier-1 opening) — **in progress**
+2. Solved maths BAC subjects, per profile, per session
 3. Evaluare Națională solved variants
 4. Explainers: exam calendar, grade calculation, syllabus changes, M1-vs-M2
    choice, what a first tutoring session looks like
+
+**On provenance — the constraint that shapes this whole phase.** The
+2026-08-20 post solves a *real* past paper, and that is the strongest format
+there is. The two informatics posts do not: their problems are written in the
+style of exam requirements, and each says so in an `:::atentie` callout with a
+pointer to subiecte.edu.ro.
+
+That distinction is not optional. Presenting an invented problem as an official
+subject is a claim a reader cannot verify and a competitor can disprove, on a
+site whose credibility rests on one named instructor. **If you have the real
+paper, solve the real paper and say which session and variant it is. If you do
+not, write your own and label it.** Never blur the two.
+
+**Compile everything.** Every C++ snippet in a published post must be compiled
+and run, and any output quoted in the prose must be that program's actual
+output. `g++` is available on the development machine; SERVER-SETUP §7.2
+requires this for generated code, and it applies just as much to code written by
+hand. Cheap to do, and the failure it prevents — a wrong solution under Răzvan's
+name, next to his olympiad credential — is the worst this site can produce.
 
 Every post: real `description`, correct `category`, `math: true` where formulas
 appear, explicit `slug` for long titles, tags reused rather than invented, and
@@ -444,7 +463,9 @@ appear, explicit `slug` for long titles, tags reused rather than invented, and
 
 Internal linking is the cheapest untapped lever here: every solved-problem post
 should link to the relevant Phase-2 landing page, and each landing page should
-link to its three most relevant posts.
+link to its most relevant posts. Both informatics posts do; the informatics
+landing page links back to both. The three maths landing pages still link to no
+post — wire them up as the maths posts appear.
 
 ### Phase 4 — off-site (mostly human tasks, see §6)
 
