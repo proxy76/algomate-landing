@@ -68,9 +68,10 @@ domain string surfaces unrelated companies of the same name and no mention of
 the tutoring site. The site is also new enough that it has almost no crawl
 history.
 
-**Therefore:** the winnable ground is (a) low-competition subject niches,
-(b) long-tail exam-intent queries, (c) the local pack. Head terms are a
-by-product of winning those first, not a starting target.
+**Therefore:** the winnable ground is (a) low-competition subject niches and
+(b) long-tail exam-intent queries. The local pack, which an earlier revision
+listed third, is not available at all — see §1.3. Head terms are a by-product of
+winning the first two, not a starting target.
 
 ### 1.2 Where this site can actually win
 
@@ -80,8 +81,32 @@ Ordered by expected time-to-result:
 |---|---|---|
 | 1 | `meditații informatică BAC`, `pregătire BAC informatică C++`, `subiecte informatică BAC rezolvate` | Far thinner competition than maths. The instructor's differentiator (national informatics olympiad results, UPB, working programmer) is strongest here. |
 | 2 | `rezolvare subiect BAC matematică M2`, `variante Evaluare Națională rezolvate`, `programa BAC matematică 2027`, `cum se calculează media la BAC` | Long-tail exam intent. Aggregator profile pages cannot serve this; worked solutions can. One such post already exists and is the correct template. |
-| 3 | `meditații matematică București`, `meditații matematică online` | Won through Google Business Profile + reviews + a dedicated landing page, not through body copy. |
-| 4 | Head terms | Downstream of tiers 1–3. Not a task. |
+| 3 | `meditații matematică online`, `meditații Evaluare Națională matematică` | Format and audience intent. Won with a dedicated page, which now exists for both. |
+| 4 | `meditații matematică București` | **Organic only — the local pack is not available.** See §1.3. Worth a page, but do not expect the map results. |
+| 5 | Head terms | Downstream of tiers 1–3. Not a task. |
+
+### 1.3 There is no Google Business Profile, and there cannot be
+
+**Confirmed by the owner, 2026-08-21.** AlgoMate teaches exclusively online and
+never meets students in person. Google Business Profile requires a business to
+have either a physical location customers can visit or in-person contact at the
+customer's address; an online-only service is not eligible. So:
+
+- **The local pack is out of reach.** Earlier revisions of this file called a
+  Business Profile "the fastest realistic route to a page one placement" for
+  `meditații matematică București`. That route does not exist. The city query is
+  now tier 4 and is an ordinary organic ranking problem, competing against
+  aggregators for the results *below* the map — which is harder, not easier.
+- **Google reviews are out too**, since they attach to a profile. Any review
+  strategy has to run on third-party platforms instead (§6).
+- **Do not "solve" this by inventing an address.** Listing a home address to
+  obtain a profile is a suspension risk and would put a false address in the
+  site's schema, which is the opposite of what NAP consistency is for.
+
+What survives from the local angle: the instructor is in București, the students
+largely are, and `/meditatii-matematica-bucuresti` says so honestly while being
+explicit that sessions are online. That page targets the organic result. It is
+not a substitute for the pack and should not be measured as one.
 
 ---
 
@@ -99,19 +124,25 @@ Everything here was confirmed by reading the code on 2026-08-21.
   one or many JSON-LD objects. This component is good. Extend it, don't replace
   it, and don't add react-helmet.
 - **Structured data** in `frontend/src/seo/structuredData.ts`:
-  `EducationalOrganization`, `Person` (Răzvan), three `Course` objects with
-  `offers`, two distinct `FAQPage` objects (homepage vs `/servicii` —
-  deliberately different questions), `LocalBusiness`, and a `breadcrumbSchema()`
-  helper. Wiring:
+  `EducationalOrganization`, `Person` (Răzvan), `LocalBusiness`, `Course`
+  objects for `/servicii` and one per landing page, a `Service` for the
+  București page, two hand-written `FAQPage` objects (homepage and `/servicii`),
+  plus `faqPageSchema()` and `breadcrumbSchema()` helpers. Wiring:
   - `pages/Home.tsx` → organization + person + faq + localBusiness
   - `pages/Services.tsx` → the three courses + servicesFaq + breadcrumb
+  - the four landing pages → their own Course/Service + `faqPageSchema(FAQS)` +
+    breadcrumb
   - `pages/Curriculum.tsx`, `pages/Blog.tsx`, `pages/Signup.tsx` → breadcrumb
   - `pages/BlogPost.tsx` → an inline `articleSchema` + breadcrumb
 - **Pricing and contact details have one source of truth**:
   `frontend/src/config/pricing.ts` and `frontend/src/config/contact.ts`. Visible
   copy, meta descriptions and JSON-LD all import from them — see §5.
-- **`/meditatii-informatica-bac`** is the first single-query landing page and
-  the template for the rest of Phase 2.
+- **Four single-query landing pages** (`/meditatii-informatica-bac`,
+  `/meditatii-matematica-bucuresti`, `/meditatii-matematica-online`,
+  `/meditatii-evaluare-nationala-matematica`), linked site-wide from the
+  footer's "Meditații" column.
+- **`FaqList` and `SectionLabel`** in `src/components/` — the FAQ block exists
+  once, on `<details>`, which is what keeps every answer in the document.
 - **robots.txt** (`frontend/public/robots.txt`) allows crawling and declares the
   sitemap. Correct.
 - **Sitemap + prerender route list** are generated by
@@ -246,30 +277,46 @@ a grep of `dist/` that no stray number survives.
 no street address, no `openingHours`, no `geo`, and an empty
 `organizationSchema.sameAs`. The live site exposed no phone number either.
 
-Local ranking leans on NAP consistency (name / address / phone) between the
-site, the Google Business Profile, and third-party directories. With no P and no
-A there was nothing to be consistent with.
+The reasoning at the time: local ranking leans on NAP consistency (name /
+address / phone) between the site, the Business Profile and third-party
+directories, and with no P and no A there was nothing to be consistent with.
+Half of that premise has since collapsed — there is no Business Profile and
+cannot be (§1.3) — but the phone still has to match the aggregator listings in
+§6, which are now the only external presence.
 
 **Done:** the owner's number, `0774 933 578`, now renders as text in the footer
 (a `tel:` href alone does not count as the visible NAP) and appears as
 `telephone` on `LocalBusiness`, `EducationalOrganization` and `Person`, from
 `src/config/contact.ts`. `areaServed` leads with the city.
 
+**Re-scoped by §1.3.** This defect was written on the assumption that a Google
+Business Profile would exist and that the schema had to match it. It will not.
+The phone number is still worth having — it is a conversion path and the NAP for
+the aggregator listings in §6 — but nothing here is going to produce a map
+result. Do not invest further in local markup expecting one.
+
 **Still open, and deliberately so:**
 
 - `sameAs` is still empty — populate it as the profiles in §6 go live, and only
   with profiles that demonstrably belong to this business.
-- No street address and no `openingHours`. There is no premises and no
-  published hours; filling those in with guesses would break the consistency the
-  rest of this is for. Revisit only if the owner publishes real ones.
+- No street address and no `openingHours`. There is no premises and no published
+  hours. Adding an address to look more local would be false in the schema and,
+  if used to chase a profile, a suspension risk.
+- `localBusinessSchema` keeps its `LocalBusiness` type. Structured data is not a
+  business listing, and the type still communicates geography and price range
+  usefully. `OnlineBusiness` would be more literally accurate but has almost no
+  consumer support. Revisit only if something concrete depends on it.
 
-### D-5 (P2) — no page targets any commercial keyword — IN PROGRESS
+### D-5 (P2) — no page targets any commercial keyword — FIXED 2026-08-21
 
-**One of the four landing pages is built:** `/meditatii-informatica-bac`
-(2026-08-21). ~1400 words, its own `<h1>`, five `<h2>`s, six FAQs shared with no
-other page, a page-specific `Course`, a breadcrumb, and links to `/inscriere`,
-`/servicii`, `/curriculum` and `/blog`. `/servicii` links back to it. Three
-routes from the Phase 2 table remain.
+All four landing pages are built. Each has its own `<h1>`, 950–1400 words, three
+to five `<h2>`s, six FAQs shared with no other page, a page-specific `Course` or
+`Service`, a breadcrumb, and a link to `/inscriere`. The footer links all four
+site-wide; `/servicii` links to the informatics page; the two maths pages link
+to each other.
+
+Measured after the build, not assumed: 5% eight-gram overlap between the
+București and online pages, and no FAQ question appearing on two pages.
 
 The original defect, for context:
 
@@ -341,41 +388,40 @@ one.
 Everything ticked above is **built and verified against `dist/`, not deployed.**
 A build must run on the server before any of it is live.
 
-### Phase 2 — landing pages (D-5)
+### Phase 2 — landing pages (D-5) — DONE 2026-08-21
 
-Four routes. Each one needs its own `<h1>`, ≥800 words of non-duplicated
-Romanian copy, its own FAQ block (distinct questions per page — duplicated
-`FAQPage` across pages is a duplicate signal), an internal link to `/inscriere`,
-and a `Course` or `Service` schema.
+All four routes exist, are in `STATIC_PAGES`, and pass the acceptance criteria
+in D-5.
 
-| Route | Primary target | Status |
+| Route | Primary target | Angle it argues |
 |---|---|---|
-| `/meditatii-informatica-bac` | `meditații informatică BAC`, `pregătire BAC informatică C++` | ✅ Built 2026-08-21. Use it as the template. |
-| `/meditatii-matematica-bucuresti` | `meditații matematică București` | Open. Pairs with the Google Business Profile. |
-| `/meditatii-matematica-online` | `meditații matematică online` | Open. Distinct angle from the București page — do not spin the same text. |
-| `/meditatii-evaluare-nationala-matematica` | `meditații Evaluare Națională matematică` | Open. Different audience (parents of 8th-graders); adjust tone. |
+| `/meditatii-informatica-bac` | `meditații informatică BAC`, `pregătire BAC informatică C++` | The subject. What the paper asks, chapters in order of marks earned. |
+| `/meditatii-matematica-online` | `meditații matematică online` | The format. What the two hours contain, and who it does not suit. |
+| `/meditatii-evaluare-nationala-matematica` | `meditații Evaluare Națională matematică` | The audience. Parents of eighth-graders; where marks are actually lost. |
+| `/meditatii-matematica-bucuresti` | `meditații matematică București` | The place. Organic only — no local pack, see §1.3. |
 
-**Copy the pattern from `src/pages/InformaticaBac.tsx`:**
+**If a fifth page is ever added, copy the pattern:**
 
 - Q&A defined once as `FAQS` and passed to `faqPageSchema(FAQS)`, so the schema
-  cannot claim an answer the page does not render.
-- A page-specific `Course` in `structuredData.ts` carrying `url` and
-  `mainEntityOfPage`, rather than re-emitting `/servicii`'s object on a second
-  URL.
+  cannot claim an answer the page does not render. Render it with `<FaqList>`.
+- A page-specific `Course` or `Service` in `structuredData.ts` carrying `url`,
+  rather than re-emitting an existing object on a second URL.
 - Claims about the exam kept to what has been stable for years, with a pointer
   to edu.ro for the rest. The syllabus changes by ministerial order; copy that
   quotes a point breakdown goes stale silently.
-- A link both ways: the landing page links into `/servicii` and `/curriculum`,
-  and they link back.
+- An angle no existing page already argues. If a paragraph would read the same
+  on two pages, it belongs on neither — that is the failure mode that makes
+  Google pick one of them and drop the other.
+- Links in both directions, plus an entry in the footer's "Meditații" column.
 
 **Mechanical requirement:** adding a route means adding it to `STATIC_PAGES` in
 `frontend/scripts/build-content.mjs`, or it will be missing from both the
 sitemap and the prerender route list, and will 404 in production. This is the
 easiest thing to forget in this codebase.
 
-**Still missing on the informatics page:** links to its three most relevant
-posts. There are no informatics posts yet — it links to `/blog` instead. Add
-them with the first Phase 3 posts.
+**Open on the landing pages:** none of them link to specific posts yet, because
+no post matches them closely enough — the informatics page links to `/blog`
+instead. Wire real links in as Phase 3 produces the posts.
 
 ### Phase 3 — content engine
 
@@ -442,20 +488,26 @@ link to its three most relevant posts.
 
 These matter more than most of the code work, and none of them are in the repo:
 
-1. **Google Business Profile.** Does not exist. This is the fastest realistic
-   route to a page-one placement for `meditații matematică București`, via the
-   local pack. Requires the owner to create and verify it.
-2. **Reviews.** Zero anywhere. Ask past students for Google reviews. For a
-   one-person tutoring business, this outweighs on-page work.
-3. **Profiles on the aggregators that currently outrank the site** —
+**A Google Business Profile is not on this list and is not a task** — the
+business is online-only and therefore ineligible (§1.3). Neither are Google
+reviews, which require one. That removes what earlier revisions called the
+single highest-leverage off-site action, so the weight shifts to the rest:
+
+1. **Profiles on the aggregators that currently outrank the site** —
    `meditatii.ro`, `superprof.com.ro`, `buki-meditatii.ro`, `olx.ro`,
    `publi24.ro`, `anunturi-meditatii.ro` — each linking back to algomate.ro.
-   This is both lead generation and the site's first inbound links. Once live,
-   add the URLs to `organizationSchema.sameAs`.
-4. **Search Console** access for T-0.3 and for ongoing monitoring.
-5. **Paid search.** SEO will not produce enrolments this session. If the owner
-   needs students now, Google Ads on the exam-intent terms is the parallel track
-   while content matures.
+   **Now the most important item here.** It is simultaneously lead generation,
+   the site's first inbound links, and the only realistic place to accumulate
+   public reviews. Once live, add the URLs to `organizationSchema.sameAs` (they
+   are the reason that array exists and is still empty).
+2. **Reviews, on those platforms.** Zero anywhere today. For a one-person
+   tutoring business this still outweighs most on-page work — it just cannot
+   happen on Google. Ask past students on whichever platforms get set up in (1).
+3. **Search Console** access for T-0.3 and for ongoing monitoring.
+4. **Paid search.** SEO will not produce enrolments this session, and with the
+   local pack unavailable the organic path for commercial queries is longer than
+   it looked. If the owner needs students now, Google Ads on the exam-intent
+   terms is the parallel track while content matures.
 
 ---
 
