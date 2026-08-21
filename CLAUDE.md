@@ -73,6 +73,24 @@ not set them up, and never date a post in the future. The weekly mock-exam job
 is designed but not built and blocked on unknowns. The doc also records known
 issues to leave alone unless asked, including pre-existing npm advisories.
 
+## SEO
+
+`docs/SEO.md` is the strategy and the task backlog: which queries are winnable,
+what is already built, and what is deliberately left to the owner. Read it
+before adding pages, schema or posts aimed at search.
+
+Two invariants from it are easy to break without noticing, because both fail
+silently in a *build* and only show up in the prerendered HTML:
+
+- **Prices come from `src/config/pricing.ts`.** Never type a price into a
+  component, a meta description or a JSON-LD object — schema that disagrees with
+  the page is a manual-action risk.
+- **Content must not depend on a mount or an animation frame.** The prerenderer
+  emulates `prefers-reduced-motion: reduce`, so a component that animates text
+  must render its finished state under that setting; accordions and tabs must
+  keep their content in the DOM and hide it with CSS. A half-typed `<h1>` and
+  six missing FAQ answers both shipped to production this way.
+
 ## Conventions
 
 - Commit subjects are lowercase and prefixed: `feat:`, `fix:`, `copy:`,
