@@ -180,6 +180,48 @@
   color: #d8d8d8;
 }
 
+/* Tables in the body. Markdown emits a bare <table>, and the sanitiser strips
+   any class off a wrapper, so the scroll container has to be the table itself:
+   `display: block` plus `width: max-content` lets the columns size to their
+   content and scroll inside the column width, instead of being squeezed into an
+   unreadable grid on a phone. */
+.prose-algomate table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  font-size: 0.92rem;
+}
+
+.prose-algomate th,
+.prose-algomate td {
+  padding: 0.7em 1.1em;
+  border-bottom: 1px solid #1e1e1e;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose-algomate th {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #e8734a;
+  border-bottom-color: #2a2a2a;
+  white-space: nowrap;
+}
+
+.prose-algomate td {
+  color: #999;
+}
+
+.prose-algomate tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 /* Images inside the body. The masthead cover is styled on the component;
    this is for ![]() in the markdown, which would otherwise overflow. */
 .prose-algomate img {

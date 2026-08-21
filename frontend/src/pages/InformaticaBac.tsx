@@ -404,14 +404,24 @@ const InformaticaBac: React.FC = () => {
               Prima ședință este o evaluare a nivelului real, iar după ea primești un plan
               concret: ce capitole, în ce ordine, până la examen. Scrie în formular ce
               specializare are elevul și cât timp mai este până la probă — se răspunde în 24 de
-              ore. Merită citit și{' '}
+              ore.
+            </p>
+            <p className="text-[#b8b8b8] leading-relaxed mb-7">
+              Până atunci, pe blog sunt rezolvate integral cerințele din capitolele grele:{' '}
               <Link
-                to="/blog"
+                to="/blog/recursivitate-bac-informatica-cerinte-rezolvate"
                 className="text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] transition-colors"
               >
-                blogul
+                recursivitate și backtracking
+              </Link>{' '}
+              și{' '}
+              <Link
+                to="/blog/matrice-bac-informatica-parcurgeri"
+                className="text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] transition-colors"
+              >
+                parcurgerile pe matrice
               </Link>
-              , unde subiectele de examen sunt rezolvate integral, cerință cu cerință.
+              , cu codul compilat și rulat înainte de publicare.
             </p>
             <Link to="/inscriere">
               <motion.button
