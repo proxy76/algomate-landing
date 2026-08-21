@@ -48,6 +48,9 @@ const STATIC_PAGES = [
   // without adding it here leaves it out of both the sitemap and the prerender
   // list, which means it 404s in production.
   { path: '/meditatii-informatica-bac', changefreq: 'monthly', priority: '0.9' },
+  { path: '/meditatii-matematica-bucuresti', changefreq: 'monthly', priority: '0.9' },
+  { path: '/meditatii-matematica-online', changefreq: 'monthly', priority: '0.9' },
+  { path: '/meditatii-evaluare-nationala-matematica', changefreq: 'monthly', priority: '0.9' },
   { path: '/curriculum', changefreq: 'monthly', priority: '0.8' },
   { path: '/inscriere', changefreq: 'monthly', priority: '0.8' },
   { path: '/blog', changefreq: 'weekly', priority: '0.9' },

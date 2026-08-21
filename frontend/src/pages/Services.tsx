@@ -8,11 +8,12 @@ import {
   Clock,
   Users,
   ArrowRight,
-  ChevronDown,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
+import SectionLabel from '../components/SectionLabel';
+import FaqList from '../components/FaqList';
 import {
   breadcrumbSchema,
   courseInformaticaBac,
@@ -178,16 +179,6 @@ const faqs = [
     a: 'Ideal, din septembrie–octombrie al clasei a XII-a, ceea ce lasă timp pentru parcurgerea întregii programe și pentru simulări. Pregătirea începută în primăvară rămâne utilă, dar se concentrează pe tipurile de subiecte care aduc cele mai multe puncte, nu pe acoperirea completă a materiei.',
   },
 ];
-
-/** Section heading, matching the rule-and-label pattern used across the site. */
-const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="flex items-baseline gap-4 mb-10">
-    <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#e8734a] whitespace-nowrap">
-      {children}
-    </span>
-    <span className="h-px flex-1 bg-[#222]" />
-  </div>
-);
 
 const Services: React.FC = () => {
   return (
@@ -537,30 +528,7 @@ const Services: React.FC = () => {
             className="mt-24 md:mt-32"
           >
             <SectionLabel>Întrebări frecvente</SectionLabel>
-            <div className="max-w-3xl border-t border-[#222]">
-              {faqs.map((f) => (
-                <details key={f.q} className="group border-b border-[#222]">
-                  {/* The affordance lives on the whole row, not on a small
-                      glyph: full-width hover ground, a chevron in a circle on
-                      the right where accordions are expected to put it, and
-                      padding on the summary so the hit area is the row. */}
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 rounded-sm px-4 py-6 transition-colors duration-200 hover:bg-[#141414] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#e8734a] [&::-webkit-details-marker]:hidden">
-                    <span className="font-sans text-[1.05rem] font-medium text-[#d8d8d8] transition-colors group-hover:text-white group-open:text-white">
-                      {f.q}
-                    </span>
-                    <span
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-[#333] text-[#e8734a] transition-all duration-300 group-hover:border-[#e8734a]/60 group-hover:bg-[#e8734a]/10 group-open:rotate-180"
-                      aria-hidden
-                    >
-                      <ChevronDown size={15} strokeWidth={2} />
-                    </span>
-                  </summary>
-                  <p className="max-w-2xl px-4 pb-7 text-[0.95rem] leading-relaxed text-[#999]">
-                    {f.a}
-                  </p>
-                </details>
-              ))}
-            </div>
+            <FaqList items={faqs} />
 
             <div className="max-w-3xl mt-12 pt-10 border-t border-[#222]">
               <p className="text-[#b8b8b8] leading-relaxed mb-7">

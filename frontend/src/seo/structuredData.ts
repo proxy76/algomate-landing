@@ -210,6 +210,85 @@ export const courseInformaticaBacLanding = {
   },
 };
 
+/**
+ * `/meditatii-matematica-bucuresti`.
+ *
+ * A `Service` rather than a second `LocalBusiness`: the business is online-only
+ * and therefore not eligible for a Google Business Profile, so there is no local
+ * listing for this to correspond to. What is true and worth stating is that the
+ * service is provided from București and aimed at students there — which is
+ * `areaServed`, not an address.
+ */
+export const serviceMatematicaBucuresti = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Meditații matematică București — online',
+  serviceType: 'Meditații matematică',
+  description:
+    'Meditații de matematică pentru elevii din București și Ilfov, pentru Bacalaureat și Evaluarea Națională. Ședințele se desfășoară online, în grupe mici sau individual.',
+  url: `${SITE_URL}/meditatii-matematica-bucuresti`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+    telephone: PHONE_E164,
+  },
+  areaServed: { '@type': 'City', name: LOCALITY },
+  availableChannel: {
+    '@type': 'ServiceChannel',
+    serviceUrl: `${SITE_URL}/inscriere`,
+    availableLanguage: 'ro',
+  },
+  offers: standardOffers,
+};
+
+/** `/meditatii-matematica-online`. */
+export const courseMatematicaOnline = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: 'Meditații Matematică Online — BAC și Evaluare Națională',
+  description:
+    'Meditații de matematică online, în ședințe de două ore cu tablă digitală partajată, notițe trimise după fiecare întâlnire și temă corectată individual între ședințe.',
+  url: `${SITE_URL}/meditatii-matematica-online`,
+  mainEntityOfPage: `${SITE_URL}/meditatii-matematica-online`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+  },
+  offers: standardOffers,
+  inLanguage: 'ro',
+  hasCourseInstance: {
+    '@type': 'CourseInstance',
+    courseMode: 'Online',
+    courseWorkload: 'PT2H',
+  },
+};
+
+/** `/meditatii-evaluare-nationala-matematica`. */
+export const courseEvaluareNationala = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: 'Meditații Evaluare Națională — Matematică',
+  description:
+    'Pregătire la matematică pentru Evaluarea Națională, clasa a VIII-a: evaluarea nivelului real, recuperarea lacunelor din gimnaziu, subiecte grupate pe tipuri de cerințe și simulări cronometrate.',
+  url: `${SITE_URL}/meditatii-evaluare-nationala-matematica`,
+  mainEntityOfPage: `${SITE_URL}/meditatii-evaluare-nationala-matematica`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+  },
+  offers: standardOffers,
+  educationalLevel: 'Gimnaziu',
+  inLanguage: 'ro',
+  hasCourseInstance: {
+    '@type': 'CourseInstance',
+    courseMode: 'Online',
+    courseWorkload: 'PT2H',
+  },
+};
+
 // ─── FAQ Schema (drives Google FAQ rich results) ─────────────────────────────
 
 export const faqSchema = {
