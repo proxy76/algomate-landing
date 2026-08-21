@@ -1,31 +1,28 @@
 # nginx config for algomate.ro
 #
-# Reconciled against the live config on 2026-08-15 (`nginx -T`), so the
-# surrounding directives here are the real ones, not guesses. Public TLS is
-# terminated by a Cloudflare tunnel, which forwards to nginx on 127.0.0.1:8080.
+# Reconciled against the live config on 2026-08-21 (`nginx -T`) — the whole
+# file below is the real one, not a template. Public TLS is terminated by a
+# Cloudflare tunnel, which forwards to nginx on 127.0.0.1:8080.
 #
-# Only the `location /` block and the two redirect directives change. Verify
-# the listen line and any directives above server_name against the live file
-# before applying — the capture used to write this started at server_name.
-
-# ─── WHAT CHANGES ───────────────────────────────────────────────────────────
+# Everything here is APPLIED. This file is a reference for what the live
+# config is and why, not a change to make.
 #
-#   -    location / {
-#   -        try_files $uri $uri/ /index.html;
-#   -    }
-#   +    absolute_redirect off;
-#   +    port_in_redirect  off;
-#   +
-#   +    location / {
-#   +        try_files $uri $uri/index.html =404;
-#   +    }
+# ─── WHY THESE DIRECTIVES EXIST — do not "simplify" them ────────────────────
 #
-# That single old line caused both production bugs:
+# The docroot is the atomic-deploy symlink, swapped by rebuild.sh:
 #
-#   $uri/       matches the directory, so nginx answers /blog with a 301 to
+#     root /srv/algomate-deploy/current;   # NOT frontend/dist
+#
+# Pointing it back at a directory that a build writes into re-creates the
+# outage of 2026-08-15 (see docs/SERVER-SETUP.md §5.2).
+#
+# The `location /` block once read `try_files $uri $uri/ /index.html;`, and
+# that single line caused both indexing bugs (§4.3.1, §4.3.2):
+#
+#   $uri/       matches the directory, so nginx answered /blog with a 301 to
 #               http://algomate.ro:8080/blog/ — it builds the Location from its
 #               own scheme and listening port, having no idea the public origin
-#               is https on 443 behind the tunnel. Google then sees a sitemap
+#               is https on 443 behind the tunnel. Google then saw a sitemap
 #               URL that redirects to a page whose canonical points back at the
 #               redirecting URL, which is a standard reason to index neither.
 #
@@ -33,10 +30,15 @@
 #               homepage byte-for-byte. /wp-login.php included. Google reads
 #               that as a soft 404.
 #
-# The replacement serves /blog straight from /blog/index.html as a 200 — no
+# The current form serves /blog straight from /blog/index.html as a 200 — no
 # redirect at all, so the fetched URL matches the canonical the page prints —
 # and 404s anything with no file behind it. The site is fully prerendered, so
-# there is nothing an SPA fallback needs to do.
+# there is nothing an SPA fallback needs to do. `absolute_redirect off` and
+# `port_in_redirect off` keep any redirect nginx does emit relative, which is
+# what stops the :8080 leak recurring in the retired-slug block.
+#
+# After any change here: sudo nginx -t && sudo systemctl reload nginx, then
+# node frontend/scripts/check-live-seo.mjs https://algomate.ro
 
 server {
     listen 127.0.0.1:8080;
@@ -45,19 +47,27 @@ server {
     client_max_body_size 1m;
 
     # Frontend — prerendered static output, not an SPA
-    root /srv/algomate/frontend/dist;
+    root /srv/algomate-deploy/current;
     index index.html;
 
-    # nginx is not the public origin; never let it name a scheme, host or port.
+    # nginx is not the public origin (TLS terminates at the Cloudflare tunnel);
+    # never let it name a scheme, host or port in a redirect.
     absolute_redirect off;
     port_in_redirect  off;
+
+    # Retired slugs — 301 to the current URL so the old one does not 404.
+    # Relative targets only; absolute_redirect off keeps them relative (§4.3.1).
+    location = /blog/rezolvare-bac-2026-matematica-tehnologic-varianta-4 {
+        return 301 /blog/rezolvare-subiect-mate-bac-m2-august-2026;
+    }
 
     location / {
         try_files $uri $uri/index.html =404;
     }
 
-    # Django API — unchanged from the live config. The enrollment form posts
-    # here; if this stops working the form silently breaks.
+    # Django API. The enrollment form posts here; if this proxy stops
+    # working the form breaks silently. A GET returns 405 (POST-only), which
+    # is the quick check that it is intact — 502/504 means it is not.
     location /api/ {
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
@@ -66,26 +76,3 @@ server {
         proxy_set_header X-Forwarded-Proto https;
     }
 }
-
-# ─── APPLY ──────────────────────────────────────────────────────────────────
-#
-#   sudo cp /etc/nginx/sites-available/algomate /root/algomate.nginx.bak
-#   sudo nano /etc/nginx/sites-available/algomate     # make the change above
-#   sudo nginx -t && sudo systemctl reload nginx
-#
-# ─── VERIFY ─────────────────────────────────────────────────────────────────
-#
-#   node frontend/scripts/check-live-seo.mjs https://algomate.ro
-#
-# Baseline before the fix is 16 failures; after it should be 0. Then test the
-# enrollment form by hand — the script does not touch /api/.
-#
-# Roll back with:
-#   sudo cp /root/algomate.nginx.bak /etc/nginx/sites-available/algomate
-#   sudo nginx -t && sudo systemctl reload nginx
-#
-# ─── NOT CHANGED HERE, ON PURPOSE ───────────────────────────────────────────
-#
-# Cache headers for /assets/ (fingerprinted by Vite, so cacheable forever) and
-# a short max-age for .html would both help, but they are a separate change
-# with separate failure modes. Get indexing correct first.

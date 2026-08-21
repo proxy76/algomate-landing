@@ -11,33 +11,33 @@ frontend/    Vite + React 19 + TypeScript + Tailwind v4. Static build,
 docs/        Runbooks — read these before improvising.
 ```
 
-## ⚠ Outstanding — do this BEFORE the next build on the server
+## Deploying — atomic, one command
 
-**`deploy/rebuild.sh` is written but not installed.** Until it is, every deploy
-rebuilds in place: `npm run build` empties `frontend/dist/` while nginx is
-serving that same directory, so anything fetching the site mid-build gets an
-error. A crawler that lands in that window can get pages dropped from Google.
-
-This is not hypothetical. It happened on 2026-08-15 and put a *"Server error
-(5xx)"* notice in Search Console on 2026-08-17. The nginx `=404` change made
-the window serve 404s instead of 500s — quieter, not fixed.
-
-If you are about to build or deploy on the server, install it first.
-**Follow `deploy/INSTALL.md` literally, step by step** — it is written as exact
-commands with the expected output for each, precisely so it does not have to be
-reasoned out. Do not improvise a shortcut; the ordering matters (the nginx
-change must come *after* the first successful run, or the site 404s).
-
-Afterwards, deploys are `rebuild.sh` and nothing else. Verify any deploy with:
+**`deploy/rebuild.sh` is installed** (since 2026-08-18, at
+`/srv/algomate-deploy/bin/rebuild.sh`). nginx serves
+`/srv/algomate-deploy/current`, a symlink that each deploy swaps in a single
+rename, so no request ever observes a half-built site and a failed build never
+goes live. Deploy as the site owner (`razvan`), then verify:
 
 ```bash
+sudo -u razvan /srv/algomate-deploy/bin/rebuild.sh
 node frontend/scripts/check-live-seo.mjs https://algomate.ro
 ```
 
-That script is the regression test for the whole indexing setup — it probes
-production as Googlebot and exits non-zero on failure. **Run it after any
-deploy or nginx change.** It has caught two production bugs already; the
+That check script is the regression test for the whole indexing setup — it
+probes production as Googlebot and exits non-zero on failure. **Run it after
+any deploy or nginx change.** It has caught two production bugs already; the
 failures it reports are real, not style opinions.
+
+**`deploy/INSTALL.md` is a completed one-time install — do not re-run it.** Its
+warning about ordering (nginx repointed only *after* the first successful run)
+describes history, not a pending step. Keep it for its rollback section: a bad
+deploy is undone by pointing the symlink at an earlier release, no rebuild.
+
+Never deploy by running `npm run build` against `frontend/dist/`. That is the
+in-place rebuild this replaced — it emptied `dist/` while nginx served that
+same directory, and a crawler landing in the window on 2026-08-15 produced a
+*"Server error (5xx)"* notice in Search Console on 2026-08-17.
 
 ## Publishing a blog post
 
