@@ -1,9 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, ChevronDown, Terminal } from 'lucide-react';
+import { ArrowRight, Terminal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
+import SectionLabel from '../components/SectionLabel';
+import FaqList from '../components/FaqList';
 import {
   breadcrumbSchema,
   courseInformaticaBacLanding,
@@ -135,16 +137,6 @@ const FAQS = [
     a: 'Da, dar ca pregătire separată, de regulă în format individual. Materia se suprapune doar parțial: BAC-ul cere corectitudine și viteză pe tipare cunoscute, olimpiada cere algoritmi și complexitate. Amestecate în aceeași ședință, se face rău la amândouă.',
   },
 ];
-
-/** Section heading, matching the rule-and-label pattern used across the site. */
-const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="flex items-baseline gap-4 mb-10">
-    <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#e8734a] whitespace-nowrap">
-      {children}
-    </span>
-    <span className="h-px flex-1 bg-[#222]" />
-  </div>
-);
 
 const InformaticaBac: React.FC = () => {
   return (
@@ -397,28 +389,7 @@ const InformaticaBac: React.FC = () => {
             <h2 className="font-display font-semibold text-3xl md:text-[2.5rem] text-[#f0f0f0] leading-[1.1] tracking-tight mb-10 max-w-2xl">
               Ce se întreabă înainte de prima ședință.
             </h2>
-            {/* <details> rather than a mounted/unmounted panel: the answers have
-                to be in the HTML, since they are also the FAQPage markup. */}
-            <div className="max-w-3xl border-t border-[#222]">
-              {FAQS.map((f) => (
-                <details key={f.q} className="group border-b border-[#222]">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 rounded-sm px-4 py-6 transition-colors duration-200 hover:bg-[#141414] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#e8734a] [&::-webkit-details-marker]:hidden">
-                    <span className="font-sans text-[1.05rem] font-medium text-[#d8d8d8] transition-colors group-hover:text-white group-open:text-white">
-                      {f.q}
-                    </span>
-                    <span
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-[#333] text-[#e8734a] transition-all duration-300 group-hover:border-[#e8734a]/60 group-hover:bg-[#e8734a]/10 group-open:rotate-180"
-                      aria-hidden
-                    >
-                      <ChevronDown size={15} strokeWidth={2} />
-                    </span>
-                  </summary>
-                  <p className="max-w-2xl px-4 pb-7 text-[0.95rem] leading-relaxed text-[#999]">
-                    {f.a}
-                  </p>
-                </details>
-              ))}
-            </div>
+            <FaqList items={FAQS} />
           </motion.section>
 
           {/* ── CTA ────────────────────────────────────────────────── */}

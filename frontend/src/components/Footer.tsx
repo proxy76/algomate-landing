@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
   return (
     <footer className="border-t border-[#1a1a1a] bg-[#0a0a0a] relative z-10">
       <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-10">
           {/* Brand */}
           <div className="md:col-span-1">
             <h3 className="text-base font-semibold text-[#f0f0f0] tracking-wide mb-3">
@@ -32,6 +32,35 @@ const Footer: React.FC = () => {
                 { name: 'Înscrie-te', href: '/inscriere' },
               ].map((link) => (
                 <li key={link.name}>
+                  <Link
+                    to={link.href}
+                    className="text-sm text-[#666] hover:text-[#e8734a] transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Subject pages. Also the only site-wide internal links into them —
+              a landing page nothing links to is a page Google finds late and
+              treats as peripheral. */}
+          <div>
+            <h4 className="text-xs font-medium text-[#888] uppercase tracking-wider mb-4">
+              Meditații
+            </h4>
+            <ul className="space-y-2">
+              {[
+                { name: 'Informatică BAC', href: '/meditatii-informatica-bac' },
+                { name: 'Matematică București', href: '/meditatii-matematica-bucuresti' },
+                { name: 'Matematică online', href: '/meditatii-matematica-online' },
+                {
+                  name: 'Evaluare Națională',
+                  href: '/meditatii-evaluare-nationala-matematica',
+                },
+              ].map((link) => (
+                <li key={link.href}>
                   <Link
                     to={link.href}
                     className="text-sm text-[#666] hover:text-[#e8734a] transition-colors"

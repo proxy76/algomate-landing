@@ -4,6 +4,9 @@ import RootLayout from './components/RootLayout';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import InformaticaBac from './pages/InformaticaBac';
+import MatematicaBucuresti from './pages/MatematicaBucuresti';
+import MatematicaOnline from './pages/MatematicaOnline';
+import EvaluareNationala from './pages/EvaluareNationala';
 import Curriculum from './pages/Curriculum';
 import Signup from './pages/Signup';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -28,6 +31,18 @@ const router = createBrowserRouter([
       {
         path: '/meditatii-informatica-bac',
         element: <InformaticaBac />,
+      },
+      {
+        path: '/meditatii-matematica-bucuresti',
+        element: <MatematicaBucuresti />,
+      },
+      {
+        path: '/meditatii-matematica-online',
+        element: <MatematicaOnline />,
+      },
+      {
+        path: '/meditatii-evaluare-nationala-matematica',
+        element: <EvaluareNationala />,
       },
       {
         path: '/curriculum',
