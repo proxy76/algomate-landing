@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { pricingAnswer } from '../config/pricing';
 
 /**
  * FAQ Section — visible on the homepage.
- * 
+ *
  * Pairs with the FAQPage JSON-LD schema in structuredData.ts.
  * The questions and answers here MUST stay in sync with the schema
  * to avoid Google penalties for inconsistent structured data.
- * 
+ *
  * SEO purpose: Provides keyword-rich, indexable text content
  * that targets long-tail queries like "cât costă meditațiile BAC"
  * and drives Google FAQ rich results.
+ *
+ * Every answer is rendered into the DOM regardless of which item is open —
+ * collapsed panels are hidden with height, not unmounted. Google's FAQ policy
+ * accepts content behind an expander but not content missing from the HTML, and
+ * this section previously shipped one answer against seven in the schema.
  */
 
 const faqItems = [
   {
     question: 'Cât costă meditațiile la AlgoMate?',
-    answer:
-      'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 150 RON/ședință pentru meditații individuale.',
+    answer: pricingAnswer,
   },
   {
     question: 'Meditațiile sunt online sau fizic?',
@@ -59,6 +64,9 @@ const FAQItem: React.FC<{
   onToggle: () => void;
   index: number;
 }> = ({ question, answer, isOpen, onToggle, index }) => {
+  const panelId = `faq-answer-${index}`;
+  const buttonId = `faq-question-${index}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -68,9 +76,11 @@ const FAQItem: React.FC<{
       className="border-b border-[#222]"
     >
       <button
+        id={buttonId}
         onClick={onToggle}
         className="w-full flex items-center justify-between py-6 md:py-7 text-left group"
         aria-expanded={isOpen}
+        aria-controls={panelId}
       >
         <div className="flex items-start gap-4 md:gap-5 flex-1 pr-4">
           <span className="font-mono text-[10px] text-[#666] tabular-nums tracking-[0.15em] pt-1.5 w-6 shrink-0">
@@ -88,23 +98,23 @@ const FAQItem: React.FC<{
           <ChevronDown size={18} strokeWidth={2} />
         </motion.span>
       </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="pl-10 md:pl-11 pb-6 md:pb-7 pr-8">
-              <p className="text-[14px] md:text-[15px] text-[#999] leading-relaxed">
-                {answer}
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Always mounted: collapsing is a height animation, not an unmount, so
+          the answer text is in the prerendered HTML for every item. */}
+      <motion.div
+        id={panelId}
+        role="region"
+        aria-labelledby={buttonId}
+        initial={false}
+        animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="overflow-hidden"
+      >
+        <div className="pl-10 md:pl-11 pb-6 md:pb-7 pr-8">
+          <p className="text-[14px] md:text-[15px] text-[#999] leading-relaxed">
+            {answer}
+          </p>
+        </div>
+      </motion.div>
     </motion.div>
   );
 };

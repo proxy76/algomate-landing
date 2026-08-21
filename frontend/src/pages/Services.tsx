@@ -14,19 +14,27 @@ import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import {
+  breadcrumbSchema,
   courseInformaticaBac,
   courseIntroductionProgramming,
   courseMatematicaBac,
   servicesFaqSchema,
 } from '../seo/structuredData';
+import {
+  GROUP_MAX_STUDENTS,
+  groupVsIndividualAnswer,
+  priceGroupLabel,
+  priceIndividualLabel,
+  pricingSummary,
+} from '../config/pricing';
 
 const services = [
   {
     icon: Sigma,
     title: "Matematică BAC",
     tech: "M1 / M2 / M3",
-    priceGroup: "100 RON",
-    priceIndividual: "150 RON",
+    priceGroup: priceGroupLabel,
+    priceIndividual: priceIndividualLabel,
     description:
       "Pregătire intensivă pentru BAC la Matematică, adaptată profilului tău. Metodă structurată cu accent pe înțelegere, nu memorare.",
     startDate: "15 August",
@@ -42,8 +50,8 @@ const services = [
     icon: Code,
     title: "Introducere în Informatică",
     tech: "Python / C++",
-    priceGroup: "100 RON",
-    priceIndividual: "150 RON",
+    priceGroup: priceGroupLabel,
+    priceIndividual: priceIndividualLabel,
     description:
       "Curs introductiv pentru clasa a 9-a. Învață bazele programării cu exerciții practice și proiecte reale care îți construiesc fundația pentru o carieră în tech.",
     startDate: "15 Iulie",
@@ -59,8 +67,8 @@ const services = [
     icon: Terminal,
     title: "Informatică BAC",
     tech: "C / C++",
-    priceGroup: "100 RON",
-    priceIndividual: "150 RON",
+    priceGroup: priceGroupLabel,
+    priceIndividual: priceIndividualLabel,
     description:
       "Pregătire completă pentru examenul de Bacalaureat la Informatică. Acoperim toți algoritmii, structurile de date și tipurile de subiecte din programa oficială.",
     startDate: "15 August",
@@ -102,8 +110,8 @@ const sessionFlow = [
 const formats = [
   {
     name: 'În grupă',
-    price: '100 RON',
-    unit: 'ședință · max 3 elevi',
+    price: priceGroupLabel,
+    unit: `ședință · max ${GROUP_MAX_STUDENTS} elevi`,
     fit: 'Potrivit când',
     points: [
       'Elevul are baza materiei și vrea să o consolideze',
@@ -114,7 +122,7 @@ const formats = [
   },
   {
     name: 'Individual',
-    price: '150 RON',
+    price: priceIndividualLabel,
     unit: 'ședință · unu la unu',
     fit: 'Potrivit când',
     points: [
@@ -147,7 +155,7 @@ const notForYou = [
 const faqs = [
   {
     q: 'Care este diferența dintre meditațiile în grupă și cele individuale?',
-    a: 'În grupă (maximum 3 elevi, 100 RON/ședință) elevii lucrează pe aceeași programă și învață și din întrebările celorlalți. Individual (150 RON/ședință) ritmul și conținutul se adaptează complet elevului, ceea ce ajută când sunt lacune mari de recuperat sau când pregătirea vizează un obiectiv specific, cum ar fi o olimpiadă.',
+    a: groupVsIndividualAnswer,
   },
   {
     q: 'Cât durează o ședință de meditații?',
@@ -186,13 +194,14 @@ const Services: React.FC = () => {
     <PageTransition>
       <SEO
         title="Servicii Meditații BAC — Informatică C++, Matematică M1/M2/M3 | AlgoMate"
-        description="Meditații de matematică BAC (M1/M2/M3), informatică BAC (C/C++) și introducere în programare (Python). 100 RON/ședință în grupe de max 3 elevi, 150 RON individual."
+        description={`Meditații de matematică BAC (M1/M2/M3), informatică BAC (C/C++) și introducere în programare (Python). ${pricingSummary}`}
         path="/servicii"
         jsonLd={[
           courseMatematicaBac,
           courseIntroductionProgramming,
           courseInformaticaBac,
           servicesFaqSchema,
+          breadcrumbSchema([{ name: 'Servicii', path: '/servicii' }]),
         ]}
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">

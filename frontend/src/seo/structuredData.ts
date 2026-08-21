@@ -5,6 +5,16 @@
  * Google uses them to show rich snippets (prices, FAQ dropdowns, course info).
  */
 
+import {
+  CURRENCY,
+  PRICE_GROUP,
+  PRICE_INDIVIDUAL,
+  GROUP_MAX_STUDENTS,
+  priceRangeLabel,
+  pricingAnswer,
+  groupVsIndividualAnswer,
+} from '../config/pricing';
+
 const SITE_URL = 'https://algomate.ro';
 
 // ─── Organization Schema (site-wide) ────────────────────────────────────────
@@ -65,22 +75,23 @@ export const personSchema = {
 // ─── Course Schemas (for /servicii page) ─────────────────────────────────────
 
 /**
- * Standard pricing, identical across all courses:
- * 100 RON/ședință in groups of max 3 students, 150 RON/ședință one-on-one.
+ * Standard pricing, identical across all courses. The numbers come from
+ * `config/pricing.ts`, which is also what the visible price blocks render —
+ * schema and page cannot disagree.
  */
 const standardOffers = [
   {
     '@type': 'Offer',
-    name: 'Ședință în grupă (max 3 elevi)',
-    price: '100',
-    priceCurrency: 'RON',
+    name: `Ședință în grupă (max ${GROUP_MAX_STUDENTS} elevi)`,
+    price: String(PRICE_GROUP),
+    priceCurrency: CURRENCY,
     availability: 'https://schema.org/InStock',
   },
   {
     '@type': 'Offer',
     name: 'Ședință individuală',
-    price: '150',
-    priceCurrency: 'RON',
+    price: String(PRICE_INDIVIDUAL),
+    priceCurrency: CURRENCY,
     availability: 'https://schema.org/InStock',
   },
 ];
@@ -159,7 +170,7 @@ export const faqSchema = {
       name: 'Cât costă meditațiile la AlgoMate?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 150 RON/ședință pentru meditații individuale.',
+        text: pricingAnswer,
       },
     },
     {
@@ -229,7 +240,7 @@ export const servicesFaqSchema = {
       name: 'Care este diferența dintre meditațiile în grupă și cele individuale?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'În grupă (maximum 3 elevi, 100 RON/ședință) elevii lucrează pe aceeași programă și învață și din întrebările celorlalți. Individual (150 RON/ședință) ritmul și conținutul se adaptează complet elevului, ceea ce ajută când sunt lacune mari de recuperat sau când pregătirea vizează un obiectiv specific, cum ar fi o olimpiadă.',
+        text: groupVsIndividualAnswer,
       },
     },
     {
@@ -289,9 +300,38 @@ export const localBusinessSchema = {
     addressLocality: 'București',
     addressCountry: 'RO',
   },
-  priceRange: '100-150 RON',
+  priceRange: priceRangeLabel,
   areaServed: {
     '@type': 'Country',
     name: 'Romania',
   },
 };
+
+// ─── Breadcrumbs ─────────────────────────────────────────────────────────────
+
+/**
+ * BreadcrumbList for a page below the homepage.
+ *
+ * Google renders this as the site-hierarchy line in place of the raw URL in a
+ * search result, which is why it is worth having on a site with only two levels.
+ * The trail here mirrors the site's actual structure, not an invented taxonomy —
+ * breadcrumbs that describe a hierarchy the site does not have are ignored at
+ * best.
+ *
+ * Pass the trail below the homepage, in order:
+ *   breadcrumbSchema([{ name: 'Blog', path: '/blog' }, { name: post.title, path: `/blog/${slug}` }])
+ */
+export const breadcrumbSchema = (
+  trail: { name: string; path: string }[]
+) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [{ name: 'Acasă', path: '/' }, ...trail].map(
+    (crumb, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: crumb.name,
+      item: `${SITE_URL}${crumb.path}`,
+    })
+  ),
+});
