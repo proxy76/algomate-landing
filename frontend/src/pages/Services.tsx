@@ -572,6 +572,13 @@ const Services: React.FC = () => {
                 >
                   programa completă pentru BAC
                 </Link>{' '}
+                sau detaliile despre{' '}
+                <Link
+                  to="/meditatii-informatica-bac"
+                  className="text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] transition-colors"
+                >
+                  meditațiile de informatică pentru BAC
+                </Link>{' '}
                 înainte să decizi.
               </p>
               <Link to="/inscriere">

@@ -168,6 +168,48 @@ export const courseMatematicaBac = {
   },
 };
 
+/**
+ * The `/meditatii-informatica-bac` landing page.
+ *
+ * Deliberately a separate object from `courseInformaticaBac` rather than the
+ * same one emitted twice: this page is the canonical description of that
+ * programme, so its Course carries `url` and `mainEntityOfPage` pointing here,
+ * and its own wording. Two URLs emitting an identical Course is a duplicate
+ * signal for no gain.
+ */
+export const courseInformaticaBacLanding = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: 'Meditații Informatică BAC — C++',
+  description:
+    'Pregătire pentru proba de informatică de la Bacalaureat, în C/C++: algoritmi, tablouri, șiruri de caractere, subprograme, recursivitate, structuri de date și grafuri, cu rezolvări de subiecte oficiale și cod scris la fiecare ședință.',
+  url: `${SITE_URL}/meditatii-informatica-bac`,
+  mainEntityOfPage: `${SITE_URL}/meditatii-informatica-bac`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+  },
+  offers: standardOffers,
+  educationalLevel: 'Liceu',
+  inLanguage: 'ro',
+  teaches: [
+    'Algoritmi elementari în C++',
+    'Tablouri unidimensionale și bidimensionale',
+    'Șiruri de caractere',
+    'Subprograme și pointeri',
+    'Recursivitate și backtracking',
+    'Structuri de date: liste, stive, cozi, arbori',
+    'Grafuri neorientate și orientate',
+    'Fișiere text',
+  ],
+  hasCourseInstance: {
+    '@type': 'CourseInstance',
+    courseMode: 'Online',
+    startDate: '2026-08-15',
+  },
+};
+
 // ─── FAQ Schema (drives Google FAQ rich results) ─────────────────────────────
 
 export const faqSchema = {
@@ -323,6 +365,34 @@ export const localBusinessSchema = {
     { '@type': 'Country', name: 'Romania' },
   ],
 };
+
+// ─── FAQ, built from the page's own copy ─────────────────────────────────────
+
+/**
+ * Build a FAQPage from the same array the page renders.
+ *
+ * The two FAQPage objects above predate this and keep their answers as literal
+ * strings, which is exactly how the homepage ended up declaring seven questions
+ * while showing one. New pages should define their Q&A once, render it, and
+ * pass it through here — then the schema cannot describe anything the visitor
+ * cannot read.
+ *
+ * Keep the questions distinct per page: the same FAQPage on several URLs is a
+ * duplicate signal, and the questions someone asks on a subject landing page
+ * are not the ones they ask on a pricing page.
+ */
+export const faqPageSchema = (items: { q: string; a: string }[]) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+});
 
 // ─── Breadcrumbs ─────────────────────────────────────────────────────────────
 
