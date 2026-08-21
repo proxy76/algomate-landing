@@ -5,9 +5,27 @@ import { Link } from 'react-router-dom';
 
 const WORDS = ["Excelență.", "Succes.", "Viitor.", "10 la BAC."];
 
+/**
+ * The typewriter runs inside the <h1>, so whatever frame the prerenderer
+ * happens to serialise becomes the page's heading in the static HTML — the one
+ * string Google reads. It used to start from "" and type at 90ms/char, which
+ * baked a truncated word ("…Pregătește-te pentru Exc") into production.
+ *
+ * Two things keep the static frame whole:
+ *   1. `currentText` starts as a complete word rather than empty, so the first
+ *      painted frame is already a full sentence.
+ *   2. The animation is skipped entirely under `prefers-reduced-motion`, and
+ *      prerender.js emulates exactly that — so the serialised frame is not a
+ *      race against the 2s prerender wait, it is deterministic.
+ *
+ * The caret is a bar element rather than a "|" character, so it does not end up
+ * in the heading's text content.
+ */
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
 const Hero: React.FC = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [currentText, setCurrentText] = useState("");
+  const [currentText, setCurrentText] = useState(WORDS[0]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -23,6 +41,7 @@ const Hero: React.FC = () => {
   const indicatorOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
 
   useEffect(() => {
+    if (window.matchMedia?.(REDUCED_MOTION_QUERY).matches) return;
     const timer = setTimeout(() => setReady(true), 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -126,7 +145,7 @@ const Hero: React.FC = () => {
                 className="block text-[#f0f0f0]"
               >
                 Meditații de <em className="italic text-[#e8734a] font-normal">matematică</em> și <em className="italic text-[#e8734a] font-normal">informatică.</em>
-              </motion.span>
+              </motion.span>{' '}
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -137,7 +156,10 @@ const Hero: React.FC = () => {
                 <span className="text-[#999]">Pregătește-te pentru </span>
                 <span className="not-italic font-semibold text-[#f0f0f0] whitespace-nowrap">
                   {currentText}
-                  <span className="text-[#e8734a] animate-pulse not-italic">|</span>
+                  <span
+                    aria-hidden="true"
+                    className="inline-block w-[0.05em] h-[0.8em] ml-[0.06em] align-baseline bg-[#e8734a] animate-pulse"
+                  />
                 </span>
               </motion.span>
             </h1>

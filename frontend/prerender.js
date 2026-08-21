@@ -94,6 +94,17 @@ async function prerender() {
       const browser = await chromium.launch();
       const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 
+      /**
+       * A snapshot has no time axis, so anything mid-animation gets frozen at
+       * an arbitrary frame. The hero typewriter used to bake a half-typed word
+       * into the <h1> that way. Components that animate text opt out under
+       * `prefers-reduced-motion` and render their finished state instead, so
+       * emulate it here and the serialised HTML stops being a race against the
+       * waits below. Framer Motion's default `reducedMotion: "never"` means the
+       * scroll-reveal animations are unaffected.
+       */
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+
       for (const route of ROUTES) {
         console.log(`Prerendering route: ${route}`);
         const url = `http://localhost:${PORT}${route}`;
