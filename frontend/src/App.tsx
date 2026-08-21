@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import RootLayout from './components/RootLayout';
 import Home from './pages/Home';
 import Services from './pages/Services';
+import InformaticaBac from './pages/InformaticaBac';
 import Curriculum from './pages/Curriculum';
 import Signup from './pages/Signup';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: '/servicii',
         element: <Services />,
+      },
+      {
+        path: '/meditatii-informatica-bac',
+        element: <InformaticaBac />,
       },
       {
         path: '/curriculum',

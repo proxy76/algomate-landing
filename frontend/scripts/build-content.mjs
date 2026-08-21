@@ -44,6 +44,10 @@ const SITE_URL = 'https://algomate.ro';
 const STATIC_PAGES = [
   { path: '/', changefreq: 'weekly', priority: '1.0' },
   { path: '/servicii', changefreq: 'monthly', priority: '0.9' },
+  // Subject landing pages — one query family each. Adding a route to App.tsx
+  // without adding it here leaves it out of both the sitemap and the prerender
+  // list, which means it 404s in production.
+  { path: '/meditatii-informatica-bac', changefreq: 'monthly', priority: '0.9' },
   { path: '/curriculum', changefreq: 'monthly', priority: '0.8' },
   { path: '/inscriere', changefreq: 'monthly', priority: '0.8' },
   { path: '/blog', changefreq: 'weekly', priority: '0.9' },
