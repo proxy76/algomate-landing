@@ -18,6 +18,7 @@ import type { LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
+import { breadcrumbSchema } from '../seo/structuredData';
 
 /* ----------------------------------------------------------------------------
  * Data
@@ -907,6 +908,7 @@ const Curriculum: React.FC = () => {
         title="Curriculum Meditații — Programa Completă BAC Informatică & Matematică | AlgoMate"
         description="Descoperă programa detaliată: algoritmi, structuri de date, C++, algebră, analiză matematică, integrale. Cursuri aliniate cu cerințele oficiale BAC."
         path="/curriculum"
+        jsonLd={breadcrumbSchema([{ name: 'Curriculum', path: '/curriculum' }])}
       />
       <div className="relative min-h-screen overflow-x-hidden pt-24 text-[#f0f0f0]">
         {/* Blueprint grid background layer — adds schematic depth */}

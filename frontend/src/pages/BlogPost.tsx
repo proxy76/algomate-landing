@@ -6,6 +6,7 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import { posts, postBySlug } from '../content/posts.generated';
 import { formatDate } from './Blog';
+import { breadcrumbSchema } from '../seo/structuredData';
 
 const SITE_URL = 'https://algomate.ro';
 
@@ -51,7 +52,13 @@ const BlogPost: React.FC = () => {
         type="article"
         /* Falls back to the site-wide card when the post has no cover. */
         ogImage={post.coverImage ? `${SITE_URL}${post.coverImage}` : undefined}
-        jsonLd={articleSchema}
+        jsonLd={[
+          articleSchema,
+          breadcrumbSchema([
+            { name: 'Blog', path: '/blog' },
+            { name: post.title, path: `/blog/${post.slug}` },
+          ]),
+        ]}
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
         <div className="max-w-6xl mx-auto px-6">
