@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   motion,
   AnimatePresence,
@@ -15,7 +15,7 @@ import {
   ArrowDown,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import { breadcrumbSchema } from '../seo/structuredData';
@@ -905,8 +905,28 @@ const CourseTabs: React.FC<{
  * Main page
  * -------------------------------------------------------------------------- */
 
+/**
+ * `?curs=<id>` opens that programme's tab, so other pages can link straight to
+ * the syllabus they are talking about instead of dropping the reader on the
+ * maths one. An unknown or missing value falls back to the default rather than
+ * rendering an empty page — the parameter is a convenience, not a contract, and
+ * a stale link should still show something.
+ */
+const courseFromParam = (value: string | null): Course['id'] =>
+  COURSES.some((c) => c.id === value) ? (value as Course['id']) : 'mate-bac';
+
 const Curriculum: React.FC = () => {
-  const [activeId, setActiveId] = useState<Course['id']>('mate-bac');
+  const [searchParams] = useSearchParams();
+  const requested = courseFromParam(searchParams.get('curs'));
+  const [activeId, setActiveId] = useState<Course['id']>(requested);
+
+  /* Only for a param change without a remount — arriving from a different
+     ?curs= while already on this page. Clicking a tab does not touch the URL,
+     so this never fights the user. */
+  useEffect(() => {
+    setActiveId(requested);
+  }, [requested]);
+
   const active = COURSES.find((c) => c.id === activeId)!;
 
   return (

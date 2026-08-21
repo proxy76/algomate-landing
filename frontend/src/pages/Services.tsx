@@ -34,6 +34,7 @@ const services = [
     icon: Sigma,
     title: "Matematică BAC",
     tech: "M1 / M2 / M3",
+    detailsTo: "/meditatii-matematica-online",
     priceGroup: priceGroupLabel,
     priceIndividual: priceIndividualLabel,
     description:
@@ -51,6 +52,9 @@ const services = [
     icon: Code,
     title: "Introducere în Informatică",
     tech: "Python / C++",
+    /* No landing page for this one — it is not an exam programme. The
+       syllabus is the detail a reader wants, so send them to that tab. */
+    detailsTo: "/curriculum?curs=intro-info",
     priceGroup: priceGroupLabel,
     priceIndividual: priceIndividualLabel,
     description:
@@ -68,6 +72,7 @@ const services = [
     icon: Terminal,
     title: "Informatică BAC",
     tech: "C / C++",
+    detailsTo: "/meditatii-informatica-bac",
     priceGroup: priceGroupLabel,
     priceIndividual: priceIndividualLabel,
     description:
@@ -327,16 +332,32 @@ const Services: React.FC = () => {
                       </div>
                     </div>
 
-                    <Link to="/inscriere">
-                      <motion.button
-                        whileHover={{ y: -2 }}
-                        whileTap={{ y: 0 }}
-                        className="bg-[#e8734a] hover:bg-[#f08c5a] text-[#0a0a0a] px-8 py-4 font-mono text-[11px] tracking-[0.25em] uppercase font-medium transition-colors duration-200 inline-flex items-center gap-3"
-                      >
-                        Înscrie-te
-                        <ArrowRight size={14} strokeWidth={2.5} />
-                      </motion.button>
-                    </Link>
+                    {/* Two actions, ranked: book, or read the dedicated page
+                        first. The second is also how those pages get found at
+                        all — before this they were reachable only from the
+                        footer. */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <Link to="/inscriere">
+                        <motion.button
+                          whileHover={{ y: -2 }}
+                          whileTap={{ y: 0 }}
+                          className="w-full sm:w-auto bg-[#e8734a] hover:bg-[#f08c5a] text-[#0a0a0a] px-8 py-4 font-mono text-[11px] tracking-[0.25em] uppercase font-medium transition-colors duration-200 inline-flex items-center justify-center gap-3"
+                        >
+                          Înscrie-te
+                          <ArrowRight size={14} strokeWidth={2.5} />
+                        </motion.button>
+                      </Link>
+                      <Link to={service.detailsTo}>
+                        <motion.button
+                          whileHover={{ y: -2 }}
+                          whileTap={{ y: 0 }}
+                          className="w-full sm:w-auto border border-[#333] hover:border-[#e8734a]/60 text-[#ccc] hover:text-white px-8 py-4 font-mono text-[11px] tracking-[0.25em] uppercase font-medium transition-all duration-200 inline-flex items-center justify-center gap-3"
+                        >
+                          Detalii
+                          <ArrowRight size={14} strokeWidth={2.5} />
+                        </motion.button>
+                      </Link>
+                    </div>
                   </div>
 
                   {/* Right — features */}
@@ -533,22 +554,65 @@ const Services: React.FC = () => {
             <div className="max-w-3xl mt-12 pt-10 border-t border-[#222]">
               <p className="text-[#b8b8b8] leading-relaxed mb-7">
                 Ai o întrebare care nu e aici? Scrie-o în formular — se răspunde în 24 de ore,
-                fără obligația de a te înscrie. Poți vedea și{' '}
+                fără obligația de a te înscrie. Sau citește mai întâi{' '}
                 <Link
                   to="/curriculum"
                   className="text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] transition-colors"
                 >
-                  programa completă pentru BAC
-                </Link>{' '}
-                sau detaliile despre{' '}
-                <Link
-                  to="/meditatii-informatica-bac"
-                  className="text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] transition-colors"
-                >
-                  meditațiile de informatică pentru BAC
-                </Link>{' '}
-                înainte să decizi.
+                  programa completă
+                </Link>
+                {' '}și pagina care ți se potrivește:
               </p>
+
+              {/* The dedicated pages, listed rather than buried in prose. Each
+                  answers a different question, and this is the second place on
+                  the site where all four are reachable. */}
+              <ul className="mb-9 border-t border-[#222]">
+                {[
+                  {
+                    to: '/meditatii-informatica-bac',
+                    name: 'Meditații informatică BAC',
+                    note: 'Ce se cere la probă și capitolele în ordinea punctajului',
+                  },
+                  {
+                    to: '/meditatii-matematica-online',
+                    name: 'Meditații matematică online',
+                    note: 'Cum decurge o ședință și pentru cine nu merge formatul',
+                  },
+                  {
+                    to: '/meditatii-matematica-bucuresti',
+                    name: 'Meditații matematică București',
+                    note: 'Pentru elevii din București și Ilfov',
+                  },
+                  {
+                    to: '/meditatii-evaluare-nationala-matematica',
+                    name: 'Meditații Evaluare Națională',
+                    note: 'Clasa a VIII-a — unde se pierd punctele, de fapt',
+                  },
+                ].map((page) => (
+                  <li key={page.to} className="border-b border-[#222]">
+                    <Link
+                      to={page.to}
+                      className="group flex items-center justify-between gap-6 py-4 transition-colors hover:bg-[#141414]"
+                    >
+                      <span>
+                        <span className="block text-[0.98rem] font-medium text-[#d8d8d8] transition-colors group-hover:text-white">
+                          {page.name}
+                        </span>
+                        <span className="block text-[0.85rem] text-[#777] mt-0.5">
+                          {page.note}
+                        </span>
+                      </span>
+                      <ArrowRight
+                        size={14}
+                        strokeWidth={2}
+                        className="shrink-0 text-[#e8734a] transition-transform group-hover:translate-x-1"
+                        aria-hidden
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
               <Link to="/inscriere">
                 <motion.button
                   whileHover={{ y: -2 }}

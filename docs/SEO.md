@@ -139,8 +139,11 @@ Everything here was confirmed by reading the code on 2026-08-21.
   copy, meta descriptions and JSON-LD all import from them — see §5.
 - **Four single-query landing pages** (`/meditatii-informatica-bac`,
   `/meditatii-matematica-bucuresti`, `/meditatii-matematica-online`,
-  `/meditatii-evaluare-nationala-matematica`), linked site-wide from the
-  footer's "Meditații" column.
+  `/meditatii-evaluare-nationala-matematica`), reachable from the footer's
+  "Meditații" column site-wide, and from `/servicii` — a `Detalii` button on
+  each programme card plus a list of all four under the FAQ.
+- **`/curriculum?curs=<id>`** opens a specific programme's tab, so a link can
+  land on the right syllabus instead of the default maths one.
 - **`FaqList` and `SectionLabel`** in `src/components/` — the FAQ block exists
   once, on `<details>`, which is what keeps every answer in the document.
 - **robots.txt** (`frontend/public/robots.txt`) allows crawling and declares the
