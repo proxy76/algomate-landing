@@ -1,6 +1,7 @@
 import React from 'react';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { COUNTRY, EMAIL, LOCALITY, PHONE_DISPLAY, PHONE_HREF } from '../config/contact';
 
 const Footer: React.FC = () => {
   return (
@@ -50,11 +51,23 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm text-[#666]">
               <li className="flex items-center gap-2">
                 <Mail size={14} className="text-[#555]" />
-                algomate.razvan@gmail.com
+                {EMAIL}
+              </li>
+              {/* Rendered as text, not just an href: the phone number has to be
+                  readable on the page for it to count as the "P" in the NAP
+                  that local search matches against the Business Profile. */}
+              <li className="flex items-center gap-2">
+                <Phone size={14} className="text-[#555]" />
+                <a
+                  href={PHONE_HREF}
+                  className="hover:text-[#e8734a] transition-colors"
+                >
+                  {PHONE_DISPLAY}
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin size={14} className="text-[#555]" />
-                București, România
+                {LOCALITY}, {COUNTRY}
               </li>
             </ul>
           </div>

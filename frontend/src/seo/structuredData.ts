@@ -5,6 +5,7 @@
  * Google uses them to show rich snippets (prices, FAQ dropdowns, course info).
  */
 
+import { EMAIL, LOCALITY, PHONE_E164 } from '../config/contact';
 import {
   CURRENCY,
   PRICE_GROUP,
@@ -24,14 +25,21 @@ export const organizationSchema = {
   '@type': 'EducationalOrganization',
   name: 'AlgoMate',
   url: SITE_URL,
-  email: 'algomate.razvan@gmail.com',
+  email: EMAIL,
+  telephone: PHONE_E164,
   description:
     'Meditații premium de matematică și informatică pentru examenul de Bacalaureat. Pregătire structurată cu rezultate dovedite.',
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'București',
+    addressLocality: LOCALITY,
     addressCountry: 'RO',
   },
+  /**
+   * Populate as profiles go live — Google Business Profile first, then the
+   * tutoring marketplaces (see docs/SEO.md §6). Only list profiles that exist
+   * and that are demonstrably the same business; a `sameAs` pointing at
+   * somebody else's page is worse than an empty array.
+   */
   sameAs: [],
 };
 
@@ -50,7 +58,8 @@ export const personSchema = {
   description:
     'Student la Universitatea Politehnica din București și programator, premiant la olimpiade și concursuri naționale de Informatică. 2 ani de meditații de matematică și informatică, cu rezultate la Bacalaureat și Evaluare Națională.',
   image: `${SITE_URL}/instructor-razvan.jpg`,
-  email: 'algomate.razvan@gmail.com',
+  email: EMAIL,
+  telephone: PHONE_E164,
   alumniOf: {
     '@type': 'CollegeOrUniversity',
     name: 'Universitatea Politehnica din București',
@@ -293,18 +302,26 @@ export const localBusinessSchema = {
   '@type': 'LocalBusiness',
   name: 'AlgoMate — Meditații Matematică & Informatică',
   url: SITE_URL,
-  email: 'algomate.razvan@gmail.com',
+  email: EMAIL,
+  telephone: PHONE_E164,
   description: 'Meditații online de matematică și informatică pentru BAC, București.',
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'București',
+    addressLocality: LOCALITY,
     addressCountry: 'RO',
   },
   priceRange: priceRangeLabel,
-  areaServed: {
-    '@type': 'Country',
-    name: 'Romania',
-  },
+  /**
+   * București first: sessions are online and open to the whole country, but the
+   * local pack is the realistic near-term win and it keys off the city. No
+   * street address and no `openingHours` — there is no premises to visit and no
+   * published hours, and inventing either to fill the schema out would break
+   * the NAP consistency this is here to establish.
+   */
+  areaServed: [
+    { '@type': 'City', name: LOCALITY },
+    { '@type': 'Country', name: 'Romania' },
+  ],
 };
 
 // ─── Breadcrumbs ─────────────────────────────────────────────────────────────
