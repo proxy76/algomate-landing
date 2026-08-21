@@ -84,14 +84,16 @@ a visitor sees is prerendered HTML produced at build time.
 - One published post: `2026-08-07-admitere-liceu-2027.md`
 - **Deployed and crawlable.** nginx serves the prerendered output directly;
   `frontend/scripts/check-live-seo.mjs` passes against production (see §4.3.1)
+- **Atomic deploys, installed 2026-08-18.** `deploy/rebuild.sh` runs from
+  `/srv/algomate-deploy/bin/rebuild.sh`; nginx serves the `current` symlink, so
+  a deploy is never observable half-done (§5.2). This replaced the in-place
+  rebuild that caused the 5xx
 
 ### Not built
 
 - **No AI/LLM integration of any kind.** No SDK, no API calls, nothing.
 - No recurring rebuild, **by decision** — post scheduling was dropped (§3.1).
   Deploys are manual; never date a post in the future
-- Deploys still rebuild in place, which is what caused the 5xx (§5.2).
-  `deploy/rebuild.sh` fixes that and is not yet installed
 - No mock-exam generation
 - No RSS, no pagination, no tag pages
 
@@ -484,23 +486,32 @@ That is less alarming and no less damaging — a 404 on the homepage, seen by a
 crawler, gets pages dropped.
 
 `deploy/rebuild.sh` fixes the cause rather than the symptom: it builds into
-`/srv/algomate/releases/<stamp>/`, sanity-checks the output, and publishes by
-replacing a symlink in a single rename. No request can observe a half-built
-site, a failed build never goes live, and rollback is another symlink swap.
+`/srv/algomate-deploy/releases/<stamp>/`, sanity-checks the output, and
+publishes by replacing a symlink in a single rename. No request can observe a
+half-built site, a failed build never goes live, and rollback is another
+symlink swap.
 
-It requires one nginx change:
+It required one nginx change, applied 2026-08-18 and live today:
 
 ```nginx
-root /srv/algomate/current;      # was /srv/algomate/frontend/dist
+root /srv/algomate-deploy/current;   # was /srv/algomate/frontend/dist
 ```
 
-**First install: follow `deploy/INSTALL.md`.** It is the same procedure written
-as literal commands with expected output at each step, including how to find
-the checkout if the default path is wrong, and rollback for both failure modes.
+**The install is done — `deploy/INSTALL.md` is history, not a pending step.**
+It ran on 2026-08-18 and deploys have used it since. Do not re-run it; the
+ordering it warns about (the script must publish `current` once *before* nginx
+is repointed, or the site 404s) is already satisfied.
 
-Ordering matters and is not obvious: the script must run successfully **once
-before** nginx is repointed, because the symlink it publishes to has to exist
-before anything is asked to serve from it. Repoint first and the site 404s.
+Deploying is now one command, as the site owner:
+
+```bash
+sudo -u razvan /srv/algomate-deploy/bin/rebuild.sh
+node /srv/algomate/frontend/scripts/check-live-seo.mjs https://algomate.ro
+```
+
+`deploy/INSTALL.md` is still worth keeping for its rollback section, which
+covers both failure modes: a broken nginx config, and a bad build that needs
+the symlink pointed back at an earlier release.
 
 ### 5.3 The systemd units — NOT NEEDED
 
