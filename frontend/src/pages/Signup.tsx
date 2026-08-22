@@ -16,6 +16,8 @@ import {
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import API_BASE_URL from '../api';
+import { GROUP_MAX_STUDENTS, priceGroupLabel, priceIndividualLabel } from '../config/pricing';
+import { breadcrumbSchema } from '../seo/structuredData';
 
 const courses = [
   { value: '', label: 'Selectează cursul dorit', backendValue: '' },
@@ -86,8 +88,9 @@ const Signup: React.FC = () => {
     <PageTransition>
       <SEO
         title="Înscrie-te la Meditații BAC — Formular de Contact | AlgoMate"
-        description="Completează formularul și începe pregătirea pentru BAC. Locuri limitate, grupe de max 3 elevi. 100 RON/ședință în grupă, 150 RON individual. Răspundem în 24h."
+        description={`Completează formularul și începe pregătirea pentru BAC. Locuri limitate, grupe de max ${GROUP_MAX_STUDENTS} elevi. ${priceGroupLabel}/ședință în grupă, ${priceIndividualLabel} individual. Răspundem în 24h.`}
         path="/inscriere"
+        jsonLd={breadcrumbSchema([{ name: 'Înscriere', path: '/inscriere' }])}
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
         <div className="max-w-3xl mx-auto px-6">
