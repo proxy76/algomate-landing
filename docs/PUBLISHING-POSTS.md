@@ -209,6 +209,34 @@ and a `position:fixed` overlay, all stripped. **Do not "fix" this by adding
 
 ---
 
+## 3.6 Code and problems in a post
+
+Two rules for any post that teaches, added after the first informatics posts.
+Both exist because the site's credibility rests on one named instructor with an
+olympiad credential attached to every byline.
+
+**Compile and run every snippet before publishing.** If the prose quotes what a
+program outputs, that string must be the program's actual output, not what it
+ought to be. `g++` is on the development machine:
+
+```bash
+g++ -std=c++14 -Wall -o /tmp/x snippet.cpp && /tmp/x
+```
+
+This is what `SERVER-SETUP.md` §7.2 requires of generated code; hand-written
+code gets no exemption. A wrong solution published under Răzvan's name is the
+worst failure this site can produce.
+
+**Never present an invented problem as an official subject.** Solving a real
+past paper is the strongest format there is — do that when you have the paper,
+and say which session and variant it is. When the problems are your own, say so
+in an `:::atentie` callout and link to
+[subiecte.edu.ro](https://subiecte.edu.ro) for the official ones. See
+`2026-08-21-recursivitate-bac-informatica.md` for the wording. Blurring the two
+is a claim a reader cannot check and a competitor can disprove.
+
+---
+
 ## 4. Build and check
 
 ```bash

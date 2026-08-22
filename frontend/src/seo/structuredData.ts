@@ -5,6 +5,17 @@
  * Google uses them to show rich snippets (prices, FAQ dropdowns, course info).
  */
 
+import { EMAIL, LOCALITY, PHONE_E164 } from '../config/contact';
+import {
+  CURRENCY,
+  PRICE_GROUP,
+  PRICE_INDIVIDUAL,
+  GROUP_MAX_STUDENTS,
+  priceRangeLabel,
+  pricingAnswer,
+  groupVsIndividualAnswer,
+} from '../config/pricing';
+
 const SITE_URL = 'https://algomate.ro';
 
 // ─── Organization Schema (site-wide) ────────────────────────────────────────
@@ -14,14 +25,21 @@ export const organizationSchema = {
   '@type': 'EducationalOrganization',
   name: 'AlgoMate',
   url: SITE_URL,
-  email: 'algomate.razvan@gmail.com',
+  email: EMAIL,
+  telephone: PHONE_E164,
   description:
     'Meditații premium de matematică și informatică pentru examenul de Bacalaureat. Pregătire structurată cu rezultate dovedite.',
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'București',
+    addressLocality: LOCALITY,
     addressCountry: 'RO',
   },
+  /**
+   * Populate as profiles go live — Google Business Profile first, then the
+   * tutoring marketplaces (see docs/SEO.md §6). Only list profiles that exist
+   * and that are demonstrably the same business; a `sameAs` pointing at
+   * somebody else's page is worse than an empty array.
+   */
   sameAs: [],
 };
 
@@ -40,7 +58,8 @@ export const personSchema = {
   description:
     'Student la Universitatea Politehnica din București și programator, premiant la olimpiade și concursuri naționale de Informatică. 2 ani de meditații de matematică și informatică, cu rezultate la Bacalaureat și Evaluare Națională.',
   image: `${SITE_URL}/instructor-razvan.jpg`,
-  email: 'algomate.razvan@gmail.com',
+  email: EMAIL,
+  telephone: PHONE_E164,
   alumniOf: {
     '@type': 'CollegeOrUniversity',
     name: 'Universitatea Politehnica din București',
@@ -65,22 +84,23 @@ export const personSchema = {
 // ─── Course Schemas (for /servicii page) ─────────────────────────────────────
 
 /**
- * Standard pricing, identical across all courses:
- * 100 RON/ședință in groups of max 3 students, 150 RON/ședință one-on-one.
+ * Standard pricing, identical across all courses. The numbers come from
+ * `config/pricing.ts`, which is also what the visible price blocks render —
+ * schema and page cannot disagree.
  */
 const standardOffers = [
   {
     '@type': 'Offer',
-    name: 'Ședință în grupă (max 3 elevi)',
-    price: '100',
-    priceCurrency: 'RON',
+    name: `Ședință în grupă (max ${GROUP_MAX_STUDENTS} elevi)`,
+    price: String(PRICE_GROUP),
+    priceCurrency: CURRENCY,
     availability: 'https://schema.org/InStock',
   },
   {
     '@type': 'Offer',
     name: 'Ședință individuală',
-    price: '150',
-    priceCurrency: 'RON',
+    price: String(PRICE_INDIVIDUAL),
+    priceCurrency: CURRENCY,
     availability: 'https://schema.org/InStock',
   },
 ];
@@ -148,6 +168,127 @@ export const courseMatematicaBac = {
   },
 };
 
+/**
+ * The `/meditatii-informatica-bac` landing page.
+ *
+ * Deliberately a separate object from `courseInformaticaBac` rather than the
+ * same one emitted twice: this page is the canonical description of that
+ * programme, so its Course carries `url` and `mainEntityOfPage` pointing here,
+ * and its own wording. Two URLs emitting an identical Course is a duplicate
+ * signal for no gain.
+ */
+export const courseInformaticaBacLanding = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: 'Meditații Informatică BAC — C++',
+  description:
+    'Pregătire pentru proba de informatică de la Bacalaureat, în C/C++: algoritmi, tablouri, șiruri de caractere, subprograme, recursivitate, structuri de date și grafuri, cu rezolvări de subiecte oficiale și cod scris la fiecare ședință.',
+  url: `${SITE_URL}/meditatii-informatica-bac`,
+  mainEntityOfPage: `${SITE_URL}/meditatii-informatica-bac`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+  },
+  offers: standardOffers,
+  educationalLevel: 'Liceu',
+  inLanguage: 'ro',
+  teaches: [
+    'Algoritmi elementari în C++',
+    'Tablouri unidimensionale și bidimensionale',
+    'Șiruri de caractere',
+    'Subprograme și pointeri',
+    'Recursivitate și backtracking',
+    'Structuri de date: liste, stive, cozi, arbori',
+    'Grafuri neorientate și orientate',
+    'Fișiere text',
+  ],
+  hasCourseInstance: {
+    '@type': 'CourseInstance',
+    courseMode: 'Online',
+    startDate: '2026-08-15',
+  },
+};
+
+/**
+ * `/meditatii-matematica-bucuresti`.
+ *
+ * A `Service` rather than a second `LocalBusiness`: the business is online-only
+ * and therefore not eligible for a Google Business Profile, so there is no local
+ * listing for this to correspond to. What is true and worth stating is that the
+ * service is provided from București and aimed at students there — which is
+ * `areaServed`, not an address.
+ */
+export const serviceMatematicaBucuresti = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Meditații matematică București — online',
+  serviceType: 'Meditații matematică',
+  description:
+    'Meditații de matematică pentru elevii din București și Ilfov, pentru Bacalaureat și Evaluarea Națională. Ședințele se desfășoară online, în grupe mici sau individual.',
+  url: `${SITE_URL}/meditatii-matematica-bucuresti`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+    telephone: PHONE_E164,
+  },
+  areaServed: { '@type': 'City', name: LOCALITY },
+  availableChannel: {
+    '@type': 'ServiceChannel',
+    serviceUrl: `${SITE_URL}/inscriere`,
+    availableLanguage: 'ro',
+  },
+  offers: standardOffers,
+};
+
+/** `/meditatii-matematica-online`. */
+export const courseMatematicaOnline = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: 'Meditații Matematică Online — BAC și Evaluare Națională',
+  description:
+    'Meditații de matematică online, în ședințe de două ore cu tablă digitală partajată, notițe trimise după fiecare întâlnire și temă corectată individual între ședințe.',
+  url: `${SITE_URL}/meditatii-matematica-online`,
+  mainEntityOfPage: `${SITE_URL}/meditatii-matematica-online`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+  },
+  offers: standardOffers,
+  inLanguage: 'ro',
+  hasCourseInstance: {
+    '@type': 'CourseInstance',
+    courseMode: 'Online',
+    courseWorkload: 'PT2H',
+  },
+};
+
+/** `/meditatii-evaluare-nationala-matematica`. */
+export const courseEvaluareNationala = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: 'Meditații Evaluare Națională — Matematică',
+  description:
+    'Pregătire la matematică pentru Evaluarea Națională, clasa a VIII-a: evaluarea nivelului real, recuperarea lacunelor din gimnaziu, subiecte grupate pe tipuri de cerințe și simulări cronometrate.',
+  url: `${SITE_URL}/meditatii-evaluare-nationala-matematica`,
+  mainEntityOfPage: `${SITE_URL}/meditatii-evaluare-nationala-matematica`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    name: 'AlgoMate',
+    url: SITE_URL,
+  },
+  offers: standardOffers,
+  educationalLevel: 'Gimnaziu',
+  inLanguage: 'ro',
+  hasCourseInstance: {
+    '@type': 'CourseInstance',
+    courseMode: 'Online',
+    courseWorkload: 'PT2H',
+  },
+};
+
 // ─── FAQ Schema (drives Google FAQ rich results) ─────────────────────────────
 
 export const faqSchema = {
@@ -159,7 +300,7 @@ export const faqSchema = {
       name: 'Cât costă meditațiile la AlgoMate?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Prețul standard este de 100 RON/ședință în grupe de maximum 3 elevi și 150 RON/ședință pentru meditații individuale.',
+        text: pricingAnswer,
       },
     },
     {
@@ -229,7 +370,7 @@ export const servicesFaqSchema = {
       name: 'Care este diferența dintre meditațiile în grupă și cele individuale?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'În grupă (maximum 3 elevi, 100 RON/ședință) elevii lucrează pe aceeași programă și învață și din întrebările celorlalți. Individual (150 RON/ședință) ritmul și conținutul se adaptează complet elevului, ceea ce ajută când sunt lacune mari de recuperat sau când pregătirea vizează un obiectiv specific, cum ar fi o olimpiadă.',
+        text: groupVsIndividualAnswer,
       },
     },
     {
@@ -282,16 +423,81 @@ export const localBusinessSchema = {
   '@type': 'LocalBusiness',
   name: 'AlgoMate — Meditații Matematică & Informatică',
   url: SITE_URL,
-  email: 'algomate.razvan@gmail.com',
+  email: EMAIL,
+  telephone: PHONE_E164,
   description: 'Meditații online de matematică și informatică pentru BAC, București.',
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'București',
+    addressLocality: LOCALITY,
     addressCountry: 'RO',
   },
-  priceRange: '100-150 RON',
-  areaServed: {
-    '@type': 'Country',
-    name: 'Romania',
-  },
+  priceRange: priceRangeLabel,
+  /**
+   * București first: sessions are online and open to the whole country, but the
+   * local pack is the realistic near-term win and it keys off the city. No
+   * street address and no `openingHours` — there is no premises to visit and no
+   * published hours, and inventing either to fill the schema out would break
+   * the NAP consistency this is here to establish.
+   */
+  areaServed: [
+    { '@type': 'City', name: LOCALITY },
+    { '@type': 'Country', name: 'Romania' },
+  ],
 };
+
+// ─── FAQ, built from the page's own copy ─────────────────────────────────────
+
+/**
+ * Build a FAQPage from the same array the page renders.
+ *
+ * The two FAQPage objects above predate this and keep their answers as literal
+ * strings, which is exactly how the homepage ended up declaring seven questions
+ * while showing one. New pages should define their Q&A once, render it, and
+ * pass it through here — then the schema cannot describe anything the visitor
+ * cannot read.
+ *
+ * Keep the questions distinct per page: the same FAQPage on several URLs is a
+ * duplicate signal, and the questions someone asks on a subject landing page
+ * are not the ones they ask on a pricing page.
+ */
+export const faqPageSchema = (items: { q: string; a: string }[]) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+});
+
+// ─── Breadcrumbs ─────────────────────────────────────────────────────────────
+
+/**
+ * BreadcrumbList for a page below the homepage.
+ *
+ * Google renders this as the site-hierarchy line in place of the raw URL in a
+ * search result, which is why it is worth having on a site with only two levels.
+ * The trail here mirrors the site's actual structure, not an invented taxonomy —
+ * breadcrumbs that describe a hierarchy the site does not have are ignored at
+ * best.
+ *
+ * Pass the trail below the homepage, in order:
+ *   breadcrumbSchema([{ name: 'Blog', path: '/blog' }, { name: post.title, path: `/blog/${slug}` }])
+ */
+export const breadcrumbSchema = (
+  trail: { name: string; path: string }[]
+) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [{ name: 'Acasă', path: '/' }, ...trail].map(
+    (crumb, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: crumb.name,
+      item: `${SITE_URL}${crumb.path}`,
+    })
+  ),
+});

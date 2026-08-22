@@ -8,25 +8,35 @@ import {
   Clock,
   Users,
   ArrowRight,
-  ChevronDown,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
+import SectionLabel from '../components/SectionLabel';
+import FaqList from '../components/FaqList';
 import {
+  breadcrumbSchema,
   courseInformaticaBac,
   courseIntroductionProgramming,
   courseMatematicaBac,
   servicesFaqSchema,
 } from '../seo/structuredData';
+import {
+  GROUP_MAX_STUDENTS,
+  groupVsIndividualAnswer,
+  priceGroupLabel,
+  priceIndividualLabel,
+  pricingSummary,
+} from '../config/pricing';
 
 const services = [
   {
     icon: Sigma,
     title: "Matematică BAC",
     tech: "M1 / M2 / M3",
-    priceGroup: "100 RON",
-    priceIndividual: "150 RON",
+    detailsTo: "/meditatii-matematica-online",
+    priceGroup: priceGroupLabel,
+    priceIndividual: priceIndividualLabel,
     description:
       "Pregătire intensivă pentru BAC la Matematică, adaptată profilului tău. Metodă structurată cu accent pe înțelegere, nu memorare.",
     startDate: "15 August",
@@ -42,8 +52,11 @@ const services = [
     icon: Code,
     title: "Introducere în Informatică",
     tech: "Python / C++",
-    priceGroup: "100 RON",
-    priceIndividual: "150 RON",
+    /* No landing page for this one — it is not an exam programme. The
+       syllabus is the detail a reader wants, so send them to that tab. */
+    detailsTo: "/curriculum?curs=intro-info",
+    priceGroup: priceGroupLabel,
+    priceIndividual: priceIndividualLabel,
     description:
       "Curs introductiv pentru clasa a 9-a. Învață bazele programării cu exerciții practice și proiecte reale care îți construiesc fundația pentru o carieră în tech.",
     startDate: "15 Iulie",
@@ -59,8 +72,9 @@ const services = [
     icon: Terminal,
     title: "Informatică BAC",
     tech: "C / C++",
-    priceGroup: "100 RON",
-    priceIndividual: "150 RON",
+    detailsTo: "/meditatii-informatica-bac",
+    priceGroup: priceGroupLabel,
+    priceIndividual: priceIndividualLabel,
     description:
       "Pregătire completă pentru examenul de Bacalaureat la Informatică. Acoperim toți algoritmii, structurile de date și tipurile de subiecte din programa oficială.",
     startDate: "15 August",
@@ -102,8 +116,8 @@ const sessionFlow = [
 const formats = [
   {
     name: 'În grupă',
-    price: '100 RON',
-    unit: 'ședință · max 3 elevi',
+    price: priceGroupLabel,
+    unit: `ședință · max ${GROUP_MAX_STUDENTS} elevi`,
     fit: 'Potrivit când',
     points: [
       'Elevul are baza materiei și vrea să o consolideze',
@@ -114,7 +128,7 @@ const formats = [
   },
   {
     name: 'Individual',
-    price: '150 RON',
+    price: priceIndividualLabel,
     unit: 'ședință · unu la unu',
     fit: 'Potrivit când',
     points: [
@@ -147,7 +161,7 @@ const notForYou = [
 const faqs = [
   {
     q: 'Care este diferența dintre meditațiile în grupă și cele individuale?',
-    a: 'În grupă (maximum 3 elevi, 100 RON/ședință) elevii lucrează pe aceeași programă și învață și din întrebările celorlalți. Individual (150 RON/ședință) ritmul și conținutul se adaptează complet elevului, ceea ce ajută când sunt lacune mari de recuperat sau când pregătirea vizează un obiectiv specific, cum ar fi o olimpiadă.',
+    a: groupVsIndividualAnswer,
   },
   {
     q: 'Cât durează o ședință de meditații?',
@@ -171,28 +185,19 @@ const faqs = [
   },
 ];
 
-/** Section heading, matching the rule-and-label pattern used across the site. */
-const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="flex items-baseline gap-4 mb-10">
-    <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#e8734a] whitespace-nowrap">
-      {children}
-    </span>
-    <span className="h-px flex-1 bg-[#222]" />
-  </div>
-);
-
 const Services: React.FC = () => {
   return (
     <PageTransition>
       <SEO
         title="Servicii Meditații BAC — Informatică C++, Matematică M1/M2/M3 | AlgoMate"
-        description="Meditații de matematică BAC (M1/M2/M3), informatică BAC (C/C++) și introducere în programare (Python). 100 RON/ședință în grupe de max 3 elevi, 150 RON individual."
+        description={`Meditații de matematică BAC (M1/M2/M3), informatică BAC (C/C++) și introducere în programare (Python). ${pricingSummary}`}
         path="/servicii"
         jsonLd={[
           courseMatematicaBac,
           courseIntroductionProgramming,
           courseInformaticaBac,
           servicesFaqSchema,
+          breadcrumbSchema([{ name: 'Servicii', path: '/servicii' }]),
         ]}
       />
       <div className="min-h-screen text-[#f0f0f0] pt-24 md:pt-28 pb-20 md:pb-24">
@@ -327,16 +332,32 @@ const Services: React.FC = () => {
                       </div>
                     </div>
 
-                    <Link to="/inscriere">
-                      <motion.button
-                        whileHover={{ y: -2 }}
-                        whileTap={{ y: 0 }}
-                        className="bg-[#e8734a] hover:bg-[#f08c5a] text-[#0a0a0a] px-8 py-4 font-mono text-[11px] tracking-[0.25em] uppercase font-medium transition-colors duration-200 inline-flex items-center gap-3"
-                      >
-                        Înscrie-te
-                        <ArrowRight size={14} strokeWidth={2.5} />
-                      </motion.button>
-                    </Link>
+                    {/* Two actions, ranked: book, or read the dedicated page
+                        first. The second is also how those pages get found at
+                        all — before this they were reachable only from the
+                        footer. */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <Link to="/inscriere">
+                        <motion.button
+                          whileHover={{ y: -2 }}
+                          whileTap={{ y: 0 }}
+                          className="w-full sm:w-auto bg-[#e8734a] hover:bg-[#f08c5a] text-[#0a0a0a] px-8 py-4 font-mono text-[11px] tracking-[0.25em] uppercase font-medium transition-colors duration-200 inline-flex items-center justify-center gap-3"
+                        >
+                          Înscrie-te
+                          <ArrowRight size={14} strokeWidth={2.5} />
+                        </motion.button>
+                      </Link>
+                      <Link to={service.detailsTo}>
+                        <motion.button
+                          whileHover={{ y: -2 }}
+                          whileTap={{ y: 0 }}
+                          className="w-full sm:w-auto border border-[#333] hover:border-[#e8734a]/60 text-[#ccc] hover:text-white px-8 py-4 font-mono text-[11px] tracking-[0.25em] uppercase font-medium transition-all duration-200 inline-flex items-center justify-center gap-3"
+                        >
+                          Detalii
+                          <ArrowRight size={14} strokeWidth={2.5} />
+                        </motion.button>
+                      </Link>
+                    </div>
                   </div>
 
                   {/* Right — features */}
@@ -528,43 +549,70 @@ const Services: React.FC = () => {
             className="mt-24 md:mt-32"
           >
             <SectionLabel>Întrebări frecvente</SectionLabel>
-            <div className="max-w-3xl border-t border-[#222]">
-              {faqs.map((f) => (
-                <details key={f.q} className="group border-b border-[#222]">
-                  {/* The affordance lives on the whole row, not on a small
-                      glyph: full-width hover ground, a chevron in a circle on
-                      the right where accordions are expected to put it, and
-                      padding on the summary so the hit area is the row. */}
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 rounded-sm px-4 py-6 transition-colors duration-200 hover:bg-[#141414] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#e8734a] [&::-webkit-details-marker]:hidden">
-                    <span className="font-sans text-[1.05rem] font-medium text-[#d8d8d8] transition-colors group-hover:text-white group-open:text-white">
-                      {f.q}
-                    </span>
-                    <span
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-[#333] text-[#e8734a] transition-all duration-300 group-hover:border-[#e8734a]/60 group-hover:bg-[#e8734a]/10 group-open:rotate-180"
-                      aria-hidden
-                    >
-                      <ChevronDown size={15} strokeWidth={2} />
-                    </span>
-                  </summary>
-                  <p className="max-w-2xl px-4 pb-7 text-[0.95rem] leading-relaxed text-[#999]">
-                    {f.a}
-                  </p>
-                </details>
-              ))}
-            </div>
+            <FaqList items={faqs} />
 
             <div className="max-w-3xl mt-12 pt-10 border-t border-[#222]">
               <p className="text-[#b8b8b8] leading-relaxed mb-7">
                 Ai o întrebare care nu e aici? Scrie-o în formular — se răspunde în 24 de ore,
-                fără obligația de a te înscrie. Poți vedea și{' '}
+                fără obligația de a te înscrie. Sau citește mai întâi{' '}
                 <Link
                   to="/curriculum"
                   className="text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] transition-colors"
                 >
-                  programa completă pentru BAC
-                </Link>{' '}
-                înainte să decizi.
+                  programa completă
+                </Link>
+                {' '}și pagina care ți se potrivește:
               </p>
+
+              {/* The dedicated pages, listed rather than buried in prose. Each
+                  answers a different question, and this is the second place on
+                  the site where all four are reachable. */}
+              <ul className="mb-9 border-t border-[#222]">
+                {[
+                  {
+                    to: '/meditatii-informatica-bac',
+                    name: 'Meditații informatică BAC',
+                    note: 'Ce se cere la probă și capitolele în ordinea punctajului',
+                  },
+                  {
+                    to: '/meditatii-matematica-online',
+                    name: 'Meditații matematică online',
+                    note: 'Cum decurge o ședință și pentru cine nu merge formatul',
+                  },
+                  {
+                    to: '/meditatii-matematica-bucuresti',
+                    name: 'Meditații matematică București',
+                    note: 'Pentru elevii din București și Ilfov',
+                  },
+                  {
+                    to: '/meditatii-evaluare-nationala-matematica',
+                    name: 'Meditații Evaluare Națională',
+                    note: 'Clasa a VIII-a — unde se pierd punctele, de fapt',
+                  },
+                ].map((page) => (
+                  <li key={page.to} className="border-b border-[#222]">
+                    <Link
+                      to={page.to}
+                      className="group flex items-center justify-between gap-6 py-4 transition-colors hover:bg-[#141414]"
+                    >
+                      <span>
+                        <span className="block text-[0.98rem] font-medium text-[#d8d8d8] transition-colors group-hover:text-white">
+                          {page.name}
+                        </span>
+                        <span className="block text-[0.85rem] text-[#777] mt-0.5">
+                          {page.note}
+                        </span>
+                      </span>
+                      <ArrowRight
+                        size={14}
+                        strokeWidth={2}
+                        className="shrink-0 text-[#e8734a] transition-transform group-hover:translate-x-1"
+                        aria-hidden
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
               <Link to="/inscriere">
                 <motion.button
                   whileHover={{ y: -2 }}
