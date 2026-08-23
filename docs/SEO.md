@@ -124,11 +124,11 @@ Everything here was confirmed by reading the code on 2026-08-21.
   one or many JSON-LD objects. This component is good. Extend it, don't replace
   it, and don't add react-helmet.
 - **Structured data** in `frontend/src/seo/structuredData.ts`:
-  `EducationalOrganization`, `Person` (Răzvan), `LocalBusiness`, `Course`
+  `EducationalOrganization`, `Person` (Răzvan), `Course`
   objects for `/servicii` and one per landing page, a `Service` for the
   București page, two hand-written `FAQPage` objects (homepage and `/servicii`),
   plus `faqPageSchema()` and `breadcrumbSchema()` helpers. Wiring:
-  - `pages/Home.tsx` → organization + person + faq + localBusiness
+  - `pages/Home.tsx` → organization + person + faq
   - `pages/Services.tsx` → the three courses + servicesFaq + breadcrumb
   - the four landing pages → their own Course/Service + `faqPageSchema(FAQS)` +
     breadcrumb
@@ -144,6 +144,13 @@ Everything here was confirmed by reading the code on 2026-08-21.
   each programme card plus a list of all four under the FAQ.
 - **`/curriculum?curs=<id>`** opens a specific programme's tab, so a link can
   land on the right syllabus instead of the default maths one.
+- **One entity graph.** `organizationSchema` and `personSchema` carry stable
+  `@id`s (`/#organization`, `/#razvan`); every Course, Service and BlogPosting
+  references them. Note the references repeat a minimal typed node rather than
+  being a bare `{'@id'}` — an `@id` only resolves within one page's markup, and
+  the full organization node is only emitted on the homepage, so a bare
+  reference would leave `provider` (required for Course results) dangling on
+  every other page.
 - **`FaqList` and `SectionLabel`** in `src/components/` — the FAQ block exists
   once, on `<details>`, which is what keeps every answer in the document.
 - **robots.txt** (`frontend/public/robots.txt`) allows crawling and declares the
@@ -305,10 +312,12 @@ result. Do not invest further in local markup expecting one.
 - No street address and no `openingHours`. There is no premises and no published
   hours. Adding an address to look more local would be false in the schema and,
   if used to chase a profile, a suspension risk.
-- `localBusinessSchema` keeps its `LocalBusiness` type. Structured data is not a
-  business listing, and the type still communicates geography and price range
-  usefully. `OnlineBusiness` would be more literally accurate but has almost no
-  consumer support. Revisit only if something concrete depends on it.
+- `localBusinessSchema` was **removed on 2026-08-23**. An earlier revision of
+  this file argued for keeping it on the grounds that markup is not a business
+  listing. That was the wrong call: the type asserts a business customers deal
+  with in a place, and there is no such place. Its `priceRange` and `areaServed`
+  moved onto `organizationSchema`, which also gained `foundingDate`, the
+  Facebook page in `sameAs`, and an `@id`. Do not reintroduce `LocalBusiness`.
 
 ### D-5 (P2) — no page targets any commercial keyword — FIXED 2026-08-21
 
