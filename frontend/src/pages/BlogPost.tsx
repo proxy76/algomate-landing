@@ -6,7 +6,7 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import { posts, postBySlug } from '../content/posts.generated';
 import { formatDate } from './Blog';
-import { breadcrumbSchema } from '../seo/structuredData';
+import { breadcrumbSchema, ORG_ID, PERSON_ID } from '../seo/structuredData';
 
 const SITE_URL = 'https://algomate.ro';
 
@@ -30,12 +30,17 @@ const BlogPost: React.FC = () => {
     dateModified: post.updatedDate || post.publishDate,
     inLanguage: 'ro',
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+    /* Same `@id`s the Person and Organization nodes use on the homepage, so a
+       post is attributed to the instructor entity rather than to a name that
+       happens to match. */
     author: {
+      '@id': PERSON_ID,
       '@type': 'Person',
       name: 'Răzvan Rădulescu',
       url: `${SITE_URL}/#instructor`,
     },
     publisher: {
+      '@id': ORG_ID,
       '@type': 'EducationalOrganization',
       name: 'AlgoMate',
       url: SITE_URL,
