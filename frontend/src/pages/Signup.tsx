@@ -17,6 +17,7 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import API_BASE_URL from '../api';
 import { GROUP_MAX_STUDENTS, priceGroupLabel, priceIndividualLabel } from '../config/pricing';
+import { PHONE_DISPLAY, PHONE_HREF } from '../config/contact';
 import { breadcrumbSchema } from '../seo/structuredData';
 
 const courses = [
@@ -115,9 +116,22 @@ const Signup: React.FC = () => {
               <h1 className="font-display font-semibold text-[2.75rem] sm:text-6xl md:text-7xl text-[#f0f0f0] leading-[1.02] tracking-tight">
                 Înscrie-te la <em className="italic text-[#e8734a] font-normal">meditații.</em>
               </h1>
-              <p className="font-mono text-[11px] md:text-xs text-[#888] md:max-w-xs uppercase tracking-wider leading-relaxed">
-                → Completează formularul și te vom contacta în cel mai scurt timp.
-              </p>
+              <div className="md:max-w-xs">
+                <p className="font-mono text-[11px] md:text-xs text-[#888] uppercase tracking-wider leading-relaxed">
+                  → Completează formularul și te vom contacta în cel mai scurt timp.
+                </p>
+                {/* The form is the main path, but someone who would rather talk
+                    should not have to hunt in the footer for a number. */}
+                <p className="mt-4 font-mono text-[11px] md:text-xs uppercase tracking-wider text-[#888]">
+                  Sau sună la{' '}
+                  <a
+                    href={PHONE_HREF}
+                    className="text-[#e8734a] border-b border-[#e8734a]/30 hover:border-[#e8734a] transition-colors"
+                  >
+                    {PHONE_DISPLAY}
+                  </a>
+                </p>
+              </div>
             </div>
 
             {/* Meta row */}

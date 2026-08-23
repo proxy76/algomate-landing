@@ -12,12 +12,7 @@ import SEO from '../components/SEO';
 import FAQ from '../components/FAQ';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, Sigma, Terminal } from 'lucide-react';
-import {
-  organizationSchema,
-  faqSchema,
-  localBusinessSchema,
-  personSchema,
-} from '../seo/structuredData';
+import { organizationSchema, faqSchema, personSchema } from '../seo/structuredData';
 import { pricingSummary } from '../config/pricing';
 
 
@@ -86,7 +81,7 @@ const Home: React.FC = () => {
         title="AlgoMate — Meditații Matematică și Informatică BAC | București"
         description={`Meditații premium de matematică și informatică pentru BAC. Pregătire structurată cu 100% promovabilitate și media 9.8. ${pricingSummary}`}
         path="/"
-        jsonLd={[organizationSchema, personSchema, faqSchema, localBusinessSchema]}
+        jsonLd={[organizationSchema, personSchema, faqSchema]}
       />
       <div className="min-h-screen text-[#f0f0f0]">
         <Hero />

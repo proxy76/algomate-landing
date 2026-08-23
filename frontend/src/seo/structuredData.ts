@@ -1,8 +1,20 @@
 /**
- * Schema.org structured data for Google rich results.
- * 
+ * Schema.org structured data.
+ *
  * These JSON-LD objects are injected per-page via the SEO component.
- * Google uses them to show rich snippets (prices, FAQ dropdowns, course info).
+ *
+ * What this markup is actually for: telling Google what the entity is — who
+ * teaches, what is taught, at what price — not raising rankings. Two specifics
+ * worth knowing before adding anything here:
+ *
+ *   - `BreadcrumbList` genuinely renders in results, in place of the raw URL.
+ *   - `FAQPage` almost certainly will **not** produce FAQ dropdowns. Google
+ *     restricted those to government and health sites in 2023. The markup stays
+ *     as a comprehension signal, and its answers must still match the visible
+ *     page — but do not expect a visual result from it.
+ *
+ * Objects are emitted as separate <script> tags rather than one @graph, so each
+ * keeps its own `@context`. They are linked by `@id` instead.
  */
 
 import { EMAIL, LOCALITY, PHONE_E164 } from '../config/contact';
@@ -18,29 +30,74 @@ import {
 
 const SITE_URL = 'https://algomate.ro';
 
+/** Stable node identifiers, so the objects below form one entity, not three. */
+export const ORG_ID = `${SITE_URL}/#organization`;
+export const PERSON_ID = `${SITE_URL}/#razvan`;
+
+/**
+ * How a Course on another page points at the organization and the instructor.
+ *
+ * Note these carry a type and a name as well as the `@id`, rather than being a
+ * bare `{ '@id': … }` reference. That is deliberate: an `@id` only resolves
+ * against nodes present in the *same page's* markup, and the full
+ * organization node is only emitted on the homepage. A bare reference on
+ * `/servicii` would leave `provider` — a required property for Course results —
+ * pointing at nothing.
+ *
+ * Repeating the minimal node keeps every page self-contained and valid, while
+ * the shared `@id` still tells Google these are all one entity rather than six
+ * unrelated providers.
+ */
+const ORG_REF = {
+  '@id': ORG_ID,
+  '@type': 'EducationalOrganization',
+  name: 'AlgoMate',
+  url: SITE_URL,
+};
+
+const PERSON_REF = {
+  '@id': PERSON_ID,
+  '@type': 'Person',
+  name: 'Răzvan Rădulescu',
+};
+
 // ─── Organization Schema (site-wide) ────────────────────────────────────────
 
+/**
+ * This absorbed the former `localBusinessSchema`. AlgoMate teaches exclusively
+ * online and never meets a student in person, so `LocalBusiness` — which asserts
+ * a business that operates somewhere you can go — was the wrong type, and it was
+ * never going to earn local results for a business that cannot even hold a
+ * Google Business Profile.
+ *
+ * `addressLocality` stays: the business genuinely is run from București, which
+ * is honest and useful. What is gone is the claim that you can visit it.
+ */
 export const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'EducationalOrganization',
+  '@id': ORG_ID,
   name: 'AlgoMate',
   url: SITE_URL,
   email: EMAIL,
   telephone: PHONE_E164,
   description:
     'Meditații premium de matematică și informatică pentru examenul de Bacalaureat. Pregătire structurată cu rezultate dovedite.',
+  foundingDate: '2025-04-15',
+  founder: { '@id': PERSON_ID },
   address: {
     '@type': 'PostalAddress',
     addressLocality: LOCALITY,
     addressCountry: 'RO',
   },
+  priceRange: priceRangeLabel,
+  areaServed: { '@type': 'Country', name: 'Romania' },
   /**
-   * Populate as profiles go live — Google Business Profile first, then the
-   * tutoring marketplaces (see docs/SEO.md §6). Only list profiles that exist
-   * and that are demonstrably the same business; a `sameAs` pointing at
-   * somebody else's page is worse than an empty array.
+   * Extend as profiles are created. Only list a profile that exists and is
+   * demonstrably this business — a `sameAs` pointing at somebody else's page is
+   * worse than a short list.
    */
-  sameAs: [],
+  sameAs: ['https://www.facebook.com/profile.php?id=61592489231596'],
 };
 
 // ─── Person Schema (the instructor section on the homepage) ─────────────────
@@ -53,6 +110,7 @@ export const organizationSchema = {
 export const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': PERSON_ID,
   name: 'Răzvan Rădulescu',
   jobTitle: 'Instructor și fondator AlgoMate',
   description:
@@ -64,11 +122,7 @@ export const personSchema = {
     '@type': 'CollegeOrUniversity',
     name: 'Universitatea Politehnica din București',
   },
-  worksFor: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-  },
+  worksFor: { '@id': ORG_ID },
   knowsAbout: [
     'Matematică',
     'Informatică',
@@ -111,18 +165,21 @@ export const courseInformaticaBac = {
   name: 'Meditații Informatică BAC — C/C++',
   description:
     'Pregătire completă pentru BAC la Informatică: algoritmi, structuri de date, rezolvări complete de subiecte. Feedback personalizat pe cod.',
-  provider: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-  },
+  provider: ORG_REF,
+  instructor: PERSON_REF,
   offers: standardOffers,
   educationalLevel: 'Liceu',
   inLanguage: 'ro',
   hasCourseInstance: {
     '@type': 'CourseInstance',
     courseMode: 'Online',
-    startDate: '2026-08-15',
+    courseWorkload: 'PT2H',
+    courseSchedule: {
+      '@type': 'Schedule',
+      repeatFrequency: 'P1W',
+      repeatCount: 1,
+      duration: 'PT2H',
+    },
   },
 };
 
@@ -132,18 +189,21 @@ export const courseIntroductionProgramming = {
   name: 'Introducere în Informatică — Python / C++',
   description:
     'Curs introductiv de programare pentru clasa a 9-a. Bazele programării cu exerciții practice și proiecte reale.',
-  provider: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-  },
+  provider: ORG_REF,
+  instructor: PERSON_REF,
   offers: standardOffers,
   educationalLevel: 'Liceu',
   inLanguage: 'ro',
   hasCourseInstance: {
     '@type': 'CourseInstance',
     courseMode: 'Online',
-    startDate: '2026-07-15',
+    courseWorkload: 'PT2H',
+    courseSchedule: {
+      '@type': 'Schedule',
+      repeatFrequency: 'P1W',
+      repeatCount: 1,
+      duration: 'PT2H',
+    },
   },
 };
 
@@ -153,18 +213,21 @@ export const courseMatematicaBac = {
   name: 'Meditații Matematică BAC — M1/M2/M3',
   description:
     'Pregătire intensivă pentru BAC la Matematică: algebră, analiză, geometrie. Metodă structurată cu accent pe înțelegere.',
-  provider: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-  },
+  provider: ORG_REF,
+  instructor: PERSON_REF,
   offers: standardOffers,
   educationalLevel: 'Liceu',
   inLanguage: 'ro',
   hasCourseInstance: {
     '@type': 'CourseInstance',
     courseMode: 'Online',
-    startDate: '2026-08-15',
+    courseWorkload: 'PT2H',
+    courseSchedule: {
+      '@type': 'Schedule',
+      repeatFrequency: 'P1W',
+      repeatCount: 1,
+      duration: 'PT2H',
+    },
   },
 };
 
@@ -185,11 +248,8 @@ export const courseInformaticaBacLanding = {
     'Pregătire pentru proba de informatică de la Bacalaureat, în C/C++: algoritmi, tablouri, șiruri de caractere, subprograme, recursivitate, structuri de date și grafuri, cu rezolvări de subiecte oficiale și cod scris la fiecare ședință.',
   url: `${SITE_URL}/meditatii-informatica-bac`,
   mainEntityOfPage: `${SITE_URL}/meditatii-informatica-bac`,
-  provider: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-  },
+  provider: ORG_REF,
+  instructor: PERSON_REF,
   offers: standardOffers,
   educationalLevel: 'Liceu',
   inLanguage: 'ro',
@@ -206,7 +266,13 @@ export const courseInformaticaBacLanding = {
   hasCourseInstance: {
     '@type': 'CourseInstance',
     courseMode: 'Online',
-    startDate: '2026-08-15',
+    courseWorkload: 'PT2H',
+    courseSchedule: {
+      '@type': 'Schedule',
+      repeatFrequency: 'P1W',
+      repeatCount: 1,
+      duration: 'PT2H',
+    },
   },
 };
 
@@ -227,12 +293,7 @@ export const serviceMatematicaBucuresti = {
   description:
     'Meditații de matematică pentru elevii din București și Ilfov, pentru Bacalaureat și Evaluarea Națională. Ședințele se desfășoară online, în grupe mici sau individual.',
   url: `${SITE_URL}/meditatii-matematica-bucuresti`,
-  provider: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-    telephone: PHONE_E164,
-  },
+  provider: ORG_REF,
   areaServed: { '@type': 'City', name: LOCALITY },
   availableChannel: {
     '@type': 'ServiceChannel',
@@ -251,17 +312,20 @@ export const courseMatematicaOnline = {
     'Meditații de matematică online, în ședințe de două ore cu tablă digitală partajată, notițe trimise după fiecare întâlnire și temă corectată individual între ședințe.',
   url: `${SITE_URL}/meditatii-matematica-online`,
   mainEntityOfPage: `${SITE_URL}/meditatii-matematica-online`,
-  provider: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-  },
+  provider: ORG_REF,
+  instructor: PERSON_REF,
   offers: standardOffers,
   inLanguage: 'ro',
   hasCourseInstance: {
     '@type': 'CourseInstance',
     courseMode: 'Online',
     courseWorkload: 'PT2H',
+    courseSchedule: {
+      '@type': 'Schedule',
+      repeatFrequency: 'P1W',
+      repeatCount: 1,
+      duration: 'PT2H',
+    },
   },
 };
 
@@ -274,11 +338,8 @@ export const courseEvaluareNationala = {
     'Pregătire la matematică pentru Evaluarea Națională, clasa a VIII-a: evaluarea nivelului real, recuperarea lacunelor din gimnaziu, subiecte grupate pe tipuri de cerințe și simulări cronometrate.',
   url: `${SITE_URL}/meditatii-evaluare-nationala-matematica`,
   mainEntityOfPage: `${SITE_URL}/meditatii-evaluare-nationala-matematica`,
-  provider: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-  },
+  provider: ORG_REF,
+  instructor: PERSON_REF,
   offers: standardOffers,
   educationalLevel: 'Gimnaziu',
   inLanguage: 'ro',
@@ -286,6 +347,12 @@ export const courseEvaluareNationala = {
     '@type': 'CourseInstance',
     courseMode: 'Online',
     courseWorkload: 'PT2H',
+    courseSchedule: {
+      '@type': 'Schedule',
+      repeatFrequency: 'P1W',
+      repeatCount: 1,
+      duration: 'PT2H',
+    },
   },
 };
 
@@ -416,34 +483,12 @@ export const servicesFaqSchema = {
   ],
 };
 
-// ─── Local Business Schema (for București targeting) ─────────────────────────
-
-export const localBusinessSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
-  name: 'AlgoMate — Meditații Matematică & Informatică',
-  url: SITE_URL,
-  email: EMAIL,
-  telephone: PHONE_E164,
-  description: 'Meditații online de matematică și informatică pentru BAC, București.',
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: LOCALITY,
-    addressCountry: 'RO',
-  },
-  priceRange: priceRangeLabel,
-  /**
-   * București first: sessions are online and open to the whole country, but the
-   * local pack is the realistic near-term win and it keys off the city. No
-   * street address and no `openingHours` — there is no premises to visit and no
-   * published hours, and inventing either to fill the schema out would break
-   * the NAP consistency this is here to establish.
-   */
-  areaServed: [
-    { '@type': 'City', name: LOCALITY },
-    { '@type': 'Country', name: 'Romania' },
-  ],
-};
+/* `localBusinessSchema` was removed on 2026-08-23. It claimed a business that
+   operates from a place customers deal with locally; sessions are exclusively
+   online and there is no premises, which is also why no Google Business Profile
+   is possible. Its useful fields — `priceRange`, `areaServed` — moved onto
+   `organizationSchema` above. Do not reintroduce the type; it will not produce
+   local results and it asserts something untrue. */
 
 // ─── FAQ, built from the page's own copy ─────────────────────────────────────
 
