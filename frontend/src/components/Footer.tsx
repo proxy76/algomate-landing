@@ -28,6 +28,7 @@ const Footer: React.FC = () => {
                 { name: 'Acasă', href: '/' },
                 { name: 'Servicii', href: '/servicii' },
                 { name: 'Curriculum', href: '/curriculum' },
+                { name: 'Resurse', href: '/resurse' },
                 { name: 'Blog', href: '/blog' },
                 { name: 'Înscrie-te', href: '/inscriere' },
               ].map((link) => (

@@ -65,6 +65,19 @@ server {
         try_files $uri $uri/index.html =404;
     }
 
+    # PENDING — not yet applied on the server as of 2026-09-10. Apply with
+    # sudo nginx -t && sudo systemctl reload nginx, then delete this line.
+    #
+    # Downloadable PDFs (docs/DOWNLOADS-SECTION.md). Filenames carry a version,
+    # so a week of caching is safe and a revision is a new URL rather than a
+    # Cloudflare purge. A missing file must 404, never fall through to the app
+    # shell. No gzip: PDFs are already compressed, so it spends CPU for ~0
+    # bytes — the same reasoning the laborator block records for its PNGs.
+    location /descarcari/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=604800";
+    }
+
     # Django API. The enrollment form posts here; if this proxy stops
     # working the form breaks silently. A GET returns 405 (POST-only), which
     # is the quick check that it is intact — 502/504 means it is not.

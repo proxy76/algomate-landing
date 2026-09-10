@@ -1,10 +1,11 @@
 /**
  * Build-time content pipeline.
  *
- * Reads content/posts/*.md, and emits three things:
- *   1. src/content/posts.generated.ts — typed post data for the app
- *   2. public/sitemap.xml             — static pages + published posts
- *   3. .generated-routes.json         — route list for prerender.js
+ * Reads content/posts/*.md, and emits four things:
+ *   1. src/content/posts.generated.ts     — typed post data for the app
+ *   2. src/content/resources.generated.ts — on-disk size of every download
+ *   3. public/sitemap.xml                 — static pages + published posts
+ *   4. .generated-routes.json             — route list for prerender.js
  *
  * Markdown is rendered here rather than in the browser so no parser ships
  * in the bundle and every post is real HTML in the prerendered output.
@@ -30,6 +31,9 @@ const ROOT = path.resolve(__dirname, '..');
 const POSTS_DIR = path.join(ROOT, 'content', 'posts');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const OUT_TS = path.join(ROOT, 'src', 'content', 'posts.generated.ts');
+const RESOURCES_TS = path.join(ROOT, 'src', 'config', 'resources.ts');
+const DOWNLOADS_DIR = path.join(PUBLIC_DIR, 'descarcari');
+const OUT_RESOURCES_TS = path.join(ROOT, 'src', 'content', 'resources.generated.ts');
 const OUT_SITEMAP = path.join(PUBLIC_DIR, 'sitemap.xml');
 const OUT_ROUTES = path.join(ROOT, '.generated-routes.json');
 
@@ -53,6 +57,11 @@ const STATIC_PAGES = [
   { path: '/meditatii-evaluare-nationala-matematica', changefreq: 'monthly', priority: '0.9' },
   { path: '/curriculum', changefreq: 'monthly', priority: '0.8' },
   { path: '/inscriere', changefreq: 'monthly', priority: '0.8' },
+  // The downloads listing. The PDFs themselves are deliberately NOT in the
+  // sitemap: check-live-seo.mjs fetches every <loc> and requires a canonical
+  // link in the body, which a PDF does not have — it would gate the deploy on
+  // a failure pointing nowhere near its cause (docs/DOWNLOADS-SECTION.md §7.1).
+  { path: '/resurse', changefreq: 'monthly', priority: '0.8' },
   { path: '/blog', changefreq: 'weekly', priority: '0.9' },
   { path: '/multumim', changefreq: 'yearly', priority: '0.3', noindex: true },
   { path: '/termeni-si-conditii', changefreq: 'yearly', priority: '0.3' },
@@ -424,6 +433,146 @@ function readPosts() {
   return published;
 }
 
+/**
+ * ─── Downloads: sizes, and the guard that keeps them honest ─────────────────
+ *
+ * The manifest in src/config/resources.ts names files in public/descarcari/.
+ * Two things happen here, and the second is the important one:
+ *
+ *   · every listed file is stat()ed, so the page can print a size nobody typed
+ *   · every listed file must EXIST — a missing one fails the build
+ *
+ * Without that guard a mistyped filename ships as a download link that 404s
+ * and nothing notices: the build succeeds, the prerender succeeds, and
+ * check-live-seo.mjs only ever looks at HTML. This is exactly the "fails
+ * silently in a build" class CLAUDE.md warns about.
+ *
+ * The manifest is a .ts file, so it is read as source text rather than
+ * imported. That is why resources.ts documents the array as plain data: the
+ * literal is extracted and evaluated, and anything cleverer than strings and
+ * numbers inside it will not survive.
+ */
+function readManifest() {
+  if (!fs.existsSync(RESOURCES_TS)) {
+    fail(RESOURCES_TS, 'missing — src/config/resources.ts is required');
+  }
+
+  const src = fs.readFileSync(RESOURCES_TS, 'utf-8');
+  // The closing "];" sits at column 0 by convention in that file, which is what
+  // makes this delimiter unambiguous without parsing TypeScript.
+  const m = /export const RESOURCES:[^=]*=\s*(\[[\s\S]*?^\]);/m.exec(src);
+  if (!m) {
+    fail(
+      RESOURCES_TS,
+      'could not find the RESOURCES array. It must read\n' +
+        '      export const RESOURCES: Resource[] = [\n        ...\n      ];\n' +
+        '    with the closing "];" at the start of a line.'
+    );
+  }
+
+  try {
+    return new Function(`"use strict"; return (${m[1]});`)();
+  } catch (err) {
+    fail(RESOURCES_TS, `RESOURCES is not plain data — ${err.message}`);
+  }
+}
+
+const SUBJECTS = ['matematica', 'informatica'];
+const CATEGORIES = ['bacalaureat', 'evaluare-nationala', 'clasa-7'];
+
+function readResources() {
+  const manifest = readManifest();
+
+  if (!Array.isArray(manifest)) {
+    fail(RESOURCES_TS, 'RESOURCES must be an array');
+  }
+
+  const seenSlugs = new Set();
+  const seenFiles = new Set();
+  const sizes = {};
+
+  for (const r of manifest) {
+    const where = r && r.slug ? `"${r.slug}"` : JSON.stringify(r);
+
+    for (const key of ['slug', 'file', 'title', 'description', 'subject', 'category']) {
+      if (typeof r?.[key] !== 'string' || !r[key].trim()) {
+        fail(RESOURCES_TS, `${where}: missing or empty "${key}"`);
+      }
+    }
+    if (!/^[a-z0-9-]+$/.test(r.slug)) {
+      fail(RESOURCES_TS, `${where}: slug must be lowercase letters, digits and hyphens`);
+    }
+    // No slashes, no diacritics, no uppercase: this filename becomes a public
+    // URL and is served straight off disk by nginx.
+    if (!/^[a-z0-9][a-z0-9.-]*\.pdf$/.test(r.file)) {
+      fail(
+        RESOURCES_TS,
+        `${where}: file "${r.file}" must be a lowercase .pdf name — no path, ` +
+          `no diacritics, no spaces`
+      );
+    }
+    if (!SUBJECTS.includes(r.subject)) {
+      fail(RESOURCES_TS, `${where}: subject must be one of ${SUBJECTS.join(', ')}`);
+    }
+    if (!CATEGORIES.includes(r.category)) {
+      fail(RESOURCES_TS, `${where}: category must be one of ${CATEGORIES.join(', ')}`);
+    }
+    if (r.pages !== undefined && (!Number.isInteger(r.pages) || r.pages < 1)) {
+      fail(RESOURCES_TS, `${where}: pages must be a positive integer when present`);
+    }
+    // Duplicate slugs collide as React keys; a duplicate file means two entries
+    // hand out the same download under different names.
+    if (seenSlugs.has(r.slug)) fail(RESOURCES_TS, `duplicate slug "${r.slug}"`);
+    if (seenFiles.has(r.file)) fail(RESOURCES_TS, `duplicate file "${r.file}"`);
+    seenSlugs.add(r.slug);
+    seenFiles.add(r.file);
+
+    const onDisk = path.join(DOWNLOADS_DIR, r.file);
+    if (!fs.existsSync(onDisk)) {
+      fail(
+        RESOURCES_TS,
+        `${where}: "${r.file}" not found — expected a file at ` +
+          `${path.relative(ROOT, onDisk)}. Add the PDF or remove the entry; ` +
+          `shipping it would publish a download link that 404s.`
+      );
+    }
+
+    sizes[r.slug] = fs.statSync(onDisk).size;
+  }
+
+  // The other direction is a warning, not an error: an unlisted PDF is usually
+  // a forgotten manifest entry, but occasionally a file linked to on purpose
+  // from somewhere else.
+  if (fs.existsSync(DOWNLOADS_DIR)) {
+    const stray = fs
+      .readdirSync(DOWNLOADS_DIR)
+      .filter((f) => f.toLowerCase().endsWith('.pdf') && !seenFiles.has(f));
+    for (const f of stray) {
+      console.log(`  ! descarcari/${f} is not in the manifest — it ships but is not listed`);
+    }
+  }
+
+  if (manifest.length) {
+    const total = Object.values(sizes).reduce((a, b) => a + b, 0);
+    console.log(`  ✓ ${manifest.length} download(s), ${Math.round(total / 1024)} KB total`);
+  }
+
+  return sizes;
+}
+
+function writeResourcesTs(sizes) {
+  const body = `// GENERATED by scripts/build-content.mjs — do not edit by hand.
+// Byte size of every file listed in src/config/resources.ts, read off disk at
+// build time. The page formats these for display, so no size is typed by hand
+// and none can drift when a PDF is re-exported.
+
+export const resourceBytes: Record<string, number> = ${JSON.stringify(sizes, null, 2)};
+`;
+
+  fs.mkdirSync(path.dirname(OUT_RESOURCES_TS), { recursive: true });
+  fs.writeFileSync(OUT_RESOURCES_TS, body, 'utf-8');
+}
+
 function writeTs(posts) {
   const body = `// GENERATED by scripts/build-content.mjs — do not edit by hand.
 // Source of truth is content/posts/*.md. Re-run \`npm run content\` after editing.
@@ -501,6 +650,7 @@ function writeRoutes(posts) {
 
 const posts = readPosts();
 writeTs(posts);
+writeResourcesTs(readResources());
 writeSitemap(posts);
 writeRoutes(posts);
 console.log(`  ✓ content built (${posts.length} post(s), ${STATIC_PAGES.length} static pages)`);
