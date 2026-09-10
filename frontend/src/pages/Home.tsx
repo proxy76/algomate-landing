@@ -45,13 +45,6 @@ const services = [
   },
 ];
 
-const stats = [
-  { value: "100%", label: "Promovabilitate", meta: "Ex. Național" },
-  { value: "34", label: "Premianți", meta: "Începând cu 2024" },
-  { value: "9.8", label: "Media notelor", meta: "La BAC" },
-  { value: "2", label: "Ani experiență", meta: "Meditații" },
-];
-
 const SectionHeader: React.FC<{
   number: string;
   kicker: string;
@@ -162,60 +155,6 @@ const Home: React.FC = () => {
         <InlineSignup />
         <Instructor />
         <FeatureGrid />
-
-        {/* § 05 — Rezultate */}
-        <section className="py-16 md:py-24 relative z-10" id="rezultate">
-          <div className="max-w-6xl mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7 }}
-            >
-              <SectionHeader
-                number="05"
-                kicker="Rezultate / Cifre"
-                title={
-                  <>
-                    Rezultate, în <em className="italic text-[#e8734a] font-normal">cifre.</em>
-                  </>
-                }
-                subtitle="Fiecare număr vine dintr-un elev care a intrat în examen pregătit."
-              />
-            </motion.div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 border-y border-[#222]">
-              {stats.map((stat, idx) => {
-                const mobileBorderL = idx % 2 === 1;
-                const mobileBorderT = idx >= 2;
-                return (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: idx * 0.08 }}
-                    className={`py-10 md:py-12 px-4 md:px-6 text-center relative border-[#222]
-                      ${mobileBorderL ? 'border-l' : ''}
-                      ${mobileBorderT ? 'border-t md:border-t-0' : ''}
-                      ${idx !== 0 ? 'md:border-l' : ''}
-                    `}
-                  >
-                    <div className="font-display font-semibold text-4xl md:text-7xl text-[#e8734a] mb-3 md:mb-4 leading-none tracking-tight">
-                      {stat.value}
-                    </div>
-                    <div className="font-mono text-[10px] text-[#ccc] uppercase tracking-[0.25em] md:tracking-[0.3em] mb-1">
-                      {stat.label}
-                    </div>
-                    <div className="font-mono text-[9px] text-[#555] uppercase tracking-[0.2em] md:tracking-[0.25em]">
-                      {stat.meta}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
 
         {/* <Testimonials /> */}
         <FAQ />

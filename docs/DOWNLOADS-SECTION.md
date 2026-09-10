@@ -234,19 +234,29 @@ so:
 - Copy is Romanian, with diacritics. No price appears on the page; if one ever
   does, it imports from `src/config/pricing.ts`.
 
-### 4.4 The download links
+### 4.4 The two actions per guide
 
-A plain anchor with the `download` attribute:
+Each row offers both, spelled out — because the first version did not. It made
+the whole row a single `download` anchor with a small "Descarcă" label in the
+margin, and a reader could neither tell the rows were files nor look inside one
+before committing to a download. An 88-page guide is a reading decision.
 
 ```tsx
-<a href={`/descarcari/${r.file}`} download>…</a>
+<a href={href} download>Descarcă PDF</a>
+<a href={href} target="_blank" rel="noopener">Citește în browser</a>
 ```
 
-Same-origin, so `download` saves the file rather than opening the browser's PDF
-viewer — while pasting the URL directly still previews it, which is friendlier
-for a shared link. This gets the download UX **without** setting
-`Content-Disposition: attachment` server-side, which would force a save in
-every context including that shared link.
+Same URL both times; the only difference is the `download` attribute, which is
+what turns a preview into a save on a same-origin anchor.
+
+Nothing about this is server-side, and that is the point: setting
+`Content-Disposition: attachment` on the nginx block would force a save in
+every context — including the preview link, and including a URL someone pastes
+to a friend.
+
+Both links carry an `aria-label` naming the guide. Fourteen links reading
+"Descarcă PDF" / "Citește în browser" are indistinguishable in a screen
+reader's link list otherwise.
 
 ---
 

@@ -135,7 +135,7 @@ const FAQ: React.FC = () => {
           <div className="mb-14 md:mb-20">
             <div className="flex items-baseline gap-3 md:gap-4 mb-6 md:mb-8">
               <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#e8734a] uppercase whitespace-nowrap">
-                § 06
+                § 05
               </span>
               <span className="h-px flex-1 bg-gradient-to-r from-[#333] via-[#222] to-transparent" />
               <span className="font-mono text-[10px] md:text-[11px] tracking-[0.25em] md:tracking-[0.3em] text-[#666] uppercase hidden md:inline">
