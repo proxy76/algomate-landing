@@ -56,8 +56,24 @@ recurring rebuild, so a future `publishDate` means the post never appears at
 all rather than appearing later.
 
 Generated and gitignored — never commit these:
-`frontend/src/content/posts.generated.ts`, `frontend/.generated-routes.json`,
+`frontend/src/content/posts.generated.ts`,
+`frontend/src/content/resources.generated.ts`, `frontend/.generated-routes.json`,
 `frontend/public/sitemap.xml`.
+
+## Downloadable materials (`/resurse`)
+
+The PDFs live in `frontend/public/descarcari/` and are described by
+`frontend/src/config/resources.ts`, which is the source of truth in the same
+way `pricing.ts` is. **Sizes are never typed by hand** — `npm run content`
+stats each file, and an entry whose file is missing fails the build on purpose.
+
+**Filenames carry a version** (`…-v1.pdf`). Cloudflare caches PDFs at the edge
+by URL, so a revised guide published under the same name keeps serving the old
+bytes. Bump to `-v2` in the manifest and on disk together.
+
+`docs/DOWNLOADS-SECTION.md` is the full record — including why the files sit
+at `/descarcari/` and not under `/resurse/`, and why no PDF URL belongs in
+the sitemap.
 
 ## Server and deployment
 

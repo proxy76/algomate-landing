@@ -158,6 +158,12 @@ Everything here was confirmed by reading the code on 2026-08-21.
 - **No SPA fallback** in nginx — unknown URLs 404 rather than soft-404. This is
   deliberate; `check-live-seo.mjs` asserts it. Do not add
   `try_files $uri /index.html`.
+- **`/resurse`** (built 2026-09-10) — the downloads listing: seven PDF guides
+  for BAC M1, Evaluarea Națională and clasa a VII-a, ungated, served from
+  `/descarcari/`.
+  In the sitemap; the PDF URLs themselves deliberately are **not**, because
+  `check-live-seo.mjs` demands a canonical tag in every sitemap URL's body and
+  a PDF has none. See `docs/DOWNLOADS-SECTION.md` §7.1 before changing that.
 - **A worked-solution blog post exists** and is the right content template:
   `frontend/content/posts/2026-08-20-rezolvare-subiect-mate-bac-m2-august.md`
   (explicit `slug`, `math: true`, tags including `Subiecte rezolvate`).
@@ -472,6 +478,30 @@ post — wire them up as the maths posts appear.
 
 ### Phase 4 — off-site (mostly human tasks, see §6)
 
+### Phase 5 — make the downloads earn search traffic — NOT STARTED
+
+`/resurse` ships the seven guides as bare files (built 2026-09-10). Two ways to
+turn them into ranking assets, in the order they are worth doing:
+
+1. **A page per guide** — `/resurse/ghid-bac-m1-subiectul-1` and friends: the
+   contents, who it is for, a preview image, the download link. This is how a
+   PDF earns traffic without being indexed as a bare file, it gives internal
+   links something to point at, and it sidesteps the sitemap problem below
+   entirely. Seven thin pages would be worse than none, so write real copy per
+   guide or do not build it — and route each one through `STATIC_PAGES` as
+   well as `App.tsx`.
+2. **Index the PDFs themselves.** "formule bac matematica pdf" is a real query
+   family and Google does index PDFs. **Prerequisite:** `check-live-seo.mjs`
+   fetches every sitemap `<loc>` and requires a canonical tag in the body, so
+   adding PDF URLs breaks the deploy check with an error that points nowhere
+   near the cause. Teach the checker a content-type branch *first* — assert
+   `200` and a non-trivial `Content-Length` for non-HTML — then add the URLs.
+   `docs/DOWNLOADS-SECTION.md` §7.1.
+
+The related commercial question — gating downloads behind an email address —
+is deliberately out of scope here: it forfeits both the edge cache and any
+indexing. `DOWNLOADS-SECTION.md` §8 has the cost breakdown.
+
 ---
 
 ## 5. Guardrails — invariants an agent must not break
@@ -479,7 +509,8 @@ post — wire them up as the maths posts appear.
 - Never add an nginx SPA fallback. It produced soft 404s on every unknown URL.
 - Never set `publishDate` in the future.
 - Never commit the generated files: `src/content/posts.generated.ts`,
-  `.generated-routes.json`, `public/sitemap.xml`.
+  `src/content/resources.generated.ts`, `.generated-routes.json`,
+  `public/sitemap.xml`.
 - Do not loosen the HTML sanitiser allow-list in `scripts/build-content.mjs`
   casually — its output is injected with `dangerouslySetInnerHTML`.
 - Extend `.prose-algomate` in `src/index.css` rather than adding the Tailwind
