@@ -36,11 +36,15 @@ export type ResourceSubject = 'matematica' | 'informatica';
 
 /**
  * What the material is *for*, which is how the page groups it. Deliberately
- * not called `exam`: not every guide targets an exam — the clasa a VII-a
- * manual follows a school-year syllabus, and filing it under an exam heading
- * would contradict its own cover.
+ * not called `exam`: not every guide targets an exam — the clasa a V-a and
+ * clasa a VII-a manuals follow a school-year syllabus, and filing them under
+ * an exam heading would contradict their own covers.
  */
-export type ResourceCategory = 'bacalaureat' | 'evaluare-nationala' | 'clasa-7';
+export type ResourceCategory =
+  | 'bacalaureat'
+  | 'evaluare-nationala'
+  | 'clasa-7'
+  | 'clasa-5';
 
 export type Resource = {
   /** Stable id. Lowercase, hyphenated. Used as the React key and the size key. */
@@ -128,6 +132,16 @@ export const RESOURCES: Resource[] = [
     category: 'clasa-7',
     pages: 108,
   },
+  {
+    slug: 'matematica-clasa-5',
+    file: 'ghid-matematica-clasa-5-v1.pdf',
+    title: 'Matematică distractivă — clasa a V-a',
+    description:
+      'Toată materia de clasa a V-a, de la recapitularea clasei a IV-a până la unitățile de măsură: numere naturale și puteri, divizibilitate, fracții ordinare și zecimale, elemente de geometrie. Fiecare lecție are explicația, motivul din spatele regulii, un model rezolvat pas cu pas și peste 50 de exerciții pe patru niveluri, cu răspunsuri.',
+    subject: 'matematica',
+    category: 'clasa-5',
+    pages: 177,
+  },
 ];
 
 /** Directory the PDFs are served from. Deliberately not under `/resurse` —
@@ -147,17 +161,19 @@ export const CATEGORY_LABEL: Record<ResourceCategory, string> = {
   bacalaureat: 'Bacalaureat',
   'evaluare-nationala': 'Evaluarea Națională',
   'clasa-7': 'Clasa a VII-a',
+  'clasa-5': 'Clasa a V-a',
 };
 
 /**
  * Display order of the sections on /resurse. The page renders a section per
- * entry here rather than filtering in state — with seven files a filter buys
+ * entry here rather than filtering in state — with eight files a filter buys
  * nothing and risks prerendering only the default subset.
  */
 export const CATEGORY_ORDER: ResourceCategory[] = [
   'bacalaureat',
   'evaluare-nationala',
   'clasa-7',
+  'clasa-5',
 ];
 
 export const resourcesForCategory = (category: ResourceCategory) =>

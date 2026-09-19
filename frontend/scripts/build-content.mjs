@@ -478,7 +478,7 @@ function readManifest() {
 }
 
 const SUBJECTS = ['matematica', 'informatica'];
-const CATEGORIES = ['bacalaureat', 'evaluare-nationala', 'clasa-7'];
+const CATEGORIES = ['bacalaureat', 'evaluare-nationala', 'clasa-7', 'clasa-5'];
 
 function readResources() {
   const manifest = readManifest();
