@@ -29,7 +29,7 @@ prerenderer, which is where every production bug on this site has come from.
 ## 1. The capacity question — already answered, do not re-investigate
 
 The brief assumed 7 PDFs, ~2356 KB, ~50 simultaneous users; what shipped is
-7 PDFs, 2520 KB (§3.5) — 8 PDFs and 3437 KB since 2026-09-19. **The server
+7 PDFs, 2520 KB (§3.5) — 8 PDFs and 3447 KB since 2026-09-19. **The server
 handles this with enormous margin.**
 Measured on the box on 2026-09-10:
 
@@ -160,6 +160,14 @@ The clasa a V-a manual was added on 2026-09-19 and brought the `clasa-5`
 category with it (§3.3: `ResourceCategory`, `CATEGORY_LABEL`, `CATEGORY_ORDER`
 and `CATEGORIES` in the build guard, all four).
 
+It went to `-v2` the same day. `-v1` shipped and was served for about an
+hour before Răzvan supplied a re-export of the same guide; the text is
+identical page for page, only the PDF encoding differs. Because `-v1` had
+already gone through the Cloudflare edge, reusing the name would have kept
+serving the old bytes (§3.4, §7.2), so the file was bumped and `-v1` deleted
+from the repo. **That is the worked example of the rule** — a re-export with
+no content change still needs the bump once the old name has been served.
+
 | slug | file | category | pages | size |
 |---|---|---|---|---|
 | `bac-m1-subiectul-1` | `ghid-bac-m1-subiectul-1-v1.pdf` | bacalaureat | 88 | 599 KB |
@@ -169,7 +177,7 @@ and `CATEGORIES` in the build guard, all four).
 | `en8-subiectul-2` | `ghid-en8-matematica-subiectul-2-v1.pdf` | evaluare-nationala | 35 | 249 KB |
 | `en8-subiectul-3` | `ghid-en8-matematica-subiectul-3-v1.pdf` | evaluare-nationala | 22 | 181 KB |
 | `matematica-clasa-7` | `ghid-matematica-clasa-7-v1.pdf` | clasa-7 | 108 | 687 KB |
-| `matematica-clasa-5` | `ghid-matematica-clasa-5-v1.pdf` | clasa-5 | 177 | 916 KB |
+| `matematica-clasa-5` | `ghid-matematica-clasa-5-v2.pdf` | clasa-5 | 177 | 926 KB |
 
 Titles and descriptions were written from each guide's own cover page and
 table of contents, so they list the topics the file actually contains.

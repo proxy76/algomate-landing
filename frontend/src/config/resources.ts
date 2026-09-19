@@ -134,7 +134,7 @@ export const RESOURCES: Resource[] = [
   },
   {
     slug: 'matematica-clasa-5',
-    file: 'ghid-matematica-clasa-5-v1.pdf',
+    file: 'ghid-matematica-clasa-5-v2.pdf',
     title: 'Matematică distractivă — clasa a V-a',
     description:
       'Toată materia de clasa a V-a, de la recapitularea clasei a IV-a până la unitățile de măsură: numere naturale și puteri, divizibilitate, fracții ordinare și zecimale, elemente de geometrie. Fiecare lecție are explicația, motivul din spatele regulii, un model rezolvat pas cu pas și peste 50 de exerciții pe patru niveluri, cu răspunsuri.',
