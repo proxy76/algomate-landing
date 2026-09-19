@@ -125,7 +125,7 @@ const Resources: React.FC = () => {
     <PageTransition>
       <SEO
         title="Resurse gratuite — ghiduri de matematică pentru BAC, Evaluarea Națională și gimnaziu | AlgoMate"
-        description="Ghiduri gratuite în PDF la matematică — Bacalaureat M1, Evaluarea Națională și materia de clasa a VII-a: teorie esențială, probleme rezolvate pas cu pas și modele de subiect. Fără cont și fără adresă de e-mail."
+        description="Ghiduri gratuite în PDF la matematică — Bacalaureat M1, Evaluarea Națională și materia de gimnaziu, clasele a V-a și a VII-a: teorie esențială, probleme rezolvate pas cu pas și modele de subiect. Fără cont și fără adresă de e-mail."
         path="/resurse"
         jsonLd={breadcrumbSchema([{ name: 'Resurse', path: '/resurse' }])}
       />

@@ -29,7 +29,8 @@ prerenderer, which is where every production bug on this site has come from.
 ## 1. The capacity question — already answered, do not re-investigate
 
 The brief assumed 7 PDFs, ~2356 KB, ~50 simultaneous users; what shipped is
-7 PDFs, 2520 KB (§3.5). **The server handles this with enormous margin.**
+7 PDFs, 2520 KB (§3.5) — 8 PDFs and 3437 KB since 2026-09-19. **The server
+handles this with enormous margin.**
 Measured on the box on 2026-09-10:
 
 | Measurement | Result |
@@ -151,9 +152,13 @@ publish a revised guide**, in the manifest and on disk together.
 
 ### 3.5 What actually shipped
 
-Seven guides, all mathematics — the corpus contains no computer-science
+Eight guides, all mathematics — the corpus contains no computer-science
 material, so `subject: 'informatica'` exists in the type but is currently
 unused.
+
+The clasa a V-a manual was added on 2026-09-19 and brought the `clasa-5`
+category with it (§3.3: `ResourceCategory`, `CATEGORY_LABEL`, `CATEGORY_ORDER`
+and `CATEGORIES` in the build guard, all four).
 
 | slug | file | category | pages | size |
 |---|---|---|---|---|
@@ -164,6 +169,7 @@ unused.
 | `en8-subiectul-2` | `ghid-en8-matematica-subiectul-2-v1.pdf` | evaluare-nationala | 35 | 249 KB |
 | `en8-subiectul-3` | `ghid-en8-matematica-subiectul-3-v1.pdf` | evaluare-nationala | 22 | 181 KB |
 | `matematica-clasa-7` | `ghid-matematica-clasa-7-v1.pdf` | clasa-7 | 108 | 687 KB |
+| `matematica-clasa-5` | `ghid-matematica-clasa-5-v1.pdf` | clasa-5 | 177 | 916 KB |
 
 Titles and descriptions were written from each guide's own cover page and
 table of contents, so they list the topics the file actually contains.
@@ -188,7 +194,7 @@ table of contents, so they list the topics the file actually contains.
 
 | File | Change |
 |---|---|
-| `frontend/public/descarcari/*.pdf` | the 7 guides |
+| `frontend/public/descarcari/*.pdf` | the guides (7 at first; 8 since 2026-09-19) |
 | `frontend/src/config/resources.ts` | **new** — the manifest (§3.3) |
 | `frontend/src/pages/Resources.tsx` | **new** — the listing page |
 | `frontend/src/App.tsx` | the `/resurse` route |
@@ -317,7 +323,7 @@ curl -s -o /dev/null -w '%{http_code}\n' https://algomate.ro/descarcari/nu-exist
 
 # the page itself prerendered with every entry present, without JS.
 # grep -c counts LINES, and the built HTML is one long line — count matches.
-curl -s https://algomate.ro/resurse | grep -o 'descarcari/[a-z0-9.-]*' | sort -u | wc -l   # expect 7
+curl -s https://algomate.ro/resurse | grep -o 'descarcari/[a-z0-9.-]*' | sort -u | wc -l   # expect 8
 ```
 
 That last check is the one that catches §4.3 mistakes. Run it.
