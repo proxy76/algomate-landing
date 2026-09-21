@@ -18,8 +18,18 @@ const RootLayout: React.FC = () => {
      /blog/<slug>/ from their directory, the SPA router uses /blog/<slug>. */
   const isArticle = /^\/blog\/[^/]+\/?$/.test(location.pathname);
 
+  /**
+   * `overflow-x-clip`, not `overflow-x-hidden`. Both stop a stray wide element
+   * from scrolling the page sideways, but `hidden` also makes this div a
+   * scroll container, and `position: sticky` inside a scroll container that
+   * never itself scrolls simply does nothing — which is why the jump bar on
+   * /resurse would not pin. `clip` contains the overflow without that side
+   * effect. The Hero's own sticky is unaffected: its nearest overflow ancestor
+   * is its `overflow-hidden` section, which is exactly the pin-then-release
+   * range it wants.
+   */
   return (
-    <div className="min-h-screen text-[#f0f0f0] font-sans overflow-x-hidden">
+    <div className="min-h-screen text-[#f0f0f0] font-sans overflow-x-clip">
       {/* ScrollRestoration is the magic bullet for React Router v7 scroll jumping */}
       <ScrollRestoration />
 
