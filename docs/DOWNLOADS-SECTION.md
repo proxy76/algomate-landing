@@ -237,7 +237,7 @@ Both directions were exercised on 2026-09-10 before the feature was wired up.
 `prerender.js` emulates `prefers-reduced-motion: reduce` and snapshots the DOM,
 so:
 
-- **All seven entries are in the DOM on first paint.** No "load more", no list
+- **Every entry is in the DOM on first paint.** No "load more", no list
   populated in `useEffect`.
 - **There is no filter state.** The guides are grouped into static sections by
   category. A filter that unmounts non-matching cards would prerender only the
@@ -247,6 +247,13 @@ so:
   breadcrumbs from `breadcrumbSchema`.
 - Copy is Romanian, with diacritics. No price appears on the page; if one ever
   does, it imports from `src/config/pricing.ts`.
+- **The jump bar is plain anchors.** Added 2026-09-21 along with the per-file
+  panels. It is a `<nav>` of ordinary `<a href="#ghiduri-…">` links, so it
+  works in the prerendered HTML with no JavaScript; the IntersectionObserver
+  only decides which one is lit. Keep it that way — a bar that scrolls via
+  `onClick` alone is dead in the snapshot and for anyone middle-clicking.
+  Its `scroll-mt` clears the fixed header plus the bar itself, so changing
+  either height means changing that value. See §7.5 for what makes it pin.
 
 ### 4.4 The two actions per guide
 
@@ -384,6 +391,23 @@ yields a route that works in `npm run dev` and 404s in production.
 Restating §4.3: if the page's content depends on a mount, an animation frame,
 or a state-driven filter that unmounts, the deployed HTML is missing content
 and the build still exits 0.
+
+### 7.5 `overflow-x: hidden` silently kills the jump bar
+
+`RootLayout.tsx` wraps the whole site and must use **`overflow-x-clip`, not
+`overflow-x-hidden`**. Both contain a stray wide element, but `hidden` also
+makes that div a scroll container, and `position: sticky` inside a scroll
+container that never itself scrolls does nothing at all. The bar still
+renders, still looks right at the top of the page, and simply never pins —
+no error, no warning, nothing in the build output.
+
+This is easy to reintroduce, because `overflow-x-hidden` is the reflex fix
+for a horizontal scrollbar. If one ever appears, find the element that is too
+wide; do not swap `clip` back to `hidden`.
+
+The Hero's own sticky is unaffected either way: its nearest overflow ancestor
+is its own `overflow-hidden` section, which is exactly the pin-then-release
+range it wants.
 
 ---
 
