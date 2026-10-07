@@ -59,6 +59,14 @@ export type Resource = {
   category: ResourceCategory;
   /** Optional. Shown next to the file size when present. */
   pages?: number;
+  /**
+   * Optional. Puts a "Nou" badge and an accent border on the card. A flag
+   * rather than a date on purpose: nothing rebuilds the site on a schedule
+   * (SERVER-SETUP.md §3.1), so an expiry computed at build time would freeze
+   * at whatever the last deploy saw. Remove it by hand when the guide is no
+   * longer news — the next deploy takes the badge down.
+   */
+  isNew?: boolean;
 };
 
 export const RESOURCES: Resource[] = [
@@ -101,6 +109,7 @@ export const RESOURCES: Resource[] = [
     subject: 'matematica',
     category: 'bacalaureat',
     pages: 73,
+    isNew: true,
   },
   {
     slug: 'en8-subiectul-1',

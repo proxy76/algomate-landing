@@ -520,6 +520,9 @@ function readResources() {
     if (r.pages !== undefined && (!Number.isInteger(r.pages) || r.pages < 1)) {
       fail(RESOURCES_TS, `${where}: pages must be a positive integer when present`);
     }
+    if (r.isNew !== undefined && typeof r.isNew !== 'boolean') {
+      fail(RESOURCES_TS, `${where}: isNew must be true or false when present`);
+    }
     // Duplicate slugs collide as React keys; a duplicate file means two entries
     // hand out the same download under different names.
     if (seenSlugs.has(r.slug)) fail(RESOURCES_TS, `duplicate slug "${r.slug}"`);
