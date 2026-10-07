@@ -123,12 +123,29 @@ const ResourceCard: React.FC<{ resource: Resource; index: number }> = ({ resourc
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.08 + index * 0.06 }}
-      className="group/card bg-black border border-[#1c1c1c] hover:border-[#333] transition-colors duration-300 p-6 sm:p-8 md:p-10"
+      className={`group/card border transition-colors duration-300 p-6 sm:p-8 md:p-10 ${
+        // A new guide keeps the well but tints its hairline and lets a faint
+        // wash of the accent in from the top — enough to find it on a scan,
+        // not enough to outshout the download button.
+        resource.isNew
+          ? 'bg-black bg-[linear-gradient(180deg,rgba(232,115,74,0.06),transparent_40%)] border-[#e8734a]/30 hover:border-[#e8734a]/60'
+          : 'bg-black border-[#1c1c1c] hover:border-[#333]'
+      }`}
     >
-      {SHOW_SUBJECT && (
-        <span className="inline-block font-mono text-[10px] tracking-[0.2em] uppercase text-[#e8734a] mb-4">
-          {SUBJECT_LABEL[resource.subject]}
-        </span>
+      {(SHOW_SUBJECT || resource.isNew) && (
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          {resource.isNew && (
+            <span className="inline-flex items-center gap-2 border border-[#e8734a]/40 bg-[#e8734a]/10 px-2.5 py-1 font-mono text-[10px] tracking-[0.2em] uppercase text-[#e8734a]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#e8734a]" aria-hidden />
+              Nou
+            </span>
+          )}
+          {SHOW_SUBJECT && (
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#e8734a]">
+              {SUBJECT_LABEL[resource.subject]}
+            </span>
+          )}
+        </div>
       )}
 
       <h3 className="font-display font-semibold text-[1.55rem] sm:text-3xl md:text-[2.05rem] text-[#f0f0f0] leading-[1.15] tracking-tight mb-3 text-balance">
