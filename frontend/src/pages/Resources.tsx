@@ -51,7 +51,7 @@ const sectionId = (category: ResourceCategory) => `ghiduri-${category}`;
 
 /**
  * The subject chip is only information when the corpus holds more than one
- * subject. Today every guide is mathematics, so eight identical "MATEMATICĂ"
+ * subject. Today every guide is mathematics, so nine identical "MATEMATICĂ"
  * labels would be decoration — and the design rule here is that structure
  * encodes something. This reads the manifest rather than a hardcoded answer,
  * so the chip appears by itself on the day an informatics guide lands.
