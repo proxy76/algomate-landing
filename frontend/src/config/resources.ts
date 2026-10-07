@@ -93,6 +93,16 @@ export const RESOURCES: Resource[] = [
     pages: 43,
   },
   {
+    slug: 'bac-m1-subiectul-3-1-functii',
+    file: 'ghid-bac-m1-subiectul-3-1-functii-v1.pdf',
+    title: 'Ghid BAC M1 — Subiectul III.1: funcții și derivate',
+    description:
+      'Toate tipurile de probleme date la III.1 între 2015 și 2026, din 36 de subiecte oficiale analizate: calculul derivatei, tangente și asimptote, monotonie, limite și convexitate, apoi cerințele c) — numărul de soluții, inegalități, comparări, limite speciale. Metoda pentru fiecare tip, subiecte oficiale rezolvate pas cu pas și 20 de probleme de exersare pe tip, cu răspunsuri.',
+    subject: 'matematica',
+    category: 'bacalaureat',
+    pages: 73,
+  },
+  {
     slug: 'en8-subiectul-1',
     file: 'ghid-en8-matematica-subiectul-1-v1.pdf',
     title: 'Ghid Evaluarea Națională — Subiectul I',
@@ -166,7 +176,7 @@ export const CATEGORY_LABEL: Record<ResourceCategory, string> = {
 
 /**
  * Display order of the sections on /resurse. The page renders a section per
- * entry here rather than filtering in state — with eight files a filter buys
+ * entry here rather than filtering in state — with nine files a filter buys
  * nothing and risks prerendering only the default subset.
  */
 export const CATEGORY_ORDER: ResourceCategory[] = [
