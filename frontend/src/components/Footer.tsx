@@ -54,6 +54,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {[
                 { name: 'Informatică BAC', href: '/meditatii-informatica-bac' },
+                { name: 'Liceu (IX–XII)', href: '/meditatii-liceu' },
                 { name: 'Matematică București', href: '/meditatii-matematica-bucuresti' },
                 { name: 'Matematică online', href: '/meditatii-matematica-online' },
                 {

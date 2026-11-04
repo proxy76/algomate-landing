@@ -566,13 +566,18 @@ const Services: React.FC = () => {
 
               {/* The dedicated pages, listed rather than buried in prose. Each
                   answers a different question, and this is the second place on
-                  the site where all four are reachable. */}
+                  the site where all five are reachable. */}
               <ul className="mb-9 border-t border-[#222]">
                 {[
                   {
                     to: '/meditatii-informatica-bac',
                     name: 'Meditații informatică BAC',
                     note: 'Ce se cere la probă și capitolele în ordinea punctajului',
+                  },
+                  {
+                    to: '/meditatii-liceu',
+                    name: 'Meditații liceu',
+                    note: 'Clasele IX–XII — ce contează în fiecare an până la BAC',
                   },
                   {
                     to: '/meditatii-matematica-online',
