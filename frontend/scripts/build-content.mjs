@@ -1,20 +1,22 @@
 /**
  * Build-time content pipeline.
  *
- * Reads content/posts/*.md, and emits four things:
+ * Reads content/posts/*.md, and emits six things:
  *   1. src/content/posts.generated.ts     — typed post data for the app
  *   2. src/content/resources.generated.ts — on-disk size of every download
  *   3. public/sitemap.xml                 — static pages + published posts
  *   4. .generated-routes.json             — route list for prerender.js
+ *   5. public/feed.xml                    — RSS 2.0, full text, for readers
+ *                                           and aggregators
+ *   6. public/llms.txt                    — plain-text site map for LLM tools
  *
  * Markdown is rendered here rather than in the browser so no parser ships
  * in the bundle and every post is real HTML in the prerendered output.
  *
  * Scheduling: a post is published when `draft` is not true AND publishDate
  * is today or earlier. Future-dated posts stay invisible until a later
- * build — which is why a daily scheduled rebuild is what makes scheduling
- * work at all. Without it, a post dated the 14th sits unpublished until
- * the next time someone deploys.
+ * build. What runs that build on the morning a post is due is
+ * deploy/publish-scheduled.sh, on a systemd timer (docs/SERVER-SETUP.md §3.1).
  */
 
 import fs from 'fs';
@@ -36,6 +38,8 @@ const DOWNLOADS_DIR = path.join(PUBLIC_DIR, 'descarcari');
 const OUT_RESOURCES_TS = path.join(ROOT, 'src', 'content', 'resources.generated.ts');
 const OUT_SITEMAP = path.join(PUBLIC_DIR, 'sitemap.xml');
 const OUT_ROUTES = path.join(ROOT, '.generated-routes.json');
+const OUT_FEED = path.join(PUBLIC_DIR, 'feed.xml');
+const OUT_LLMS = path.join(PUBLIC_DIR, 'llms.txt');
 
 const SITE_URL = 'https://algomate.ro';
 
@@ -46,23 +50,54 @@ const SITE_URL = 'https://algomate.ro';
  * URL you tell crawlers not to index is a contradictory signal.
  */
 const STATIC_PAGES = [
-  { path: '/', changefreq: 'weekly', priority: '1.0' },
-  { path: '/servicii', changefreq: 'monthly', priority: '0.9' },
+  {
+    path: '/', changefreq: 'weekly', priority: '1.0',
+    llms: 'Pagina principală: cine predă, cum arată o ședință, întrebări frecvente.',
+  },
+  {
+    path: '/servicii', changefreq: 'monthly', priority: '0.9',
+    llms: 'Programele (Matematică BAC, Informatică BAC, introducere în programare), prețuri, formatul ședințelor.',
+  },
   // Subject landing pages — one query family each. Adding a route to App.tsx
   // without adding it here leaves it out of both the sitemap and the prerender
   // list, which means it 404s in production.
-  { path: '/meditatii-informatica-bac', changefreq: 'monthly', priority: '0.9' },
-  { path: '/meditatii-matematica-bucuresti', changefreq: 'monthly', priority: '0.9' },
-  { path: '/meditatii-matematica-online', changefreq: 'monthly', priority: '0.9' },
-  { path: '/meditatii-evaluare-nationala-matematica', changefreq: 'monthly', priority: '0.9' },
-  { path: '/curriculum', changefreq: 'monthly', priority: '0.8' },
-  { path: '/inscriere', changefreq: 'monthly', priority: '0.8' },
+  {
+    path: '/meditatii-informatica-bac', changefreq: 'monthly', priority: '0.9',
+    llms: 'Meditații informatică pentru BAC, în C++: ce cere proba E.d) și în ce ordine se lucrează capitolele.',
+  },
+  {
+    path: '/meditatii-liceu', changefreq: 'monthly', priority: '0.9',
+    llms: 'Meditații de liceu la matematică și informatică, pe clase (IX–XII): ce contează în fiecare an până la BAC.',
+  },
+  {
+    path: '/meditatii-matematica-bucuresti', changefreq: 'monthly', priority: '0.9',
+    llms: 'Meditații matematică pentru elevii din București, online.',
+  },
+  {
+    path: '/meditatii-matematica-online', changefreq: 'monthly', priority: '0.9',
+    llms: 'Cum se desfășoară o meditație de matematică online: tablă digitală, notițe, temă corectată.',
+  },
+  {
+    path: '/meditatii-evaluare-nationala-matematica', changefreq: 'monthly', priority: '0.9',
+    llms: 'Pregătire la matematică pentru Evaluarea Națională, clasa a VIII-a.',
+  },
+  {
+    path: '/curriculum', changefreq: 'monthly', priority: '0.8',
+    llms: 'Programa parcursă la fiecare program, capitol cu capitol.',
+  },
+  { path: '/inscriere', changefreq: 'monthly', priority: '0.8', llms: 'Formularul de înscriere.' },
   // The downloads listing. The PDFs themselves are deliberately NOT in the
   // sitemap: check-live-seo.mjs fetches every <loc> and requires a canonical
   // link in the body, which a PDF does not have — it would gate the deploy on
   // a failure pointing nowhere near its cause (docs/DOWNLOADS-SECTION.md §7.1).
-  { path: '/resurse', changefreq: 'monthly', priority: '0.8' },
-  { path: '/blog', changefreq: 'weekly', priority: '0.9' },
+  {
+    path: '/resurse', changefreq: 'monthly', priority: '0.8',
+    llms: 'Ghiduri PDF gratuite: BAC M1 pe subiecte, Evaluare Națională, clasele a V-a și a VII-a.',
+  },
+  {
+    path: '/blog', changefreq: 'weekly', priority: '0.9',
+    llms: 'Toate articolele: subiecte rezolvate, calendarul examenelor, metodă.',
+  },
   { path: '/multumim', changefreq: 'yearly', priority: '0.3', noindex: true },
   { path: '/termeni-si-conditii', changefreq: 'yearly', priority: '0.3' },
   { path: '/politica-de-confidentialitate', changefreq: 'yearly', priority: '0.3' },
@@ -417,6 +452,7 @@ function readPosts() {
       coverImage,
       coverAlt,
       readingMinutes: Math.max(1, Math.round(words / 200)),
+      wordCount: words,
       html: clean,
     });
   }
@@ -593,6 +629,7 @@ export interface Post {
   /** Empty when the image is decorative — see resolveCover in build-content.mjs. */
   coverAlt: string;
   readingMinutes: number;
+  wordCount: number;
   /** Rendered at build time; no markdown parser ships to the browser. */
   html: string;
 }
@@ -651,9 +688,122 @@ function writeRoutes(posts) {
   fs.writeFileSync(OUT_ROUTES, JSON.stringify(routes, null, 2), 'utf-8');
 }
 
+const escapeXml = (s) =>
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+
+/** 05:00 UTC — the morning the scheduled rebuild publishes a post, not midnight. */
+const rfc822 = (isoDate) => new Date(`${isoDate}T05:00:00Z`).toUTCString();
+
+/**
+ * RSS 2.0 with the full article in content:encoded.
+ *
+ * Full text rather than an excerpt because the consumers that matter here —
+ * feed readers, news aggregators, and the LLM tools that read feeds to find
+ * what changed — all do better with the whole thing. Root-relative links are
+ * absolutised: a feed is read away from the site, where "/blog/x" resolves to
+ * nothing. The HTML is the same sanitised output the page renders.
+ *
+ * Not in the sitemap: check-live-seo.mjs requires a canonical tag in every
+ * sitemap URL's body, and a feed has none.
+ */
+function writeFeed(posts) {
+  const absolutise = (html) =>
+    html.replace(/(href|src)="\/(?!\/)/g, `$1="${SITE_URL}/`);
+
+  const items = posts.slice(0, 30).map((p) => {
+    const url = `${SITE_URL}/blog/${p.slug}`;
+    const image = p.coverImage
+      ? `\n      <enclosure url="${SITE_URL}${p.coverImage}" type="${
+          p.coverImage.endsWith('.png') ? 'image/png' : 'image/jpeg'
+        }" length="${fs.statSync(path.join(PUBLIC_DIR, p.coverImage.slice(1))).size}"/>`
+      : '';
+    return `    <item>
+      <title>${escapeXml(p.title)}</title>
+      <link>${url}</link>
+      <guid isPermaLink="true">${url}</guid>
+      <pubDate>${rfc822(p.publishDate)}</pubDate>
+      <dc:creator>Răzvan Rădulescu</dc:creator>
+      <category>${escapeXml(p.category)}</category>${p.tags
+        .map((t) => `\n      <category>${escapeXml(t)}</category>`)
+        .join('')}
+      <description>${escapeXml(p.description)}</description>${image}
+      <content:encoded><![CDATA[${absolutise(p.html).replace(/]]>/g, ']]]]><![CDATA[>')}]]></content:encoded>
+    </item>`;
+  });
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>AlgoMate — Blog</title>
+    <link>${SITE_URL}/blog</link>
+    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>Subiecte de BAC și Evaluare Națională rezolvate, calendarul examenelor și metodă, la matematică și informatică.</description>
+    <language>ro</language>
+    <image>
+      <url>${SITE_URL}/logo.png</url>
+      <title>AlgoMate — Blog</title>
+      <link>${SITE_URL}/blog</link>
+    </image>${posts.length ? `\n    <lastBuildDate>${rfc822(posts[0].publishDate)}</lastBuildDate>` : ''}
+${items.join('\n')}
+  </channel>
+</rss>
+`;
+
+  fs.writeFileSync(OUT_FEED, xml, 'utf-8');
+}
+
+/**
+ * llms.txt (llmstxt.org): a plain-markdown index of the site for LLM tools.
+ *
+ * Google says outright that it does not read this file and that it neither
+ * helps nor hurts in Search. It is here for the other assistants and agents
+ * that do fetch it, and it costs nothing because it is generated from the same
+ * lists as the sitemap. No prices in it on purpose: prices live in
+ * src/config/pricing.ts and on /servicii, and a second copy here would be the
+ * one that goes stale.
+ */
+function writeLlms(posts) {
+  const pages = STATIC_PAGES.filter((p) => !p.noindex && p.llms)
+    .map((p) => `- [${SITE_URL}${p.path}](${SITE_URL}${p.path}): ${p.llms}`)
+    .join('\n');
+
+  const articles = posts
+    .map((p) => `- [${p.title}](${SITE_URL}/blog/${p.slug}) (${p.publishDate}): ${p.description}`)
+    .join('\n');
+
+  const body = `# AlgoMate
+
+> Meditații de matematică și informatică pentru Bacalaureat și Evaluarea Națională, online, susținute de un singur profesor: Răzvan Rădulescu (București). Ședințe de două ore, în grupe mici sau individual.
+
+Site-ul este în limba română. Articolele de pe blog sunt scrise de Răzvan Rădulescu; cele care rezolvă un subiect oficial spun ce sesiune și ce variantă este, iar cele cu probleme proprii o spun explicit. Subiectele oficiale se publică pe https://subiecte.edu.ro.
+
+## Pagini
+
+${pages}
+
+## Articole
+
+${articles}
+
+## Opțional
+
+- [Flux RSS, text integral](${SITE_URL}/feed.xml)
+- [Sitemap](${SITE_URL}/sitemap.xml)
+`;
+
+  fs.writeFileSync(OUT_LLMS, body, 'utf-8');
+}
+
 const posts = readPosts();
 writeTs(posts);
 writeResourcesTs(readResources());
 writeSitemap(posts);
 writeRoutes(posts);
+writeFeed(posts);
+writeLlms(posts);
 console.log(`  ✓ content built (${posts.length} post(s), ${STATIC_PAGES.length} static pages)`);

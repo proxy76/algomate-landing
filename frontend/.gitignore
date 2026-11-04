@@ -21,6 +21,8 @@ src/content/posts.generated.ts
 src/content/resources.generated.ts
 .generated-routes.json
 public/sitemap.xml
+public/feed.xml
+public/llms.txt
 .env
 .env.*
 !.env.example

@@ -6,6 +6,7 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import SectionLabel from '../components/SectionLabel';
 import FaqList from '../components/FaqList';
+import RelatedPosts from '../components/RelatedPosts';
 import {
   breadcrumbSchema,
   courseInformaticaBacLanding,
@@ -376,6 +377,12 @@ const InformaticaBac: React.FC = () => {
               </p>
             </div>
           </motion.section>
+
+          <RelatedPosts
+            tags={['Informatică BAC']}
+            exclude={['recursivitate-bac-informatica-cerinte-rezolvate', 'matrice-bac-informatica-parcurgeri']}
+            heading="Mai multe subiecte de informatică, rezolvate."
+          />
 
           {/* ── FAQ ────────────────────────────────────────────────── */}
           <motion.section

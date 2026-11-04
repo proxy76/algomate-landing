@@ -6,6 +6,7 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import SectionLabel from '../components/SectionLabel';
 import FaqList from '../components/FaqList';
+import RelatedPosts from '../components/RelatedPosts';
 import {
   breadcrumbSchema,
   courseMatematicaOnline,
@@ -226,6 +227,11 @@ const MatematicaOnline: React.FC = () => {
               </p>
             </div>
           </motion.section>
+
+          <RelatedPosts
+            tags={['Matematică M1', 'Matematică M2']}
+            heading="Subiecte de matematică, rezolvate pas cu pas."
+          />
 
           {/* ── FAQ ────────────────────────────────────────────────── */}
           <motion.section

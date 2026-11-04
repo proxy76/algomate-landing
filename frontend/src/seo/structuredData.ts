@@ -18,13 +18,45 @@ import {
 
 const SITE_URL = 'https://algomate.ro';
 
+/**
+ * Stable node identifiers. Every object that means "the business" or "the
+ * instructor" points at one of these, so Google and the LLM crawlers resolve
+ * the homepage Organization, a post's publisher and a post's author to the
+ * same two entities instead of a scatter of unrelated nameless ones. That
+ * entity link is most of what "author authority" means to a machine reader.
+ */
+export const ORG_ID = `${SITE_URL}/#organization`;
+export const PERSON_ID = `${SITE_URL}/#instructor`;
+export const WEBSITE_ID = `${SITE_URL}/#website`;
+export const LOGO_URL = `${SITE_URL}/logo.png`;
+
+// ─── WebSite Schema (homepage) ───────────────────────────────────────────────
+
+/**
+ * What Google reads for the site name shown above every search result.
+ * Without it the result can carry the bare domain, or a guess.
+ */
+export const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': WEBSITE_ID,
+  name: 'AlgoMate',
+  alternateName: ['AlgoMate Meditații', 'algomate.ro'],
+  url: `${SITE_URL}/`,
+  inLanguage: 'ro',
+  publisher: { '@id': ORG_ID },
+};
+
 // ─── Organization Schema (site-wide) ────────────────────────────────────────
 
 export const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'EducationalOrganization',
+  '@id': ORG_ID,
   name: 'AlgoMate',
   url: SITE_URL,
+  logo: LOGO_URL,
+  founder: { '@id': PERSON_ID },
   email: EMAIL,
   telephone: PHONE_E164,
   description:
@@ -53,7 +85,9 @@ export const organizationSchema = {
 export const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': PERSON_ID,
   name: 'Răzvan Rădulescu',
+  url: `${SITE_URL}/#instructor`,
   jobTitle: 'Instructor și fondator AlgoMate',
   description:
     'Student la Universitatea Politehnica din București și programator, premiant la olimpiade și concursuri naționale de Informatică. 2 ani de meditații de matematică și informatică, cu rezultate la Bacalaureat și Evaluare Națională.',
@@ -64,11 +98,7 @@ export const personSchema = {
     '@type': 'CollegeOrUniversity',
     name: 'Universitatea Politehnica din București',
   },
-  worksFor: {
-    '@type': 'EducationalOrganization',
-    name: 'AlgoMate',
-    url: SITE_URL,
-  },
+  worksFor: { '@type': 'EducationalOrganization', '@id': ORG_ID, name: 'AlgoMate', url: SITE_URL },
   knowsAbout: [
     'Matematică',
     'Informatică',
@@ -258,6 +288,32 @@ export const courseMatematicaOnline = {
   },
   offers: standardOffers,
   inLanguage: 'ro',
+  hasCourseInstance: {
+    '@type': 'CourseInstance',
+    courseMode: 'Online',
+    courseWorkload: 'PT2H',
+  },
+};
+
+/** `/meditatii-liceu` — the year-by-year page, both subjects. */
+export const courseLiceu = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: 'Meditații Liceu — Matematică și Informatică, clasele IX–XII',
+  description:
+    'Meditații online de matematică și informatică pentru liceu, organizate pe clase: fundația din clasa a IX-a, funcțiile și tablourile din a X-a, analiza, subprogramele și grafurile din a XI-a, recapitularea pentru Bacalaureat din a XII-a.',
+  url: `${SITE_URL}/meditatii-liceu`,
+  mainEntityOfPage: `${SITE_URL}/meditatii-liceu`,
+  provider: {
+    '@type': 'EducationalOrganization',
+    '@id': ORG_ID,
+    name: 'AlgoMate',
+    url: SITE_URL,
+  },
+  offers: standardOffers,
+  educationalLevel: 'Liceu',
+  inLanguage: 'ro',
+  teaches: ['Matematică de liceu', 'Informatică de liceu (C++)', 'Pregătire Bacalaureat'],
   hasCourseInstance: {
     '@type': 'CourseInstance',
     courseMode: 'Online',

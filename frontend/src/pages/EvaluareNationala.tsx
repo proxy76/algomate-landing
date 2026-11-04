@@ -6,6 +6,7 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import SectionLabel from '../components/SectionLabel';
 import FaqList from '../components/FaqList';
+import RelatedPosts from '../components/RelatedPosts';
 import {
   breadcrumbSchema,
   courseEvaluareNationala,
@@ -265,6 +266,12 @@ const EvaluareNationala: React.FC = () => {
               </p>
             </div>
           </motion.section>
+
+          <RelatedPosts
+            tags={['Evaluare Națională 2027', 'Evaluare Națională']}
+            exclude={['admitere-liceu-2027', 'calendar-examene-2027']}
+            heading="Subiecte de Evaluare Națională, rezolvate."
+          />
 
           {/* ── FAQ ────────────────────────────────────────────────── */}
           <motion.section

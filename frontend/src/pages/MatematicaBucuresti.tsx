@@ -6,6 +6,7 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import SectionLabel from '../components/SectionLabel';
 import FaqList from '../components/FaqList';
+import RelatedPosts from '../components/RelatedPosts';
 import {
   breadcrumbSchema,
   faqPageSchema,
@@ -265,6 +266,11 @@ const MatematicaBucuresti: React.FC = () => {
               </p>
             </div>
           </motion.section>
+
+          <RelatedPosts
+            tags={['Matematică M1', 'Matematică M2', 'Evaluare Națională 2027']}
+            heading="Ce lucrăm, pe subiecte reale."
+          />
 
           {/* ── FAQ ────────────────────────────────────────────────── */}
           <motion.section

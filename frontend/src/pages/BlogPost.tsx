@@ -6,7 +6,13 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import { posts, postBySlug } from '../content/posts.generated';
 import { formatDate } from './Blog';
-import { breadcrumbSchema } from '../seo/structuredData';
+import {
+  breadcrumbSchema,
+  LOGO_URL,
+  ORG_ID,
+  PERSON_ID,
+  WEBSITE_ID,
+} from '../seo/structuredData';
 
 const SITE_URL = 'https://algomate.ro';
 
@@ -23,23 +29,35 @@ const BlogPost: React.FC = () => {
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
+    '@id': `${SITE_URL}/blog/${post.slug}#article`,
     headline: post.title,
     description: post.description,
-    ...(post.coverImage ? { image: `${SITE_URL}${post.coverImage}` } : {}),
+    // Article rich results and Discover both want an image; the site card is
+    // the honest fallback for a post without its own cover.
+    image: post.coverImage ? `${SITE_URL}${post.coverImage}` : `${SITE_URL}/og-image.png`,
     datePublished: post.publishDate,
     dateModified: post.updatedDate || post.publishDate,
     inLanguage: 'ro',
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+    articleSection: post.category,
+    wordCount: post.wordCount,
+    isAccessibleForFree: true,
+    // The same @ids the homepage declares, so the byline resolves to the
+    // instructor entity rather than to a second, anonymous Person.
     author: {
       '@type': 'Person',
+      '@id': PERSON_ID,
       name: 'Răzvan Rădulescu',
       url: `${SITE_URL}/#instructor`,
     },
     publisher: {
       '@type': 'EducationalOrganization',
+      '@id': ORG_ID,
       name: 'AlgoMate',
       url: SITE_URL,
+      logo: { '@type': 'ImageObject', url: LOGO_URL },
     },
+    isPartOf: { '@id': WEBSITE_ID },
     keywords: post.tags.join(', '),
   };
 
