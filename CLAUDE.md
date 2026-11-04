@@ -51,14 +51,23 @@ file sitting in the folder is not live, and pushing to `main` does not publish
 it — a build must run on the server. `npm run content` regenerates post data;
 `npm run build` does that plus the full static build.
 
-**Never date a post in the future.** Scheduling was dropped and there is no
-recurring rebuild, so a future `publishDate` means the post never appears at
-all rather than appearing later.
+**Scheduled posts publish on their date at 05:00 UTC** — but only once pushed
+to `origin/main`. `algomate-publish.timer` (since 2026-11-04) checks every
+morning and deploys only when a post has come due; it refuses to run if
+`/srv/algomate` has uncommitted or unpushed work, so leave the checkout clean.
+Held posts are not rendered until their date, so validate a scheduled post with
+the date shim in SERVER-SETUP §3.1 before pushing it.
 
 Generated and gitignored — never commit these:
 `frontend/src/content/posts.generated.ts`,
 `frontend/src/content/resources.generated.ts`, `frontend/.generated-routes.json`,
-`frontend/public/sitemap.xml`.
+`frontend/public/sitemap.xml`, `frontend/public/feed.xml`,
+`frontend/public/llms.txt`.
+
+Cover images: `node frontend/scripts/make-cover.mjs --out public/blog/<x>.jpg
+--kicker "…" --title "…" [--mark "∫"]` renders a 1600×900 typographic cover.
+Every new post should have one — Google Discover needs a large image of the
+article's own.
 
 ## Downloadable materials (`/resurse`)
 
@@ -84,8 +93,8 @@ points anywhere near its cause. In particular, do not add an SPA fallback
 (`try_files $uri /index.html`); the site is fully prerendered and that is what
 produced soft 404s on every unknown URL.
 
-Post scheduling and the daily timer were **dropped by decision** (§3.1) — do
-not set them up, and never date a post in the future. The weekly mock-exam job
+Post scheduling was dropped on 2026-08-17 and **reinstated on 2026-11-04** as
+`algomate-publish.timer` (§3.1) — do not add a second timer. The weekly mock-exam job
 is designed but not built and blocked on unknowns. The doc also records known
 issues to leave alone unless asked, including pre-existing npm advisories.
 

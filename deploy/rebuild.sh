@@ -6,9 +6,9 @@
 # Running it from inside the repo is unsafe: bash reads a script incrementally,
 # and `git reset --hard` below rewrites the file mid-execution.
 #
-# Run by hand for every deploy. There is no timer: post scheduling was dropped
-# (SERVER-SETUP §3.1), so nothing needs to run on a schedule. The value here is
-# atomic publishing, which matters on a manual deploy just as much.
+# Run by hand for every deploy, and by publish-scheduled.sh on the mornings a
+# scheduled post comes due (SERVER-SETUP §3.1). The value here is atomic
+# publishing, which matters on a manual deploy just as much.
 #
 # WHY THE SYMLINK DANCE
 #

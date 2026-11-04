@@ -1,0 +1,20 @@
+# Installed copy: /etc/systemd/system/algomate-publish.service
+# Runs deploy/publish-scheduled.sh, which builds only when a post has come due.
+# See docs/SERVER-SETUP.md §3.1.
+[Unit]
+Description=AlgoMate: publish scheduled posts that have come due
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=razvan
+Group=razvan
+WorkingDirectory=/srv/algomate
+# systemd does not load a login shell; node, npm and git live in /usr/bin.
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStart=/srv/algomate-deploy/bin/publish-scheduled.sh
+TimeoutStartSec=1800
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full

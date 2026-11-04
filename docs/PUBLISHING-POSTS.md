@@ -73,8 +73,11 @@ Validate before building:
 or earlier (UTC).** Held posts print `· holding "<slug>" (draft)` or
 `(scheduled YYYY-MM-DD)` in the build log and produce no page.
 
-**Never set a future `publishDate`.** Post scheduling was dropped as an idea
-(SERVER-SETUP §3.1) and there is no recurring rebuild, so a future-dated post
+**A future `publishDate` is now a schedule** (since 2026-11-04,
+SERVER-SETUP §3.1): `algomate-publish.timer` deploys it at 05:00 UTC that
+morning, provided the post is pushed to `origin/main`. Validate it with the
+date shim in §3.1 first — a held post is not rendered until its morning.
+The text below described the situation before that, when a future-dated post
 does not publish late — it does not publish at all. Nothing on the server
 watches the calendar; the date is only ever read during a build. If a post is
 meant to go live, date it today or earlier. If you are handed one dated in the
@@ -297,9 +300,9 @@ file was added.
 
 ## 6. Deploy
 
-**Deploys are manual. There is no timer** — post scheduling was dropped
-(SERVER-SETUP §3.1). Pushing to `main` publishes nothing on its own; a build
-must run on the server after the commit lands. Copying the markdown across is
+**Posts dated today deploy by hand; future-dated posts deploy themselves** on
+their morning (SERVER-SETUP §3.1). Either way, pushing to `main` alone builds
+nothing — a build must run on the server after the commit lands. Copying the markdown across is
 not enough, because it is not read at runtime.
 
 So publishing is always: commit → push → **build on the server**.
@@ -326,7 +329,11 @@ node frontend/scripts/check-live-seo.mjs https://algomate.ro
 
 ## 7. Things that are not built
 
-Do not promise these without implementing them: RSS, pagination, tag pages,
+An RSS feed with the full text is generated at `/feed.xml`, and every new
+post is pinged to IndexNow by the scheduled publisher (by hand after a manual
+deploy: `node frontend/scripts/indexnow.mjs https://algomate.ro/blog/<slug>`).
+
+Do not promise these without implementing them: pagination, tag pages,
 author pages, related-post logic beyond "the two most recent others", search,
 comments, and maths rendering (no KaTeX — LaTeX in a post renders as literal
 text).

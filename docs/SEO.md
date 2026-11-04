@@ -172,9 +172,9 @@ Everything here was confirmed by reading the code on 2026-08-21.
 
 From `docs/SERVER-SETUP.md` §2–3.1:
 
-- No post scheduling, no recurring rebuild. **Never set a `publishDate` in the
-  future** — there is no timer, so a future date means the post never appears.
-- No RSS, no pagination, no tag pages.
+- ~~No post scheduling~~ — reinstated 2026-11-04 as `algomate-publish.timer`
+  (SERVER-SETUP §3.1). A future `publishDate` publishes that morning once pushed.
+- ~~No RSS~~ — `/feed.xml` since 2026-11-04 (§8). Still no pagination, no tag pages.
 - No AI/LLM integration.
 - The npm advisories (8 high / 1 moderate) are known and are a separate
   scheduled job. Leave them alone unless explicitly asked.
@@ -467,8 +467,9 @@ hand. Cheap to do, and the failure it prevents — a wrong solution under Răzva
 name, next to his olympiad credential — is the worst this site can produce.
 
 Every post: real `description`, correct `category`, `math: true` where formulas
-appear, explicit `slug` for long titles, tags reused rather than invented, and
-**never a future `publishDate`**.
+appear, explicit `slug` for long titles, tags reused rather than invented, a
+`coverImage` (§8), and a future `publishDate` only if it is pushed and validated
+with the date shim (SERVER-SETUP §3.1).
 
 Internal linking is the cheapest untapped lever here: every solved-problem post
 should link to the relevant Phase-2 landing page, and each landing page should
@@ -507,7 +508,8 @@ indexing. `DOWNLOADS-SECTION.md` §8 has the cost breakdown.
 ## 5. Guardrails — invariants an agent must not break
 
 - Never add an nginx SPA fallback. It produced soft 404s on every unknown URL.
-- Never set `publishDate` in the future.
+- Never push a future-dated post without rendering it first with the date shim
+  (SERVER-SETUP §3.1) — it is not built until its morning.
 - Never commit the generated files: `src/content/posts.generated.ts`,
   `src/content/resources.generated.ts`, `.generated-routes.json`,
   `public/sitemap.xml`.
@@ -576,3 +578,77 @@ single highest-leverage off-site action, so the weight shifts to the rest:
 5. For anything touching JSON-LD: Google Rich Results Test passes on the
    affected URL.
 6. Commit follows the prefix convention; docs updated if behaviour changed.
+
+---
+
+## 8. Update 2026-11-04 — AI search, feeds, the liceu page, ten scheduled posts
+
+### 8.1 What was added
+
+- **`/meditatii-liceu`** — fifth landing page, for `meditații liceu` /
+  `meditații matematică liceu` / `meditații informatică liceu`. Its angle is the
+  *year* (IX–XII), so it overlaps none of the other four. Own `Course`
+  (`courseLiceu`), six FAQs of its own, breadcrumb, footer and `/servicii` links,
+  in `STATIC_PAGES`.
+- **`RelatedPosts`** on all five landing pages, matched by tag. Driven by the
+  generated `posts`, so a scheduled post appears on the landing pages the morning
+  it publishes and nothing links ahead of time. This closes the "maths landing
+  pages link to no post" item in Phase 3.
+- **Entity graph.** `WebSite` on the homepage (site name in results);
+  `@id`s for the organisation (`/#organization`) and the instructor
+  (`/#instructor`), referenced from every post's `author`/`publisher`; `logo`
+  (`/logo.png`); `BlogPosting` now always has an `image`, plus `wordCount`,
+  `articleSection`, `isAccessibleForFree`.
+- **`/feed.xml`** — RSS 2.0, full text, linked site-wide from `index.html`.
+- **`/llms.txt`** — generated index for LLM tools. Google says it ignores the
+  file; others read it. Zero maintenance, so it stays.
+- **IndexNow** (`scripts/indexnow.mjs`, key file at the site root). Reaches Bing,
+  which is the index behind ChatGPT search and Copilot. Called by the scheduled
+  publisher; call by hand after manual deploys.
+- **Covers** (`scripts/make-cover.mjs`) on every new post — Discover effectively
+  requires a large per-article image.
+- **Ten posts**, one a week on Wednesdays from 2026-11-04 to 2027-01-06. The
+  first three solve the official 2027 model papers (BAC M_mate-info, BAC
+  informatică C++, Evaluare Națională), published by CNCE on 2026-11-01 — the
+  strongest format per Phase 3. The rest are labelled own-problem posts
+  (subprograme, legi de compoziție, șiruri, integrale) and explainers (simulare,
+  media BAC, plan de pregătire). All C++ compiled and run; all maths verified.
+- The calendar post was updated (`updatedDate`) — both calendars were approved
+  with the draft dates unchanged.
+
+### 8.2 What the research said about AI search, and what it means here
+
+Google's own guidance (Search Central, "Optimizing for generative AI features",
+May 2026) is that AI Overviews and AI Mode run on the normal ranking systems:
+no special markup, no llms.txt, no chunking. What matters is crawlability,
+indexing with snippets allowed, and **non-commodity content** — first-hand
+worked solutions are exactly that. It also warns that mass-producing pages for
+fan-out queries is scaled-content abuse: keep posts at the quality of the ten
+above, not more of them.
+
+For ChatGPT, Claude, Perplexity and Copilot the levers are different: their
+**search** crawlers must be allowed, and Bing must have the page (IndexNow).
+
+### 8.3 Human-only — new items for §6
+
+1. **Cloudflare is blocking AI crawlers.** The live robots.txt is prefixed by
+   "Cloudflare Managed content" that disallows GPTBot, ClaudeBot,
+   Google-Extended, Applebot-Extended, meta-externalagent and others, and
+   GPTBot/ClaudeBot get a **403 at the edge**. The search/retrieval bots
+   (OAI-SearchBot, ChatGPT-User, Claude-SearchBot, PerplexityBot) are allowed,
+   so assistants can *fetch* pages live — but the models never learn the site
+   exists. For a business that wants to be recommended by LLMs, turn off
+   *Block AI bots* and the managed robots.txt (Cloudflare → AI Crawl Control /
+   Security → Bots), or at minimum allow GPTBot, ClaudeBot and Google-Extended.
+   Google-Extended does not affect Search or AI Overviews; it controls Gemini.
+   This is the owner's call — it is also a licence to train.
+2. **Search Console:** confirm the site is *included* in generative AI features
+   (there is an opt-out toggle) and watch the Generative AI performance report.
+3. **Bing Webmaster Tools:** import the site from Search Console. Free, five
+   minutes, and the only way to see what ChatGPT search has to work with.
+4. **Google News / Discover:** there is no application any more — Google News
+   inclusion is automatic and content-policy based. A tutoring blog is unlikely
+   to be treated as a news publisher; Discover (the feed on Samsung and other
+   Android home screens) is the realistic target, and it keys off large images,
+   freshness and engagement, which the covers and the timely model-paper posts
+   address.

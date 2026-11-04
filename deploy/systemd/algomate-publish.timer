@@ -1,0 +1,20 @@
+# Installed copy: /etc/systemd/system/algomate-publish.timer
+#
+# 05:00 UTC is 07:00 in București in winter and 08:00 in summer. UTC on
+# purpose: build-content.mjs compares publishDate with the UTC date, so a run
+# before 00:00 UTC would still see yesterday.
+#
+# Daily rather than weekly: the script is a no-op on days nothing is due, and a
+# daily check means a post dated on any weekday still goes out that morning.
+[Unit]
+Description=Run the AlgoMate scheduled-post check every morning
+
+[Timer]
+OnCalendar=*-*-* 05:00:00 UTC
+RandomizedDelaySec=300
+# If the server was off at 05:00, run at boot — the script compares the live
+# release with what should exist, so a late run still publishes the post.
+Persistent=true
+
+[Install]
+WantedBy=timers.target
