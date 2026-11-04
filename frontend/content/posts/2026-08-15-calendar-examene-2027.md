@@ -1,20 +1,22 @@
 ---
-title: "Calendar Evaluare Națională și Bacalaureat 2027: ce se știe până acum"
-description: "Ministerul Educației a pus în consultare publică datele pentru examenele naționale din 2027. Iată calendarul propus, zi cu zi, și ce încă se poate schimba."
+title: "Calendar Evaluare Națională și Bacalaureat 2027: datele oficiale, zi cu zi"
+description: "Calendarele pentru Evaluarea Națională și Bacalaureat 2027 au fost aprobate. Toate datele, zi cu zi — simulări, probe de competențe, probe scrise, contestații — și regulile noi de corectare."
 publishDate: 2026-08-15
+updatedDate: 2026-11-04
 category: "Examene"
 tags:
   - Bacalaureat 2027
   - Evaluare Națională 2027
   - Calendar examene
   - Părinți
+  - Simulare 2027
 ---
 
-Pe 13 august 2026, Ministerul Educației și Cercetării a pus în dezbatere publică proiectele de calendar pentru Evaluarea Națională și Bacalaureat 2027. Dacă ai un copil în clasa a VIII-a sau a XII-a anul acesta, e primul lucru concret pe care îl poți nota în agendă — chiar dacă, deocamdată, e încă în formă de proiect.
+> **Actualizare, 4 noiembrie 2026: calendarele sunt acum oficiale.** Calendarul Bacalaureatului 2027 a fost aprobat prin ordinul ministrului nr. 5.211/2026, publicat în Monitorul Oficial în septembrie, iar calendarul Evaluării Naționale 2027 a fost publicat în forma finală în octombrie. Datele aprobate sunt cele din proiectul pus în consultare în august — nu s-a mutat nicio probă. Am adăugat mai jos și calendarul simulării de Bacalaureat. Pe 1 noiembrie au apărut și modelele oficiale de subiecte pentru 2027; pe cel de matematică M_mate-info l-am [rezolvat integral aici](/blog/model-subiect-bac-2027-matematica-m-mate-info-rezolvat).
 
-Iată ce propune ministerul, ce se schimbă față de anii trecuți și ce rămâne de clarificat.
+Pe 13 august 2026, Ministerul Educației și Cercetării a pus în dezbatere publică proiectele de calendar pentru Evaluarea Națională și Bacalaureat 2027, iar în toamnă le-a aprobat fără modificări de date. Dacă ai un copil în clasa a VIII-a sau a XII-a anul acesta, acestea sunt termenele după care se organizează tot anul școlar.
 
-> **Atenție: datele de mai jos nu sunt finale.** Tot calendarul din acest articol provine dintr-un proiect aflat în consultare publică. Forma definitivă se aprobă prin ordin de ministru și se poate modifica până atunci. Folosește datele ca reper de planificare, nu ca pe niște termene confirmate, și verifică [edu.ro](https://www.edu.ro) înainte de a lua orice decizie care depinde de ele.
+Iată calendarul, ce se schimbă față de anii trecuți și ce merită făcut de acum.
 
 ## De ce se mută examenele mai devreme
 
@@ -31,7 +33,8 @@ Rezultatul: atât Evaluarea Națională, cât și prima sesiune de Bacalaureat s
 | 16 martie 2027 | Limba și literatura română — probă scrisă |
 | 17 martie 2027 | Matematică — probă scrisă |
 | 18 martie 2027 | Limba și literatura maternă — probă scrisă |
-| 30 martie 2027 | Afișarea rezultatelor la simulare |
+
+Proiectul din august anunța rezultatele simulării pentru 30 martie 2027.
 
 **Examenul propriu-zis:**
 
@@ -50,6 +53,18 @@ Rezultatul: atât Evaluarea Națională, cât și prima sesiune de Bacalaureat s
 
 Elevii vor intra practic în examen la mai puțin de două săptămâni după ultima zi de școală, cu o zi liberă între proba de română și cea de matematică.
 
+## Calendar Bacalaureat 2027 — simularea din martie
+
+Simularea probelor scrise pentru elevii de clasa a XII-a:
+
+| Dată | Probă |
+|---|---|
+| 22 martie 2027 | Limba și literatura română (E.a) |
+| 23 martie 2027 | Proba obligatorie a profilului (E.c) — matematică sau istorie |
+| 24 martie 2027 | Proba la alegere a profilului și specializării (E.d) |
+| 25 martie 2027 | Limba și literatura maternă (E.b) |
+| 9 aprilie 2027 | Comunicarea rezultatelor |
+
 ## Calendar Bacalaureat 2027 — sesiunea din vară
 
 **Probele de competențe** (comunicare orală, limbi străine, competențe digitale) se dau, ca și până acum, în cursul anului, înaintea probelor scrise:
@@ -62,7 +77,7 @@ Elevii vor intra practic în examen la mai puțin de două săptămâni după ul
 | 19–21 aprilie 2027 | Proba C — competențe lingvistice într-o limbă străină |
 | 21–23 aprilie 2027 | Proba D — competențe digitale |
 
-**Probele scrise**, propuse mai devreme decât în anii trecuți:
+**Probele scrise**, mai devreme decât în anii trecuți:
 
 | Dată | Probă |
 |---|---|
@@ -96,7 +111,7 @@ Pentru cei care nu promovează din prima sau vor să-și îmbunătățească med
 
 ## Ce se schimbă la corectarea lucrărilor
 
-Proiectul introduce reguli noi de verificare, atât la evaluarea inițială, cât și la contestații — pentru ambele examene, dar cu praguri ușor diferite.
+Calendarele aprobate vin cu reguli noi de verificare, atât la evaluarea inițială, cât și la contestații — pentru ambele examene, dar cu praguri ușor diferite.
 
 **La evaluarea inițială:**
 
@@ -109,26 +124,24 @@ Proiectul introduce reguli noi de verificare, atât la evaluarea inițială, câ
 
 Elevii păstrează dreptul de a-și vizualiza lucrarea înainte de a decide dacă depun contestație, dar depunerea contestației nu este condiționată de această vizualizare.
 
-## Ce nu e încă stabilit
+## Ce mai poate să se schimbe
 
-Important de reținut: tot ce ai citit mai sus este, la acest moment, **proiect aflat în consultare publică**, nu decizie finală. Forma definitivă va fi aprobată prin ordin de ministru, după analiza observațiilor primite din consultare și după ședința Comisiei de Dialog Social de la nivelul ministerului. Până atunci, datele pot suferi ajustări, mai ales dacă apar obiecții din partea inspectoratelor, sindicatelor din educație sau părinților.
-
-Structura anului școlar 2026–2027 este însă deja aprobată: cursurile încep pe 7 septembrie 2026.
+Puțin. Ordinele permit comisiilor naționale să prelungească sau să scurteze perioadele de evaluare și de afișare a rezultatelor „în situații justificate” — așa s-a întâmplat în 2026, când două probe de BAC au fost amânate din cauza caniculei. Datele probelor scrise sunt însă cele de mai sus, iar structura anului școlar 2026–2027 este aprobată separat.
 
 ## Ce poți face acum
 
-**1. Notează datele ca reper, nu ca literă de lege.** Sunt suficient de detaliate încât să-ți organizezi vara lui 2027, dar păstrează în minte că pot apărea mici modificări până la ordinul final.
+**1. Notează datele.** Sunt aprobate, deci îți poți organiza după ele și pregătirea, și vara lui 2027.
 
 **2. Ține cont de calendarul mai strâns.** Atât Evaluarea Națională, cât și Bacalaureatul sesiunea I încep la mai puțin de două săptămâni după ultima zi de curs. Practic, vacanța de vară pentru clasele a VIII-a, a XII-a și a XIII-a începe cu perioada de examen inclusă, nu după ea.
 
-**3. Verifică periodic edu.ro.** Pe măsură ce se apropie termenele de consultare și ședința Comisiei de Dialog Social, e util să revii pentru confirmarea oficială a datelor.
+**3. Lucrează modelele oficiale.** Modelele de subiecte pentru 2027 sunt pe [subiecte.edu.ro](https://subiecte.edu.ro) din 1 noiembrie. Sunt cel mai bun reper pentru ce înseamnă „nivelul de examen” anul acesta — și o simulare utilă înainte de cea din martie.
 
 **4. Pentru clasa a VIII-a, nu uita nici de admiterea la liceu.** Calendarul de mai sus e pentru Evaluarea Națională; el rămâne baza repartizării, indiferent dacă liceul ales organizează sau nu un examen propriu suplimentar.
 
 ## Pe scurt
 
-Ministerul propune examene mai devreme, atât la Evaluare Națională, cât și la Bacalaureat, motivat de valurile de caniculă din ultimii ani. Evaluarea Națională ar urma să aibă loc între 22 și 25 iunie 2027, iar probele scrise de la Bacalaureat, între 14 și 18 iunie 2027. Se adaugă și o etapă nouă de reverificare a notelor când diferența dintre evaluatori e mare. Totul e, deocamdată, propunere — forma finală vine prin ordin de ministru.
+Examenele din 2027 sunt mai devreme decât în anii trecuți, atât la Evaluare Națională, cât și la Bacalaureat, din cauza valurilor de caniculă. Evaluarea Națională are loc între 22 și 25 iunie 2027 (matematica pe 24 iunie), iar probele scrise de la Bacalaureat între 14 și 18 iunie 2027. Simulările sunt pe 16–18 martie (clasa a VIII-a) și 22–25 martie (clasa a XII-a). Se adaugă o etapă nouă de reverificare a notelor când diferența dintre evaluatori e mare. Calendarele sunt aprobate.
 
 ---
 
-*Articol scris pe 15 august 2026, pe baza proiectelor de calendar puse în consultare publică de Ministerul Educației și Cercetării pe 13 august 2026. Datele sunt provizorii până la publicarea ordinelor de ministru finale. Verifică întotdeauna [edu.ro](https://www.edu.ro) pentru forma oficială.*
+*Articol scris pe 15 august 2026, pe baza proiectelor de calendar puse în consultare publică pe 13 august 2026, și actualizat pe 4 noiembrie 2026 după aprobarea lor. Textul oficial al ordinelor este pe [edu.ro](https://www.edu.ro).*
