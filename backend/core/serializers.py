@@ -1,7 +1,15 @@
+import re
+
 from rest_framework import serializers
 
 
 ALLOWED_TUTORING_TYPES = {"Matematică BAC", "Informatică BAC", "Introducere în Informatică"}
+
+# C0/C1 control characters, plus the Unicode line and paragraph separators that
+# some mail clients treat as newlines.
+_CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f  ]")
+# The message body may keep its line breaks and tabs.
+_CONTROL_EXCEPT_NEWLINES = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 
 class ContactSerializer(serializers.Serializer):
@@ -18,7 +26,21 @@ class ContactSerializer(serializers.Serializer):
     is_robot_verified = serializers.BooleanField()
 
     # Honeypot: must be empty. Bots tend to fill every field.
-    website = serializers.CharField(required=False, allow_blank=True, default="")
+    website = serializers.CharField(required=False, allow_blank=True, default="", max_length=200)
+
+    def validate_name(self, value):
+        # The name goes into the Subject header of the notification email. A
+        # line break there is a header-injection attempt; Django would refuse
+        # to send it, but as an unhandled BadHeaderError — a 500 for the
+        # visitor. Reject it here as the bad input it is.
+        if _CONTROL.search(value):
+            raise serializers.ValidationError("Invalid characters in name.")
+        return value
+
+    def validate_message(self, value):
+        if _CONTROL_EXCEPT_NEWLINES.search(value):
+            raise serializers.ValidationError("Invalid characters in message.")
+        return value
 
     def validate_is_robot_verified(self, value):
         if not value:
@@ -32,7 +54,10 @@ class ContactSerializer(serializers.Serializer):
 
     def validate_phone(self, value):
         cleaned = value.replace(" ", "").replace("-", "").replace(".", "")
-        if not cleaned.lstrip("+").isdigit() or not (6 <= len(cleaned) <= 20):
+        digits = cleaned.lstrip("+")
+        # isascii: str.isdigit() is true for every Unicode digit, so without
+        # it "٠٧٧٤…" or "⁰⁷⁷⁴" passes validation and lands in the inbox.
+        if not (digits.isascii() and digits.isdigit()) or not (6 <= len(cleaned) <= 20):
             raise serializers.ValidationError("Invalid phone number.")
         return value
 

@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.core.cache import cache
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -14,6 +14,7 @@ from .serializers import ContactSerializer
 logger = logging.getLogger(__name__)
 
 # Per-email rate limit: max 3 submissions per 24h from the same email address.
+# The per-address limit is the "contact" throttle scope in settings.py.
 EMAIL_RATE_LIMIT = 3
 EMAIL_RATE_WINDOW_SECONDS = 60 * 60 * 24
 
@@ -52,14 +53,19 @@ class ContactAPIView(APIView):
         )
 
         try:
-            send_mail(
-                subject,
-                message_body,
-                settings.DEFAULT_FROM_EMAIL,
-                [settings.CONTACT_RECIPIENT_EMAIL],
-                fail_silently=False,
-            )
+            EmailMessage(
+                subject=subject,
+                body=message_body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[settings.CONTACT_RECIPIENT_EMAIL],
+                # "Reply" in the inbox answers the parent or student, not the
+                # site's own sending address. EmailField has already validated
+                # this as a single address, so it cannot carry a second header.
+                reply_to=[data["email"]],
+            ).send(fail_silently=False)
         except Exception:
+            # Deliberately no request data here: the journal is not where a
+            # visitor's name, phone number and message should end up.
             logger.exception("Failed to send contact email")
             return Response(
                 {"detail": "Failed to send email."},
