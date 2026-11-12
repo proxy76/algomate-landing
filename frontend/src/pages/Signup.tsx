@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import axios from 'axios';
 import {
   User,
   Mail,
@@ -15,7 +14,7 @@ import {
 } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
-import API_BASE_URL from '../api';
+import { submitContact } from '../api';
 import { GROUP_MAX_STUDENTS, priceGroupLabel, priceIndividualLabel } from '../config/pricing';
 import { breadcrumbSchema } from '../seo/structuredData';
 
@@ -35,6 +34,7 @@ const Signup: React.FC = () => {
     course: '',
     message: '',
     isRobotVerified: false,
+    website: '', // honeypot — must stay empty
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -53,27 +53,27 @@ const Signup: React.FC = () => {
     const selectedCourse = courses.find((c) => c.value === formData.course);
     const tutoringTypes = selectedCourse?.backendValue ? [selectedCourse.backendValue] : [];
 
-    try {
-      await axios.post(`${API_BASE_URL}/api/contact/`, {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        message: formData.message,
-        tutoring_types: tutoringTypes,
-        is_robot_verified: formData.isRobotVerified,
-        website: '',
-      });
+    const result = await submitContact({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      message: formData.message,
+      tutoring_types: tutoringTypes,
+      is_robot_verified: formData.isRobotVerified,
+      website: formData.website,
+    });
 
-      setFormData({ name: '', email: '', phone: '', course: '', message: '', isRobotVerified: false });
+    if (result === 'ok') {
+      setFormData({ name: '', email: '', phone: '', course: '', message: '', isRobotVerified: false, website: '' });
       navigate('/multumim');
-    } catch (err) {
-      setStatus('error');
-      if (axios.isAxiosError(err) && err.response?.status === 429) {
-        setErrorMessage('Prea multe încercări. Te rugăm să aștepți și să încerci din nou mai târziu.');
-      } else {
-        setErrorMessage('A apărut o eroare. Te rugăm să încerci din nou.');
-      }
+      return;
     }
+    setStatus('error');
+    setErrorMessage(
+      result === 'rate-limited'
+        ? 'Prea multe încercări. Te rugăm să aștepți și să încerci din nou mai târziu.'
+        : 'A apărut o eroare. Te rugăm să încerci din nou.'
+    );
   };
 
   const filledCount = [formData.name, formData.email, formData.phone, formData.course, formData.message].filter(Boolean).length;
@@ -192,6 +192,7 @@ const Signup: React.FC = () => {
                         value={formData.name}
                         onChange={handleChange}
                         required
+                        autoComplete="name"
                         placeholder="Popescu Andrei"
                         className={`${inputBase} ${borderIdle} ${borderFocus}`}
                       />
@@ -218,6 +219,7 @@ const Signup: React.FC = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
+                        autoComplete="email"
                         placeholder="email@exemplu.com"
                         className={`${inputBase} ${borderIdle} ${borderFocus}`}
                       />
@@ -244,6 +246,7 @@ const Signup: React.FC = () => {
                         value={formData.phone}
                         onChange={handleChange}
                         required
+                        autoComplete="tel"
                         placeholder="07xx xxx xxx"
                         className={`${inputBase} ${borderIdle} ${borderFocus}`}
                       />
@@ -319,6 +322,22 @@ const Signup: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Honeypot — off-screen rather than hidden, so bots still
+                    fill it; the backend rejects any submission where it is
+                    not empty. The quick form on the homepage has had one all
+                    along; this form sent a hard-coded empty string instead,
+                    which protected nothing. */}
+                <input
+                  type="text"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleChange}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="absolute -left-[9999px] w-px h-px opacity-0"
+                />
+
                 {/* Robot verification */}
                 <div className="mb-10">
                   <label className="flex items-center gap-3 cursor-pointer group">
@@ -340,6 +359,8 @@ const Signup: React.FC = () => {
                   <motion.div
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
+                    /* Announced by screen readers when it appears. */
+                    role="alert"
                     className="flex items-center gap-3 text-red-400 text-sm mb-6 border border-red-500/40 bg-red-500/10 px-4 py-3 rounded-sm"
                   >
                     <AlertCircle size={16} strokeWidth={2} />

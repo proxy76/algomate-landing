@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, ChevronDown, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import API_BASE_URL from '../api';
+import { submitContact } from '../api';
 
 /**
  * Inline enrollment card — sits directly after the AlgoMate guarantee bar.
@@ -75,25 +74,26 @@ const InlineSignup: React.FC = () => {
     setStatus('loading');
     setError('');
 
-    try {
-      await axios.post(`${API_BASE_URL}/api/contact/`, {
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        message: 'Înscriere rapidă din pagina principală.',
-        tutoring_types: form.program ? [form.program] : [],
-        is_robot_verified: true,
-        website: form.website,
-      });
+    const result = await submitContact({
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      message: 'Înscriere rapidă din pagina principală.',
+      tutoring_types: form.program ? [form.program] : [],
+      is_robot_verified: true,
+      website: form.website,
+    });
+
+    if (result === 'ok') {
       navigate('/multumim');
-    } catch (err) {
-      setStatus('error');
-      if (axios.isAxiosError(err) && err.response?.status === 429) {
-        setError('Ai atins limita de trei cereri. Încearcă din nou peste 24 de ore.');
-      } else {
-        setError('Nu am putut trimite cererea. Verifică conexiunea și încearcă din nou.');
-      }
+      return;
     }
+    setStatus('error');
+    setError(
+      result === 'rate-limited'
+        ? 'Ai trimis prea multe cereri într-un timp scurt. Încearcă din nou mai târziu sau sună-mă direct.'
+        : 'Nu am putut trimite cererea. Verifică conexiunea și încearcă din nou.'
+    );
   };
 
   return (
