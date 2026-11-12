@@ -27,6 +27,20 @@ if (!fs.existsSync(ROUTES_FILE)) {
 const ROUTES = JSON.parse(fs.readFileSync(ROUTES_FILE, 'utf-8'));
 
 /**
+ * The 404 page is prerendered too, to dist/404.html, and nginx serves it for
+ * any URL with no file behind it — with a 404 status (`error_page 404
+ * /404.html`), so it is a real "not found", not the soft 404 an SPA fallback
+ * would be.
+ *
+ * It is rendered by asking for a path no route matches, and it is NOT in
+ * .generated-routes.json on purpose: publish-scheduled.sh treats every entry
+ * there as "<route>/index.html must exist in the live release", and a route
+ * whose output is a bare 404.html would look permanently unpublished and
+ * trigger a rebuild every morning.
+ */
+const NOT_FOUND = { route: '/__pagina-inexistenta__', file: '404.html' };
+
+/**
  * Deduplicate <head> tags.
  * Since we now serve a clean index.html to every route during prerender,
  * we shouldn't get duplicates from previous routes. But we still do this
@@ -105,7 +119,7 @@ async function prerender() {
        */
       await page.emulateMedia({ reducedMotion: 'reduce' });
 
-      for (const route of ROUTES) {
+      for (const route of [...ROUTES, NOT_FOUND.route]) {
         console.log(`Prerendering route: ${route}`);
         const url = `http://localhost:${PORT}${route}`;
 
@@ -142,7 +156,14 @@ async function prerender() {
         let html = deduplicateHead(await page.content());
 
         let outPath;
-        if (route === '/') {
+        if (route === NOT_FOUND.route) {
+          // Guard against the catch-all route silently going missing: without
+          // it this snapshot would be an empty shell served on every 404.
+          if (!html.includes('noindex') || !/<h1[\s>]/.test(html)) {
+            throw new Error('the 404 page did not render — is the "*" route still in router.tsx?');
+          }
+          outPath = path.join(DIST_DIR, NOT_FOUND.file);
+        } else if (route === '/') {
           outPath = path.join(DIST_DIR, 'index.html');
         } else {
           const routeDir = path.join(DIST_DIR, route.substring(1));

@@ -2,7 +2,6 @@
 <html lang="ro">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Site-wide: feed readers and aggregators discover the blog feed from any page. -->
     <link rel="alternate" type="application/rss+xml" title="AlgoMate — Blog" href="https://algomate.ro/feed.xml" />
@@ -14,10 +13,18 @@
       the final HTML into static files. No fallback tags needed here.
     -->
 
-    <!-- Fonts — preconnect + load -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <!-- Fonts are self-hosted: src/fonts.css, preloaded by vite.config.ts.
+         There is deliberately no third-party request anywhere on the site. -->
+
+    <!-- Icons. Order matters: browsers that can draw SVG take the last icon
+         they understand, so the .ico is listed first and is only the
+         fallback. iOS ignores both and wants the apple-touch-icon. All the
+         rasters are rendered from favicon.svg by scripts/make-icons.mjs. -->
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
   </head>
   <body>
     <div id="root"></div>

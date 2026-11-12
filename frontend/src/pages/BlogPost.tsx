@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useLoaderData, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
+import NotFound from './NotFound';
 import { posts, postBySlug } from '../content/posts.generated';
-import { formatDate } from './Blog';
+import { formatDate } from '../lib/formatDate';
 import {
   breadcrumbSchema,
   LOGO_URL,
@@ -19,9 +20,14 @@ const SITE_URL = 'https://algomate.ro';
 const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const post = slug ? postBySlug(slug) : undefined;
+  /* The body is its own chunk, fetched by the route's loader in router.tsx so
+     it is here before the first render. Null for a slug that is not a post. */
+  const html = useLoaderData() as string | null;
 
-  // Unknown slug: send the reader to the index rather than a dead end.
-  if (!post) return <Navigate to="/blog" replace />;
+  /* Unknown slug. This used to redirect to /blog; but the server answers
+     such a URL with a 404 status, and a page that says "not found" is the
+     honest match for that — a silent hop to the index is not. */
+  if (!post || html === null) return <NotFound />;
 
   const others = posts.filter((p) => p.slug !== post.slug).slice(0, 2);
 
@@ -34,7 +40,17 @@ const BlogPost: React.FC = () => {
     description: post.description,
     // Article rich results and Discover both want an image; the site card is
     // the honest fallback for a post without its own cover.
-    image: post.coverImage ? `${SITE_URL}${post.coverImage}` : `${SITE_URL}/og-image.png`,
+    image:
+      post.coverImage && post.coverWidth && post.coverHeight
+        ? {
+            '@type': 'ImageObject',
+            url: `${SITE_URL}${post.coverImage}`,
+            width: post.coverWidth,
+            height: post.coverHeight,
+          }
+        : post.coverImage
+          ? `${SITE_URL}${post.coverImage}`
+          : `${SITE_URL}/og-image.png`,
     datePublished: post.publishDate,
     dateModified: post.updatedDate || post.publishDate,
     inLanguage: 'ro',
@@ -70,6 +86,17 @@ const BlogPost: React.FC = () => {
         type="article"
         /* Falls back to the site-wide card when the post has no cover. */
         ogImage={post.coverImage ? `${SITE_URL}${post.coverImage}` : undefined}
+        ogImageSize={
+          post.coverImage && post.coverWidth && post.coverHeight
+            ? { width: post.coverWidth, height: post.coverHeight }
+            : undefined
+        }
+        article={{
+          publishedTime: post.publishDate,
+          modifiedTime: post.updatedDate || post.publishDate,
+          section: post.category,
+          tags: post.tags,
+        }}
         jsonLd={[
           articleSchema,
           breadcrumbSchema([
@@ -152,9 +179,14 @@ const BlogPost: React.FC = () => {
                 <img
                   src={post.coverImage}
                   alt={post.coverAlt}
-                  /* Fixed box: the intrinsic size isn't known at build time, and
-                     a header image that reflows the article is worse than a crop. */
-                  className="w-full aspect-[16/9] object-cover border border-[#222]"
+                  /* Fixed box, so a cover of any proportion crops instead of
+                     reflowing the article. width/height are the file's own
+                     size, read at build time; with them the browser reserves
+                     the space before the CSS arrives. */
+                  width={post.coverWidth ?? undefined}
+                  height={post.coverHeight ?? undefined}
+                  decoding="async"
+                  className="w-full h-auto aspect-[16/9] object-cover border border-[#222]"
                   /* Above the fold on every article — this is the LCP element. */
                   loading="eager"
                   fetchPriority="high"
@@ -172,7 +204,7 @@ const BlogPost: React.FC = () => {
                 post.coverImage ? '' : 'border-t border-[#222] pt-12 md:pt-14'
               }`}
               /* Rendered at build time from repo-controlled markdown. */
-              dangerouslySetInnerHTML={{ __html: post.html }}
+              dangerouslySetInnerHTML={{ __html: html }}
             />
 
             {/* Byline */}
@@ -190,6 +222,7 @@ const BlogPost: React.FC = () => {
                   width={64}
                   height={64}
                   loading="lazy"
+                  decoding="async"
                   /* Face sits in the upper third of the portrait, not the very top. */
                   className="w-14 h-14 md:w-16 md:h-16 object-cover object-[center_22%] grayscale-[0.4] shrink-0"
                 />

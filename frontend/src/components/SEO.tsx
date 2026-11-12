@@ -15,6 +15,19 @@ interface SEOProps {
   path: string;
   /** Optional Open Graph image URL */
   ogImage?: string;
+  /** Pixel size of `ogImage`, when it is not the site-wide card. */
+  ogImageSize?: { width: number; height: number };
+  /**
+   * Article metadata — blog posts only. Emitted as Open Graph `article:*`
+   * tags, which is where Facebook, LinkedIn, Slack and most feed readers
+   * take a shared link's date and section from (they do not read JSON-LD).
+   */
+  article?: {
+    publishedTime: string;
+    modifiedTime: string;
+    section: string;
+    tags: string[];
+  };
   /** og:type — "article" for blog posts, "website" everywhere else */
   type?: 'website' | 'article';
   /**
@@ -30,17 +43,24 @@ interface SEOProps {
 
 const SITE_URL = 'https://algomate.ro';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
+/** public/og-image.png is 1024×1024. Update both if the card is replaced. */
+const DEFAULT_OG_IMAGE_SIZE = { width: 1024, height: 1024 };
+/** Posts publish at 05:00 UTC (algomate-publish.timer); dates carry no time. */
+const asTimestamp = (isoDate: string) => `${isoDate}T05:00:00Z`;
 
 const SEO: React.FC<SEOProps> = ({
   title,
   description,
   path,
   ogImage = DEFAULT_OG_IMAGE,
+  ogImageSize,
+  article,
   type = 'website',
   noindex = false,
   jsonLd,
 }) => {
   const canonicalUrl = `${SITE_URL}${path}`;
+  const imageSize = ogImageSize ?? (ogImage === DEFAULT_OG_IMAGE ? DEFAULT_OG_IMAGE_SIZE : undefined);
 
   // If jsonLd is an array, render multiple script tags; otherwise render one
   const jsonLdArray = jsonLd
@@ -72,8 +92,24 @@ const SEO: React.FC<SEOProps> = ({
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
+      {/* Declared size lets a scraper accept the image as a large preview
+          without downloading it first to measure it. */}
+      {imageSize && <meta property="og:image:width" content={String(imageSize.width)} />}
+      {imageSize && <meta property="og:image:height" content={String(imageSize.height)} />}
       <meta property="og:locale" content="ro_RO" />
       <meta property="og:site_name" content="AlgoMate" />
+
+      {article && (
+        <>
+          <meta property="article:published_time" content={asTimestamp(article.publishedTime)} />
+          <meta property="article:modified_time" content={asTimestamp(article.modifiedTime)} />
+          <meta property="article:author" content="Răzvan Rădulescu" />
+          <meta property="article:section" content={article.section} />
+          {article.tags.map((tag) => (
+            <meta key={tag} property="article:tag" content={tag} />
+          ))}
+        </>
+      )}
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />

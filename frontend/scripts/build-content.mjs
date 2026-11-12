@@ -1,14 +1,18 @@
 /**
  * Build-time content pipeline.
  *
- * Reads content/posts/*.md, and emits six things:
- *   1. src/content/posts.generated.ts     — typed post data for the app
- *   2. src/content/resources.generated.ts — on-disk size of every download
- *   3. public/sitemap.xml                 — static pages + published posts
- *   4. .generated-routes.json             — route list for prerender.js
- *   5. public/feed.xml                    — RSS 2.0, full text, for readers
+ * Reads content/posts/*.md, and emits eight things:
+ *   1. src/content/posts.generated.ts     — typed post metadata for the app
+ *   2. src/content/posts/<slug>.generated.ts — one module per post body,
+ *                                           loaded only by the page that
+ *                                           shows it (see writeTs)
+ *   3. src/content/resources.generated.ts — on-disk size of every download
+ *   4. public/sitemap.xml                 — static pages + published posts
+ *   5. .generated-routes.json             — route list for prerender.js
+ *   6. public/feed.xml                    — RSS 2.0, full text, for readers
  *                                           and aggregators
- *   6. public/llms.txt                    — plain-text site map for LLM tools
+ *   7. public/llms.txt                    — plain-text site map for LLM tools
+ *   8. public/.well-known/security.txt    — where to report a vulnerability
  *
  * Markdown is rendered here rather than in the browser so no parser ships
  * in the bundle and every post is real HTML in the prerendered output.
@@ -22,6 +26,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
 import { marked, Marked } from 'marked';
@@ -33,6 +38,8 @@ const ROOT = path.resolve(__dirname, '..');
 const POSTS_DIR = path.join(ROOT, 'content', 'posts');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const OUT_TS = path.join(ROOT, 'src', 'content', 'posts.generated.ts');
+const OUT_BODIES_DIR = path.join(ROOT, 'src', 'content', 'posts');
+const CONTACT_TS = path.join(ROOT, 'src', 'config', 'contact.ts');
 const RESOURCES_TS = path.join(ROOT, 'src', 'config', 'resources.ts');
 const DOWNLOADS_DIR = path.join(PUBLIC_DIR, 'descarcari');
 const OUT_RESOURCES_TS = path.join(ROOT, 'src', 'content', 'resources.generated.ts');
@@ -40,6 +47,7 @@ const OUT_SITEMAP = path.join(PUBLIC_DIR, 'sitemap.xml');
 const OUT_ROUTES = path.join(ROOT, '.generated-routes.json');
 const OUT_FEED = path.join(PUBLIC_DIR, 'feed.xml');
 const OUT_LLMS = path.join(PUBLIC_DIR, 'llms.txt');
+const OUT_SECURITY = path.join(PUBLIC_DIR, '.well-known', 'security.txt');
 
 const SITE_URL = 'https://algomate.ro';
 
@@ -48,59 +56,84 @@ const SITE_URL = 'https://algomate.ro';
  * `noindex: true` still gets prerendered and served — it is only kept out of
  * the sitemap, to match the robots meta the page itself emits. Submitting a
  * URL you tell crawlers not to index is a contradictory signal.
+ *
+ * `src` lists the files whose content the page is made of, relative to
+ * frontend/. The sitemap's <lastmod> is the date of the last commit that
+ * touched any of them (see lastModified below) — so when adding a page, list
+ * its component, plus pricing.ts if it quotes a price.
  */
+const PRICING = 'src/config/pricing.ts';
 const STATIC_PAGES = [
   {
     path: '/', changefreq: 'weekly', priority: '1.0',
+    src: ['src/pages/Home.tsx', 'src/components/Hero.tsx', 'src/components/FeatureGrid.tsx', 'src/components/HowItWorks.tsx', 'src/components/Instructor.tsx', 'src/components/FAQ.tsx', 'src/components/CTASection.tsx', 'src/components/InlineSignup.tsx', PRICING],
     llms: 'Pagina principală: cine predă, cum arată o ședință, întrebări frecvente.',
   },
   {
     path: '/servicii', changefreq: 'monthly', priority: '0.9',
+    src: ['src/pages/Services.tsx', PRICING],
     llms: 'Programele (Matematică BAC, Informatică BAC, introducere în programare), prețuri, formatul ședințelor.',
   },
-  // Subject landing pages — one query family each. Adding a route to App.tsx
+  // Subject landing pages — one query family each. Adding a route to router.tsx
   // without adding it here leaves it out of both the sitemap and the prerender
   // list, which means it 404s in production.
   {
     path: '/meditatii-informatica-bac', changefreq: 'monthly', priority: '0.9',
+    src: ['src/pages/InformaticaBac.tsx', PRICING],
     llms: 'Meditații informatică pentru BAC, în C++: ce cere proba E.d) și în ce ordine se lucrează capitolele.',
   },
   {
     path: '/meditatii-liceu', changefreq: 'monthly', priority: '0.9',
+    src: ['src/pages/MeditatiiLiceu.tsx', PRICING],
     llms: 'Meditații de liceu la matematică și informatică, pe clase (IX–XII): ce contează în fiecare an până la BAC.',
   },
   {
     path: '/meditatii-matematica-bucuresti', changefreq: 'monthly', priority: '0.9',
+    src: ['src/pages/MatematicaBucuresti.tsx', PRICING],
     llms: 'Meditații matematică pentru elevii din București, online.',
   },
   {
     path: '/meditatii-matematica-online', changefreq: 'monthly', priority: '0.9',
+    src: ['src/pages/MatematicaOnline.tsx', PRICING],
     llms: 'Cum se desfășoară o meditație de matematică online: tablă digitală, notițe, temă corectată.',
   },
   {
     path: '/meditatii-evaluare-nationala-matematica', changefreq: 'monthly', priority: '0.9',
+    src: ['src/pages/EvaluareNationala.tsx', PRICING],
     llms: 'Pregătire la matematică pentru Evaluarea Națională, clasa a VIII-a.',
   },
   {
     path: '/curriculum', changefreq: 'monthly', priority: '0.8',
+    src: ['src/pages/Curriculum.tsx'],
     llms: 'Programa parcursă la fiecare program, capitol cu capitol.',
   },
-  { path: '/inscriere', changefreq: 'monthly', priority: '0.8', llms: 'Formularul de înscriere.' },
-  // The downloads listing. The PDFs themselves are deliberately NOT in the
-  // sitemap: check-live-seo.mjs fetches every <loc> and requires a canonical
-  // link in the body, which a PDF does not have — it would gate the deploy on
-  // a failure pointing nowhere near its cause (docs/DOWNLOADS-SECTION.md §7.1).
+  {
+    path: '/inscriere', changefreq: 'monthly', priority: '0.8',
+    src: ['src/pages/Signup.tsx', PRICING],
+    llms: 'Formularul de înscriere.',
+  },
+  // The downloads listing. The PDFs themselves are in the sitemap too, since
+  // 2026-11-12 — added by writeSitemap from the manifest, not listed here,
+  // because they are files, not routes to prerender. That became possible
+  // once check-live-seo.mjs learned not to demand a canonical tag from a
+  // non-HTML URL (docs/DOWNLOADS-SECTION.md §7.1).
   {
     path: '/resurse', changefreq: 'monthly', priority: '0.8',
+    src: ['src/pages/Resources.tsx', 'src/config/resources.ts', 'public/descarcari'],
     llms: 'Ghiduri PDF gratuite: BAC M1 pe subiecte, Evaluare Națională, clasele a V-a și a VII-a.',
   },
   {
+    // Also moves whenever a post is published or updated — see writeSitemap.
     path: '/blog', changefreq: 'weekly', priority: '0.9',
+    src: ['src/pages/Blog.tsx'],
     llms: 'Toate articolele: subiecte rezolvate, calendarul examenelor, metodă.',
   },
-  { path: '/multumim', changefreq: 'yearly', priority: '0.3', noindex: true },
-  { path: '/termeni-si-conditii', changefreq: 'yearly', priority: '0.3' },
-  { path: '/politica-de-confidentialitate', changefreq: 'yearly', priority: '0.3' },
+  { path: '/multumim', changefreq: 'yearly', priority: '0.3', noindex: true, src: ['src/pages/ThankYou.tsx'] },
+  { path: '/termeni-si-conditii', changefreq: 'yearly', priority: '0.3', src: ['src/pages/TermsAndConditions.tsx'] },
+  {
+    path: '/politica-de-confidentialitate', changefreq: 'yearly', priority: '0.3',
+    src: ['src/pages/PrivacyPolicy.tsx'],
+  },
 ];
 
 const REQUIRED = ['title', 'description', 'publishDate', 'category'];
@@ -145,7 +178,18 @@ const SANITIZE_OPTIONS = {
   transformTags: {
     a: (tagName, attribs) => {
       const href = attribs.href || '';
-      const external = /^https?:\/\//i.test(href) && !href.includes('algomate.ro');
+      // Compare the host, not the string: `href.includes('algomate.ro')` also
+      // matched https://elsewhere.example/?ref=algomate.ro and let that link
+      // open without rel="noopener noreferrer".
+      let external = false;
+      if (/^https?:\/\//i.test(href)) {
+        try {
+          const host = new URL(href).hostname.toLowerCase();
+          external = host !== 'algomate.ro' && !host.endsWith('.algomate.ro');
+        } catch {
+          external = true;
+        }
+      }
       return {
         tagName,
         attribs: external
@@ -339,7 +383,7 @@ function renderMarkdown(md, { math = false, file } = {}) {
 function resolveCover(file, data) {
   const src = data.coverImage;
   if (src === undefined || src === null || src === '') {
-    return { coverImage: null, coverAlt: '' };
+    return { coverImage: null, coverAlt: '', coverWidth: null, coverHeight: null };
   }
 
   if (typeof src !== 'string' || !src.startsWith('/')) {
@@ -351,10 +395,45 @@ function resolveCover(file, data) {
     fail(file, `coverImage "${src}" not found — expected a file at ${path.relative(ROOT, onDisk)}`);
   }
 
+  const size = imageSize(onDisk);
+
   return {
     coverImage: src,
     coverAlt: typeof data.coverAlt === 'string' ? data.coverAlt : '',
+    coverWidth: size ? size.width : null,
+    coverHeight: size ? size.height : null,
   };
+}
+
+/**
+ * Pixel dimensions of a JPEG or PNG, read from the file header. Used for
+ * og:image:width/height and the JSON-LD ImageObject — a crawler that is told
+ * the size up front can accept a large preview without fetching the image to
+ * measure it. Returns null for anything it does not recognise; the size is a
+ * hint, never a reason to fail a build.
+ */
+function imageSize(file) {
+  try {
+    const buf = fs.readFileSync(file);
+    // PNG: 8-byte signature, then IHDR with width and height.
+    if (buf.length > 24 && buf.readUInt32BE(0) === 0x89504e47) {
+      return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+    }
+    // JPEG: walk the segments to the first start-of-frame marker.
+    if (buf.length > 4 && buf[0] === 0xff && buf[1] === 0xd8) {
+      let i = 2;
+      while (i + 9 < buf.length) {
+        if (buf[i] !== 0xff) return null;
+        const marker = buf[i + 1];
+        const isSOF = marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker);
+        if (isSOF) return { width: buf.readUInt16BE(i + 7), height: buf.readUInt16BE(i + 5) };
+        i += 2 + buf.readUInt16BE(i + 2);
+      }
+    }
+  } catch {
+    /* fall through */
+  }
+  return null;
 }
 
 /** YYYY-MM-DD in UTC, so scheduling doesn't drift with the build machine. */
@@ -409,7 +488,7 @@ function readPosts() {
 
     // Validated before the publish gate, so a broken path surfaces while the
     // post is still a draft rather than on the morning it goes live.
-    const { coverImage, coverAlt } = resolveCover(file, data);
+    const { coverImage, coverAlt, coverWidth, coverHeight } = resolveCover(file, data);
 
     const reason =
       data.draft === true ? 'draft' : publishDate > today ? `scheduled ${publishDate}` : null;
@@ -451,6 +530,8 @@ function readPosts() {
       tags: Array.isArray(data.tags) ? data.tags : [],
       coverImage,
       coverAlt,
+      coverWidth,
+      coverHeight,
       readingMinutes: Math.max(1, Math.round(words / 200)),
       wordCount: words,
       html: clean,
@@ -596,7 +677,7 @@ function readResources() {
     console.log(`  ✓ ${manifest.length} download(s), ${Math.round(total / 1024)} KB total`);
   }
 
-  return sizes;
+  return { sizes, files: manifest.map((r) => r.file) };
 }
 
 function writeResourcesTs(sizes) {
@@ -612,7 +693,25 @@ export const resourceBytes: Record<string, number> = ${JSON.stringify(sizes, nul
   fs.writeFileSync(OUT_RESOURCES_TS, body, 'utf-8');
 }
 
+/**
+ * Post data for the app, in two parts.
+ *
+ * posts.generated.ts holds the metadata of every post — what the blog index,
+ * the "related posts" blocks and the article masthead need. It is small and
+ * every page imports it.
+ *
+ * The rendered HTML goes into one module per post under src/content/posts/,
+ * reached only through loadPostHtml(), a dynamic import. Vite turns each into
+ * its own chunk, fetched by the one article page that shows it.
+ *
+ * Before 2026-11-12 the HTML sat in the same array as the metadata, so the
+ * whole archive was compiled into the main script: with 13 posts that was
+ * 1.1 MB of a 1.76 MB bundle, downloaded and parsed on the homepage, the
+ * enrolment form and every other page, and growing with each weekly post.
+ */
 function writeTs(posts) {
+  const meta = posts.map(({ html: _html, ...rest }) => rest);
+
   const body = `// GENERATED by scripts/build-content.mjs — do not edit by hand.
 // Source of truth is content/posts/*.md. Re-run \`npm run content\` after editing.
 
@@ -628,37 +727,114 @@ export interface Post {
   coverImage: string | null;
   /** Empty when the image is decorative — see resolveCover in build-content.mjs. */
   coverAlt: string;
+  /** Pixel size of the cover, read off the file. Null when there is no cover. */
+  coverWidth: number | null;
+  coverHeight: number | null;
   readingMinutes: number;
   wordCount: number;
-  /** Rendered at build time; no markdown parser ships to the browser. */
-  html: string;
 }
 
-export const posts: Post[] = ${JSON.stringify(posts, null, 2)};
+export const posts: Post[] = ${JSON.stringify(meta, null, 2)};
 
 export const postBySlug = (slug: string): Post | undefined =>
   posts.find((p) => p.slug === slug);
+
+/**
+ * The article bodies, one lazily-loaded module each, so a page downloads the
+ * post it shows and none of the others. Rendered at build time; no markdown
+ * parser ships to the browser.
+ */
+const bodies: Record<string, () => Promise<{ default: string }>> = {
+${posts.map((p) => `  ${JSON.stringify(p.slug)}: () => import('./posts/${p.slug}.generated'),`).join('\n')}
+};
+
+/** Resolves to null for a slug that is not a published post. */
+export const loadPostHtml = (slug: string): Promise<string | null> =>
+  Object.hasOwn(bodies, slug) ? bodies[slug]().then((m) => m.default) : Promise.resolve(null);
 `;
 
   fs.mkdirSync(path.dirname(OUT_TS), { recursive: true });
   fs.writeFileSync(OUT_TS, body, 'utf-8');
+
+  // Bodies. Clear the directory first: a post that was unpublished or
+  // re-slugged must not leave its old module behind to be bundled.
+  fs.mkdirSync(OUT_BODIES_DIR, { recursive: true });
+  for (const f of fs.readdirSync(OUT_BODIES_DIR)) {
+    if (f.endsWith('.generated.ts')) fs.rmSync(path.join(OUT_BODIES_DIR, f));
+  }
+  for (const p of posts) {
+    fs.writeFileSync(
+      path.join(OUT_BODIES_DIR, `${p.slug}.generated.ts`),
+      `// GENERATED by scripts/build-content.mjs — do not edit by hand.\n` +
+        `export default ${JSON.stringify(p.html)};\n`,
+      'utf-8'
+    );
+  }
 }
 
-function writeSitemap(posts) {
+/**
+ * ─── Sitemap <lastmod> that means something ────────────────────────────────
+ *
+ * Static pages used to be stamped with the build date. Builds run on every
+ * deploy and every scheduled post, so a dozen pages claimed to have changed
+ * each week when nothing on them had. Google says it uses <lastmod> only when
+ * it is "consistently and verifiably accurate"; a sitemap that cries wolf
+ * weekly teaches it to ignore the field, including on the posts, where the
+ * date is real and is the signal that an updated article should be recrawled.
+ *
+ * So: the date of the last commit that touched the page's own sources. Falls
+ * back to today when git cannot answer (a tarball, a shallow or missing
+ * checkout) — the old behaviour, and never a build failure.
+ */
+function lastModified(sources, fallback) {
+  if (!sources || sources.length === 0) return fallback;
+  try {
+    const out = execFileSync(
+      'git',
+      ['log', '-1', '--format=%cs', '--', ...sources],
+      { cwd: ROOT, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }
+    ).trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(out) ? out : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeSitemap(posts, downloads) {
   const today = todayISO();
+  // The blog index changes whenever a post is added or revised.
+  const newestPost = posts.reduce((d, p) => {
+    const m = p.updatedDate || p.publishDate;
+    return m > d ? m : d;
+  }, '');
+  const later = (a, b) => (a > b ? a : b);
 
   const entries = [
-    ...STATIC_PAGES.filter((p) => !p.noindex).map((p) => ({
-      loc: `${SITE_URL}${p.path}`,
-      lastmod: today,
-      changefreq: p.changefreq,
-      priority: p.priority,
-    })),
+    ...STATIC_PAGES.filter((p) => !p.noindex).map((p) => {
+      const own = lastModified(p.src, today);
+      return {
+        loc: `${SITE_URL}${p.path}`,
+        // Never in the future: a commit dated ahead of the build clock would
+        // otherwise publish a lastmod crawlers reject outright.
+        lastmod: [p.path === '/blog' && newestPost ? later(own, newestPost) : own, today].sort()[0],
+        changefreq: p.changefreq,
+        priority: p.priority,
+      };
+    }),
     ...posts.map((p) => ({
       loc: `${SITE_URL}/blog/${p.slug}`,
       lastmod: p.updatedDate || p.publishDate,
       changefreq: 'monthly',
       priority: '0.7',
+    })),
+    // The guides. Google indexes PDFs, and "… pdf" is how a lot of exam
+    // material is searched for. A revised guide gets a new filename (-v2),
+    // so each URL's lastmod is simply when that file was committed.
+    ...downloads.map((file) => ({
+      loc: `${SITE_URL}/descarcari/${file}`,
+      lastmod: [lastModified([`public/descarcari/${file}`], today), today].sort()[0],
+      changefreq: 'yearly',
+      priority: '0.5',
     })),
   ];
 
@@ -799,11 +975,39 @@ ${articles}
   fs.writeFileSync(OUT_LLMS, body, 'utf-8');
 }
 
+/**
+ * /.well-known/security.txt (RFC 9116) — tells someone who has found a hole in
+ * the site whom to tell. Generated rather than committed for two reasons: the
+ * address comes from src/config/contact.ts like every other copy of it, and
+ * the mandatory Expires field is re-stamped a year ahead on each build, so the
+ * file cannot quietly lapse the way a hand-written one does.
+ */
+function writeSecurityTxt() {
+  const m = /export const EMAIL\s*=\s*['"]([^'"]+)['"]/.exec(fs.readFileSync(CONTACT_TS, 'utf-8'));
+  if (!m) fail(CONTACT_TS, 'could not find `export const EMAIL = "…"`');
+
+  const expires = new Date();
+  expires.setUTCFullYear(expires.getUTCFullYear() + 1);
+
+  const body = `# Raportarea unei vulnerabilități pe algomate.ro (RFC 9116)
+# Reporting a security issue with algomate.ro
+Contact: mailto:${m[1]}
+Expires: ${expires.toISOString().slice(0, 10)}T00:00:00.000Z
+Preferred-Languages: ro, en
+Canonical: ${SITE_URL}/.well-known/security.txt
+`;
+
+  fs.mkdirSync(path.dirname(OUT_SECURITY), { recursive: true });
+  fs.writeFileSync(OUT_SECURITY, body, 'utf-8');
+}
+
 const posts = readPosts();
 writeTs(posts);
-writeResourcesTs(readResources());
-writeSitemap(posts);
+const resources = readResources();
+writeResourcesTs(resources.sizes);
+writeSitemap(posts, resources.files);
 writeRoutes(posts);
 writeFeed(posts);
 writeLlms(posts);
+writeSecurityTxt();
 console.log(`  ✓ content built (${posts.length} post(s), ${STATIC_PAGES.length} static pages)`);

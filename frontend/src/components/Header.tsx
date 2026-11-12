@@ -45,13 +45,14 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav aria-label="Navigare principală" className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => {
             const isActive = location.pathname === link.href;
             return (
               <Link
                 key={link.name}
                 to={link.href}
+                aria-current={isActive ? 'page' : undefined}
                 className={`relative text-sm font-medium transition-colors duration-300 ${
                   isActive ? 'text-[#f0f0f0]' : 'text-[#999] hover:text-[#f0f0f0]'
                 }`}
@@ -73,7 +74,9 @@ const Header: React.FC = () => {
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="md:hidden text-[#999] hover:text-[#f0f0f0] transition-colors"
-          aria-label="Toggle menu"
+          aria-label={mobileMenuOpen ? 'Închide meniul' : 'Deschide meniul'}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="meniu-mobil"
         >
           {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -87,15 +90,17 @@ const Header: React.FC = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            id="meniu-mobil"
             className="md:hidden bg-[#0a0a0a]/95 backdrop-blur-xl overflow-hidden"
           >
-            <div className="flex flex-col px-6 py-4 gap-1">
+            <nav aria-label="Navigare principală" className="flex flex-col px-6 py-4 gap-1">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.href;
                 return (
                   <Link
                     key={link.name}
                     to={link.href}
+                    aria-current={isActive ? 'page' : undefined}
                     className={`py-3 text-sm font-medium transition-colors ${
                       isActive ? 'text-[#e8734a]' : 'text-[#999] hover:text-[#f0f0f0]'
                     }`}
@@ -104,7 +109,7 @@ const Header: React.FC = () => {
                   </Link>
                 );
               })}
-            </div>
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>

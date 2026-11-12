@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Self-hosted Inter, Fraunces and JetBrains Mono — generated, see
+   scripts/make-fonts-css.mjs for why they are declared the way they are. */
+@import "./fonts.css";
 /* KaTeX stylesheet. Formulas are rendered to HTML at build time, so no maths
    JavaScript ships — but the glyph positioning depends on this CSS, and the
    fonts it references are only fetched by browsers that actually meet a

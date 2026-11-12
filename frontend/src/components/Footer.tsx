@@ -81,14 +81,16 @@ const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-sm text-[#666]">
               <li className="flex items-center gap-2">
-                <Mail size={14} className="text-[#555]" />
-                {EMAIL}
+                <Mail size={14} className="text-[#555]" aria-hidden />
+                <a href={`mailto:${EMAIL}`} className="hover:text-[#e8734a] transition-colors">
+                  {EMAIL}
+                </a>
               </li>
               {/* Rendered as text, not just an href: the phone number has to be
                   readable on the page for it to count as the "P" in the NAP
                   that local search matches against the Business Profile. */}
               <li className="flex items-center gap-2">
-                <Phone size={14} className="text-[#555]" />
+                <Phone size={14} className="text-[#555]" aria-hidden />
                 <a
                   href={PHONE_HREF}
                   className="hover:text-[#e8734a] transition-colors"
@@ -97,7 +99,7 @@ const Footer: React.FC = () => {
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin size={14} className="text-[#555]" />
+                <MapPin size={14} className="text-[#555]" aria-hidden />
                 {LOCALITY}, {COUNTRY}
               </li>
             </ul>

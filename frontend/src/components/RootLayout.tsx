@@ -33,10 +33,20 @@ const RootLayout: React.FC = () => {
       {/* ScrollRestoration is the magic bullet for React Router v7 scroll jumping */}
       <ScrollRestoration />
 
+      {/* Skip link: the first Tab stop on every page. Invisible until it has
+          keyboard focus, then it lets a keyboard or screen-reader user jump
+          past the header instead of tabbing through six nav links each time. */}
+      <a
+        href="#continut"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-[#e8734a] focus:text-[#0a0a0a] focus:px-4 focus:py-2.5 focus:font-mono focus:text-[11px] focus:tracking-[0.2em] focus:uppercase focus:font-medium focus:outline-none"
+      >
+        Sari la conținut
+      </a>
+
       {!isArticle && <InteractiveBackground />}
       <Header />
       
-      <main className="relative z-10 w-full min-h-screen">
+      <main id="continut" tabIndex={-1} className="relative z-10 w-full min-h-screen focus:outline-none">
         <AnimatePresence mode="wait">
           {/* React Router Data API requires cloning the outlet to pass the key for framer motion exit animations */}
           {outlet && React.cloneElement(outlet as React.ReactElement, { key: location.pathname })}

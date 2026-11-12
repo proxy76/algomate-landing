@@ -6,6 +6,7 @@ import PageTransition from '../components/PageTransition';
 import SEO from '../components/SEO';
 import { breadcrumbSchema } from '../seo/structuredData';
 import { posts } from '../content/posts.generated';
+import { formatDate } from '../lib/formatDate';
 
 /**
  * Blog index — a contents page, not a card grid.
@@ -14,15 +15,6 @@ import { posts } from '../content/posts.generated';
  * length) in the margins, and give the whole width to the title.
  */
 
-const MONTHS = [
-  'ian', 'feb', 'mar', 'apr', 'mai', 'iun',
-  'iul', 'aug', 'sep', 'oct', 'noi', 'dec',
-];
-
-export const formatDate = (iso: string) => {
-  const [y, m, d] = iso.split('-');
-  return `${Number(d)} ${MONTHS[Number(m) - 1]} ${y}`;
-};
 
 const Blog: React.FC = () => {
   return (
