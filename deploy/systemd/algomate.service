@@ -1,0 +1,72 @@
+# Installed copy: /etc/systemd/system/algomate.service
+#
+# The Django backend: one endpoint, POST /api/contact/, which emails the
+# enrolment form to the owner. nginx proxies /api/contact/ to it
+# (deploy/nginx/algomate.conf.example).
+#
+# After changing this file:
+#     sudo install -m 644 deploy/systemd/algomate.service /etc/systemd/system/
+#     sudo systemctl daemon-reload && sudo systemctl restart algomate
+#     curl -s -o /dev/null -w '%{http_code}\n' https://algomate.ro/api/contact/   # expect 405
+#
+# After a backend code or requirements change (rebuild.sh deploys the frontend
+# only — the backend is not restarted by a deploy):
+#     sudo -u razvan /srv/algomate/backend/venv/bin/pip install -r /srv/algomate/backend/requirements.txt
+#     sudo systemctl restart algomate
+[Unit]
+Description=AlgoMate Django backend
+After=network.target
+
+[Service]
+User=razvan
+Group=razvan
+WorkingDirectory=/srv/algomate/backend
+# Holds the Django secret and the Gmail app password. systemd reads it as
+# root before dropping privileges, so the file itself should be 600.
+EnvironmentFile=/srv/algomate/backend/.env
+# --workers 1 is load-bearing: the rate limits live in a per-process memory
+# cache (settings.py CACHES). A second worker doubles every limit.
+#
+# The access log leads with X-Forwarded-For — the visitor's address as nginx
+# states it. gunicorn's default (%(h)s) is the peer, which is always nginx on
+# 127.0.0.1 and says nothing about who is hammering the form.
+ExecStart=/srv/algomate/backend/venv/bin/gunicorn config.wsgi \
+  --workers 1 \
+  --bind 127.0.0.1:8000 \
+  --timeout 30 \
+  --access-logfile - \
+  --access-logformat '%({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"' \
+  --error-logfile -
+Restart=on-failure
+RestartSec=5
+
+# ─── Sandbox ─────────────────────────────────────────────────────────────────
+# This process parses input from the open internet and holds a mail password.
+# It needs to read its own code, listen on loopback and talk SMTP — nothing
+# else — so everything else is taken away. If it is ever compromised, the
+# attacker gets a process that cannot write anywhere, cannot see /home, and
+# cannot gain privileges.
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

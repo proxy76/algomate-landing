@@ -1,0 +1,49 @@
+# http-level settings for algomate.ro — installed as /etc/nginx/conf.d/algomate.conf
+#
+# `map` and `limit_req_zone` are only valid in the http context, so they cannot
+# live in the server block (sites-available/algomate, algomate.conf.example).
+# nginx.conf includes conf.d/*.conf before sites-enabled/*, which is the order
+# these need. Every name is prefixed algomate_ — this box serves other sites
+# from the same nginx.
+#
+# Applied 2026-11-12. After any change:
+#     sudo nginx -t && sudo systemctl reload nginx
+#     node frontend/scripts/check-live-seo.mjs https://algomate.ro
+
+# ─── Cache-Control, chosen by what the URL is ────────────────────────────────
+#
+# One variable, set once at server level — rather than an add_header in each
+# location — because of how nginx inherits add_header: a location that sets
+# even one header of its own silently drops every header declared above it.
+# That is how a site ends up with security headers on its HTML and none on its
+# downloads. Nothing in the server block calls add_header inside a location.
+#
+#   /assets/*    Vite fingerprints every filename with a content hash, so a
+#                given URL can never change meaning: cache it for a year and
+#                tell the browser not to revalidate.
+#   /descarcari  PDFs carry a version in the name (CLAUDE.md), a week is safe.
+#   images       Not fingerprinted (covers, portrait, icons); a week. Replace
+#                one under the same name and it takes that long to show —
+#                rename it, or purge it in Cloudflare.
+#   feeds etc.   An hour, so a newly published post reaches readers quickly.
+#   /api/        Never stored: a form submission's answer is nobody else's.
+#   default      HTML. `no-cache` means "store it, but ask before reusing it":
+#                a conditional request that nginx answers with a 304. Without
+#                it browsers fall back to heuristics and can keep showing a
+#                page that names script files a later deploy has removed.
+map $uri $algomate_cache_control {
+    default                                    "no-cache";
+    ~^/api/                                    "no-store";
+    ~^/assets/                                 "public, max-age=31536000, immutable";
+    ~^/descarcari/                             "public, max-age=604800";
+    ~*\.(?:jpe?g|png|webp|avif|gif|svg|ico)$   "public, max-age=604800";
+    ~*\.(?:xml|txt|webmanifest)$               "public, max-age=3600";
+}
+
+# ─── Request rate for /api/ ──────────────────────────────────────────────────
+#
+# A backstop in front of Django's own throttle (backend/config/settings.py):
+# 30 requests a minute per visitor is far above anything the form produces and
+# far below what a script hammering the endpoint wants. Keyed on the visitor's
+# address, which the server block restores from CF-Connecting-IP.
+limit_req_zone $binary_remote_addr zone=algomate_api:1m rate=30r/m;

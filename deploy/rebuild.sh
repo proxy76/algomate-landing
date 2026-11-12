@@ -54,6 +54,8 @@ DEPLOY_ROOT="${DEPLOY_ROOT:-/srv/algomate-deploy}"
 RELEASES="$DEPLOY_ROOT/releases"
 CURRENT="$DEPLOY_ROOT/current"
 KEEP="${KEEP:-5}"
+# How long a superseded /assets/ file stays downloadable — see "Carry" below.
+ASSET_GRACE_DAYS="${ASSET_GRACE_DAYS:-14}"
 
 log()  { echo "[$(date -Is)] $*"; }
 die()  { echo "[$(date -Is)] FATAL: $*" >&2; exit 1; }
@@ -101,11 +103,38 @@ NEW="$RELEASES/$STAMP"
 mkdir -p "$RELEASES"
 cp -a "$REPO/frontend/dist" "$NEW"
 
+# ── Carry the outgoing release's assets forward ─────────────────────────────
+# Everything under /assets/ has a content hash in its name, and every page is
+# split into chunks that are fetched as the visitor navigates (router.tsx). The
+# symlink swap below is atomic for a *request*, but a *visit* spans many
+# requests: a tab opened before the swap holds HTML that names the old
+# chunks, and will ask for them after it. Without this block those requests
+# 404 — a stylesheet that fails to load, or a link that does nothing — for
+# anyone on the site at 05:00 on a publishing morning, and for any crawler
+# midway through rendering a page.
+#
+# So files the new build did not produce are copied over from the release
+# being replaced. Names cannot collide (same name = same bytes). `cp -p`
+# keeps each file's original mtime, which is what ages it out: once a file
+# has not been part of a build for ASSET_GRACE_DAYS it stops being carried,
+# so the directory does not grow without bound.
+if [ -d "$CURRENT/assets" ] && [ -d "$NEW/assets" ]; then
+    carried=0
+    while IFS= read -r -d '' old; do
+        dest="$NEW/assets/$(basename "$old")"
+        if [ ! -e "$dest" ]; then
+            cp -p "$old" "$dest"
+            carried=$((carried + 1))
+        fi
+    done < <(find -L "$CURRENT/assets" -maxdepth 1 -type f -mtime "-$ASSET_GRACE_DAYS" -print0)
+    log "carried $carried asset(s) forward from the outgoing release"
+fi
+
 # ── Verify before publishing ────────────────────────────────────────────────
 # A build can fail in ways that still exit 0 — a prerender step that silently
 # produced nothing, a content script that emitted an empty sitemap. Refuse to
 # publish rather than take the site down.
-for f in index.html robots.txt sitemap.xml blog/index.html; do
+for f in index.html robots.txt sitemap.xml blog/index.html 404.html; do
     if [ ! -s "$NEW/$f" ]; then
         log "FATAL: $f missing or empty in the new build — not switching"
         rm -rf "$NEW"
@@ -116,6 +145,20 @@ done
 # The homepage must contain real prerendered text, not just the SPA shell.
 if ! grep -q 'rel="canonical"' "$NEW/index.html"; then
     log "FATAL: index.html has no canonical — prerendering did not run"
+    rm -rf "$NEW"
+    exit 1
+fi
+
+# Every script and stylesheet the homepage names must be in the release. A
+# page whose CSS 404s still "builds", and still passes the checks above.
+missing_asset=0
+while IFS= read -r asset; do
+    if [ ! -s "$NEW$asset" ]; then
+        log "FATAL: index.html references $asset, which is not in the build"
+        missing_asset=1
+    fi
+done < <(grep -oE '(src|href)="/assets/[^"]+"' "$NEW/index.html" | sed -E 's/^(src|href)="//; s/"$//' | sort -u)
+if [ "$missing_asset" -ne 0 ]; then
     rm -rf "$NEW"
     exit 1
 fi

@@ -1,8 +1,12 @@
-# nginx config for algomate.ro
+# nginx config for algomate.ro — installed as /etc/nginx/sites-available/algomate
 #
-# Reconciled against the live config on 2026-08-21 (`nginx -T`) — the whole
+# Reconciled against the live config on 2026-11-12 (`nginx -T`) — the whole
 # file below is the real one, not a template. Public TLS is terminated by a
-# Cloudflare tunnel, which forwards to nginx on 127.0.0.1:8080.
+# Cloudflare tunnel (cloudflared), which forwards to nginx on 127.0.0.1:8080.
+#
+# It needs its companion, deploy/nginx/algomate-http.conf.example, installed
+# as /etc/nginx/conf.d/algomate.conf: that file defines $algomate_cache_control
+# and the algomate_api rate-limit zone used below. Without it `nginx -t` fails.
 #
 # Everything here is APPLIED. This file is a reference for what the live
 # config is and why, not a change to make.
@@ -37,14 +41,22 @@
 # `port_in_redirect off` keep any redirect nginx does emit relative, which is
 # what stops the :8080 leak recurring in the retired-slug block.
 #
+# `error_page 404 /404.html` is NOT an SPA fallback, though it looks like a
+# cousin of one: the response keeps its 404 status. It only replaces nginx's
+# bare "404 Not Found" body with the site's own prerendered page.
+#
 # After any change here: sudo nginx -t && sudo systemctl reload nginx, then
 # node frontend/scripts/check-live-seo.mjs https://algomate.ro
+# (the script covers the security headers, the HTTPS redirect and the 404
+# page as well as the indexing checks).
 
 server {
     listen 127.0.0.1:8080;
     server_name algomate.ro;
 
     client_max_body_size 1m;
+    # Error pages and the Server header would otherwise print the version.
+    server_tokens off;
 
     # Frontend — prerendered static output, not an SPA
     root /srv/algomate-deploy/current;
@@ -54,6 +66,77 @@ server {
     # never let it name a scheme, host or port in a redirect.
     absolute_redirect off;
     port_in_redirect  off;
+
+    # ─── Who the visitor is ──────────────────────────────────────────────────
+    # Every connection arrives from cloudflared on loopback, so without this
+    # $remote_addr is 127.0.0.1 for the whole internet: the access log is
+    # useless, and Django's per-visitor rate limit on the enrolment form
+    # becomes one bucket shared by everyone (five submissions an hour, total —
+    # the bug fixed on 2026-11-12). Cloudflare states the real client address
+    # in CF-Connecting-IP. Trusting that header is safe only because nginx
+    # listens on loopback and nothing but the tunnel can reach it; if this
+    # block is ever given a public listener, list Cloudflare's ranges here
+    # instead of 127.0.0.1.
+    set_real_ip_from 127.0.0.1;
+    real_ip_header   CF-Connecting-IP;
+
+    # ─── HTTPS only ──────────────────────────────────────────────────────────
+    # Cloudflare accepts plain http:// on the public side and forwards it
+    # here like any other request, so http://algomate.ro/ used to answer 200 —
+    # the whole site, and the enrolment form with it, readable and alterable
+    # by anyone on the path. The tunnel reports the scheme the visitor used.
+    # This is the one absolute redirect in the file and it is absolute on
+    # purpose: it names the public origin explicitly, which is the opposite of
+    # the §4.3.1 leak, where nginx guessed. ("Always Use HTTPS" in the
+    # Cloudflare dashboard does the same one hop earlier; with both on, this
+    # simply never fires.)
+    if ($http_x_forwarded_proto = "http") {
+        return 301 https://algomate.ro$request_uri;
+    }
+
+    # ─── Response headers ────────────────────────────────────────────────────
+    # All at server level, none inside a location — see the note on add_header
+    # inheritance in algomate-http.conf.example. `always` puts them on error
+    # responses too; a 404 page is as frameable as any other.
+    #
+    # HSTS: a year, this host only. No includeSubDomains and no preload —
+    # both are effectively irreversible and would bind every other
+    # *.algomate.ro service to HTTPS for good; that is the owner's call.
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Content-Type-Options    "nosniff" always;
+    add_header X-Frame-Options           "DENY" always;
+    add_header Referrer-Policy           "strict-origin-when-cross-origin" always;
+    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header Permissions-Policy        "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), browsing-topics=()" always;
+    # Content-Security-Policy. The site loads nothing from anywhere else —
+    # fonts are self-hosted since 2026-11-12 — so nearly everything is 'self'.
+    #   script-src   no 'unsafe-inline', no eval: an injected <script> does
+    #                not run. Article HTML is sanitised at build time; this is
+    #                the second lock on that door. JSON-LD blocks are data and
+    #                are not affected. /cdn-cgi/ (Cloudflare's email-obfuscation
+    #                decoder) is same-origin and so already allowed.
+    #   style-src    'unsafe-inline' is required: KaTeX and the prerendered
+    #                animation states are inline style attributes.
+    #   img-src      https: so a post may embed an image hosted elsewhere.
+    #   cloudflareinsights.com  pre-allowed so that switching on Cloudflare
+    #                Web Analytics later works instead of failing silently.
+    # A new third-party script, font or embed must be added here or the
+    # browser will refuse it — check the console after adding one.
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" always;
+    add_header Cache-Control $algomate_cache_control always;
+
+    # ─── Encoding and compression ────────────────────────────────────────────
+    charset utf-8;
+    charset_types text/css text/plain text/xml application/javascript application/json application/manifest+json image/svg+xml;
+    # nginx.conf turns gzip on for text/html only. Cloudflare compresses for
+    # the visitor regardless; this shrinks the origin→edge hop, where a
+    # 550 kB article chunk would otherwise travel uncompressed. gzip_proxied
+    # is needed because every request here comes through a proxy.
+    gzip_types text/css text/plain text/xml application/javascript application/json application/manifest+json application/xml image/svg+xml;
+    gzip_proxied any;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_comp_level 5;
 
     # Retired slugs — 301 to the current URL so the old one does not 404.
     # Relative targets only; absolute_redirect off keeps them relative (§4.3.1).
@@ -65,27 +148,69 @@ server {
         try_files $uri $uri/index.html =404;
     }
 
-    # PENDING — not yet applied on the server as of 2026-09-10. Apply with
-    # sudo nginx -t && sudo systemctl reload nginx, then delete this line.
-    #
-    # Downloadable PDFs (docs/DOWNLOADS-SECTION.md). Filenames carry a version,
-    # so a week of caching is safe and a revision is a new URL rather than a
-    # Cloudflare purge. A missing file must 404, never fall through to the app
-    # shell. No gzip: PDFs are already compressed, so it spends CPU for ~0
-    # bytes — the same reasoning the laborator block records for its PNGs.
-    location /descarcari/ {
-        try_files $uri =404;
-        add_header Cache-Control "public, max-age=604800";
+    # ─── Not found ───────────────────────────────────────────────────────────
+    # The status stays 404 (that is what `error_page 404 <uri>` without an
+    # `=code` does); only the body changes, to the prerendered 404 page.
+    # `internal` makes a direct request for /404.html a 404 as well, so the
+    # page has no URL at which it answers 200.
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
     }
 
-    # Django API. The enrollment form posts here; if this proxy stops
-    # working the form breaks silently. A GET returns 405 (POST-only), which
-    # is the quick check that it is intact — 502/504 means it is not.
-    location /api/ {
+    # Dotfiles are never content: a stray .env, .git or editor backup in the
+    # build output must not be downloadable. /.well-known/ is the exception
+    # the web is built on (security.txt lives there).
+    location ~ /\.(?!well-known/) {
+        return 404;
+    }
+
+    location = /site.webmanifest {
+        types { }
+        default_type application/manifest+json;
+    }
+
+    # Downloadable PDFs (docs/DOWNLOADS-SECTION.md). Filenames carry a version,
+    # so a week of caching is safe and a revision is a new URL rather than a
+    # Cloudflare purge — the max-age itself is set by $algomate_cache_control.
+    # A missing file must 404, never fall through to the app shell.
+    location /descarcari/ {
+        try_files $uri =404;
+    }
+
+    # ─── Django API ──────────────────────────────────────────────────────────
+    # The enrolment form posts here; if this proxy stops working the form
+    # breaks silently. A GET returns 405 (POST-only), which is the quick check
+    # that it is intact — 502/504 means it is not.
+    #
+    # Exactly one path is proxied. Everything else under /api/ is answered
+    # here: the backend's log used to be hundreds of lines of scanners asking
+    # Django for /api/.env and /api/graphql.
+    location = /api/contact/ {
+        limit_req zone=algomate_api burst=10 nodelay;
+        limit_req_status 429;
+        # Largest legitimate body: a 2000-character message and four fields.
+        client_max_body_size 32k;
+
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        # Overwritten, never appended to: this single address is what the
+        # backend rate-limits on (NUM_PROXIES = 1), so nothing the client
+        # sent may survive in it.
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto https;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 30s;
+
+        # Django sets these itself; without hiding them each would be sent
+        # twice, once from each side.
+        proxy_hide_header X-Content-Type-Options;
+        proxy_hide_header X-Frame-Options;
+        proxy_hide_header Referrer-Policy;
+        proxy_hide_header Cross-Origin-Opener-Policy;
+    }
+    location /api/ {
+        return 404;
     }
 }
