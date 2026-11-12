@@ -94,8 +94,8 @@ by URL, so a revised guide published under the same name keeps serving the old
 bytes. Bump to `-v2` in the manifest and on disk together.
 
 `docs/DOWNLOADS-SECTION.md` is the full record — including why the files sit
-at `/descarcari/` and not under `/resurse/`, and why no PDF URL belongs in
-the sitemap.
+at `/descarcari/` and not under `/resurse/`, and how the PDF URLs came to be
+in the sitemap (they are added from the manifest automatically).
 
 ## Pages, chunks and fonts
 
@@ -120,8 +120,12 @@ things follow, and each fails silently if forgotten:
 `docs/SERVER-SETUP.md` is the reference: current state, the live nginx config,
 and §4.3.1–4.3.2 on the two indexing bugs it fixed. **Read those two sections
 before touching nginx** — both are easy to reintroduce, and neither symptom
-points anywhere near its cause. Two more rules since 2026-11-12, for the same
-reason:
+points anywhere near its cause. In particular, do not add an SPA fallback
+(`try_files $uri /index.html`); the site is fully prerendered and that is what
+produced soft 404s on every unknown URL. (`error_page 404 /404.html` is not
+one: it serves the site's 404 page *with a 404 status*.)
+
+Two more rules since 2026-11-12, for the same reason:
 
 - **Never put `add_header` inside a `location`.** nginx then drops every
   header inherited from the server block for that location — the security
@@ -133,9 +137,7 @@ reason:
   only trace is a console message.
 
 `docs/SECURITY.md` is the audit record: what was found, what was fixed, and
-what is left for the owner (secret rotation among them). In particular, do not add an SPA fallback
-(`try_files $uri /index.html`); the site is fully prerendered and that is what
-produced soft 404s on every unknown URL.
+what is left for the owner (secret rotation among them).
 
 Post scheduling was dropped on 2026-08-17 and **reinstated on 2026-11-04** as
 `algomate-publish.timer` (§3.1) — do not add a second timer. The weekly mock-exam job
