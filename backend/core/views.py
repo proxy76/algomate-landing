@@ -24,6 +24,16 @@ class ContactAPIView(APIView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "contact"
 
+    def get_throttles(self):
+        # Only submissions count. DRF throttles before it dispatches, so
+        # without this a GET — answered 405, and used as the "is the backend
+        # up?" probe by check-live-seo.mjs and by anyone monitoring the site —
+        # would spend the same five-an-hour allowance as the form itself, and
+        # the sixth probe would report a healthy backend as down (429).
+        if self.request.method != "POST":
+            return []
+        return super().get_throttles()
+
     def post(self, request):
         serializer = ContactSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

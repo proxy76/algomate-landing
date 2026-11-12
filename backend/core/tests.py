@@ -170,6 +170,12 @@ class ContactEndpointTests(SimpleTestCase):
         r = self.post(ip="10.9.9.9, 203.0.113.50", email="c9@example.com")
         self.assertEqual(r.status_code, 429)
 
+    def test_probing_with_get_does_not_spend_the_form_allowance(self):
+        for _ in range(20):
+            r = self.client.get(URL, HTTP_X_FORWARDED_FOR="203.0.113.77")
+            self.assertEqual(r.status_code, 405)
+        self.assertEqual(self.post(ip="203.0.113.77").status_code, 200)
+
     def test_per_email_limit(self):
         for i in range(3):
             r = self.post(ip=f"203.0.113.{100 + i}")
