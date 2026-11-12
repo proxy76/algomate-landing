@@ -17,9 +17,9 @@ prerenderer, which is where every production bug on this site has come from.
 - **Do not gzip the PDFs.** They are already compressed; gzipping spends CPU
   for ~0 bytes. The `laborator` server block records the same reasoning for
   its PNGs.
-- **Do not add individual PDF URLs to `sitemap.xml`** without first reading
-  §7.1 — it breaks the deploy regression test in a way whose error message
-  points nowhere near the cause.
+- ~~Do not add individual PDF URLs to `sitemap.xml`~~ — done on 2026-11-12,
+  in the order §7.1 prescribes: the checker learned about non-HTML URLs first.
+  The PDFs are added to the sitemap from the manifest automatically.
 - **Do not hand-type file sizes into the UI.** They are generated (§4.2).
 - Do not deploy by running `npm run build` against `frontend/dist/`. Use
   `/srv/algomate-deploy/bin/rebuild.sh` (`CLAUDE.md`).
@@ -71,10 +71,11 @@ touching anything load-bearing: `/root/.npm` (342 MB), `/var/log/journal`
 1. **The site is fully prerendered, not server-rendered.** `npm run build`
    runs `build-content.mjs` → `vite build` → `prerender.js` (Playwright).
    Every route is a static `index.html` on disk.
-2. **A route lives in three places.** `src/App.tsx` (the router),
-   `STATIC_PAGES` in `scripts/build-content.mjs` (sitemap + the generated
-   prerender list), and the nav arrays. Adding it to `App.tsx` alone means
-   **it 404s in production**.
+2. **A route lives in three places.** `src/router.tsx` (the router; it was
+   `src/App.tsx` until 2026-11-12), `STATIC_PAGES` in
+   `scripts/build-content.mjs` (sitemap + the generated prerender list), and
+   the nav arrays. Adding it to the router alone means **it 404s in
+   production**.
 3. **`frontend/public/` is copied verbatim into `dist/`** by Vite. No hashing,
    no processing. Filenames stay exactly as written.
 4. **Nothing on this server watches the calendar.** No timer, no recurring
@@ -313,6 +314,12 @@ Then:
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
+> **Changed 2026-11-12.** The `add_header` line is gone from this block. An
+> `add_header` inside a location makes nginx drop every header inherited from
+> the server block, which would have stripped the new security headers from
+> every PDF. The same week-long `Cache-Control` now comes from the
+> `$algomate_cache_control` map (`deploy/nginx/algomate-http.conf.example`).
+
 Without it the files still serve — `location /` and `try_files $uri` already
 find them — but with no `Cache-Control`, so Cloudflare applies its own default
 TTL instead of the intended week. Delete the `PENDING` comment from the example
@@ -360,7 +367,15 @@ files in `dist/descarcari/`, and no PDF URL in `sitemap.xml`.
 
 ## 7. Traps
 
-### 7.1 Putting PDF URLs in the sitemap breaks the deploy check
+### 7.1 Putting PDF URLs in the sitemap breaks the deploy check — RESOLVED 2026-11-12
+
+**What was done:** `check-live-seo.mjs` now branches on `Content-Type`. For a
+sitemap URL that is not `text/html` it asserts `200`, `application/pdf` for a
+`.pdf`, and a body over 10 kB, and skips the canonical check. With that in
+place `writeSitemap()` in `build-content.mjs` appends every file in the
+manifest, with the file's last commit date as `<lastmod>`. Nothing to maintain:
+a new manifest entry is in the sitemap on the next build. The history below is
+kept because it explains why the order mattered.
 
 `check-live-seo.mjs` fetches **every** `<loc>` in `sitemap.xml` and requires a
 `<link rel="canonical">` in the response body. A PDF has no such tag, so every
@@ -391,7 +406,7 @@ agent can do from the box.
 
 ### 7.3 The route registered in only one place
 
-`App.tsx` **and** `STATIC_PAGES` in `build-content.mjs`. One without the other
+`router.tsx` **and** `STATIC_PAGES` in `build-content.mjs`. One without the other
 yields a route that works in `npm run dev` and 404s in production.
 
 ### 7.4 The prerender snapshot

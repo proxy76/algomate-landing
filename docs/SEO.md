@@ -490,8 +490,8 @@ turn them into ranking assets, in the order they are worth doing:
    links something to point at, and it sidesteps the sitemap problem below
    entirely. Seven thin pages would be worse than none, so write real copy per
    guide or do not build it — and route each one through `STATIC_PAGES` as
-   well as `App.tsx`.
-2. **Index the PDFs themselves.** "formule bac matematica pdf" is a real query
+   well as `router.tsx`.
+2. ✅ **Done 2026-11-12** (§9). **Index the PDFs themselves.** "formule bac matematica pdf" is a real query
    family and Google does index PDFs. **Prerequisite:** `check-live-seo.mjs`
    fetches every sitemap `<loc>` and requires a canonical tag in the body, so
    adding PDF URLs breaks the deploy check with an error that points nowhere
@@ -511,8 +511,13 @@ indexing. `DOWNLOADS-SECTION.md` §8 has the cost breakdown.
 - Never push a future-dated post without rendering it first with the date shim
   (SERVER-SETUP §3.1) — it is not built until its morning.
 - Never commit the generated files: `src/content/posts.generated.ts`,
-  `src/content/resources.generated.ts`, `.generated-routes.json`,
-  `public/sitemap.xml`.
+  `src/content/posts/`, `src/content/resources.generated.ts`,
+  `.generated-routes.json`, `public/sitemap.xml`, `public/feed.xml`,
+  `public/llms.txt`.
+- **Keep the site free of third-party requests.** Fonts are self-hosted and
+  the Content-Security-Policy assumes nothing loads from elsewhere. A tag
+  manager, an embedded video or a web-font `<link>` costs a DNS + TLS
+  handshake before first paint and needs a CSP change (`docs/SECURITY.md` S-3).
 - Do not loosen the HTML sanitiser allow-list in `scripts/build-content.mjs`
   casually — its output is injected with `dangerouslySetInnerHTML`.
 - Extend `.prose-algomate` in `src/index.css` rather than adding the Tailwind
@@ -652,3 +657,82 @@ For ChatGPT, Claude, Perplexity and Copilot the levers are different: their
    Android home screens) is the realistic target, and it keys off large images,
    freshness and engagement, which the covers and the timely model-paper posts
    address.
+
+---
+
+## 9. Update 2026-11-12 — performance, crawl signals, the 404 page
+
+Done alongside the security audit (`docs/SECURITY.md`). Nothing here changed a
+word of copy, a title, a description or a canonical: the prerendered text of
+all 22 routes was diffed against the previous build and differs only by the
+skip link.
+
+### 9.1 What changed, and why it matters to search
+
+- **One chunk per page and per post.** The whole site, and the HTML of every
+  post, used to be a single 1.76 MB script (282 kB gzipped) loaded by every
+  page, growing weekly. The homepage now loads about 155 kB gzipped of script
+  and that number no longer depends on the archive. This is Core Web Vitals
+  work: less to download and parse before the page responds to input.
+- **Self-hosted fonts, preloaded.** No render-blocking stylesheet from
+  `fonts.googleapis.com`, no second connection to `fonts.gstatic.com`. The
+  headline paints in its real face sooner (LCP) and shifts less (CLS).
+- **Long-lived caching.** Hashed assets are `immutable` for a year; HTML is
+  `no-cache`, so a deploy is visible at once.
+- **Sitemap `<lastmod>` is true.** Static pages carried the build date, so
+  every page claimed a change on every weekly rebuild. Google uses the field
+  only when it is "consistently and verifiably accurate"; now it is the date
+  of the last commit to the page's sources (`src:` in `STATIC_PAGES`), and
+  `/blog` moves when a post is published.
+- **PDF guides in the sitemap** — Phase 5 item 2. Nine URLs under
+  `/descarcari/`.
+- **Article metadata for the platforms that do not read JSON-LD**:
+  `article:published_time`, `article:modified_time`, `article:section`,
+  `article:tag`, `og:image:width/height`. `BlogPosting.image` is an
+  `ImageObject` with dimensions.
+- **One set of head tags after JavaScript runs.** React hoists `<title>`,
+  canonical and the rest into `<head>` next to the prerendered copies, so the
+  rendered DOM — which is what Googlebot evaluates — had two of each, and after
+  an in-app navigation the first canonical still named the entry page. The
+  static copies are now removed once React has mounted (`main.tsx`).
+- **A real 404 page**, prerendered, served with a 404 status, `noindex`, no
+  canonical, with links back into the site. Dead inbound links used to land on
+  nginx's blank "404 Not Found".
+- **HTTPS only.** `http://algomate.ro/…` answered 200 — a duplicate of the
+  whole site on another scheme. It 301s now.
+- `favicon.ico`, `apple-touch-icon.png`, a web manifest and `theme-color`.
+  Google's result favicon uses the SVG; the `.ico` is for everything that
+  requests `/favicon.ico` unprompted.
+
+### 9.2 Deliberately not changed
+
+- **`createRoot`, not `hydrateRoot`.** The app still replaces the prerendered
+  DOM instead of hydrating it. Hydration would remove a re-render, but the
+  prerenderer rewrites inline styles to force animated elements visible, so
+  the markup React would produce and the markup on the page differ by design.
+  That is a rewrite of the prerender step, not a tweak.
+- **KaTeX CSS stays in the main stylesheet** (~7 kB gzipped). Splitting it out
+  changes the cascade order against `.prose-algomate` overrides of equal
+  specificity.
+- **The article body downloads twice** — once as prerendered HTML, once as the
+  chunk React renders from. Reading it back out of the DOM would save ~30 kB
+  gzipped on a maths post and would make the page depend on Cloudflare not
+  rewriting the HTML (it already rewrites e-mail addresses).
+
+### 9.3 Human-only — additions to §6
+
+1. **`og-image.png` is a 1024×1024 JPEG with a `.png` name.** It works, but
+   the card is declared `summary_large_image`, which wants about 1.91:1 —
+   platforms crop the square. A 1200×630 card (a real PNG or a `.jpg` with the
+   reference in `SEO.tsx` updated, plus `DEFAULT_OG_IMAGE_SIZE`) is a design
+   task. Posts are unaffected: they use their own 1600×900 covers.
+2. **Cloudflare: "Always Use HTTPS"**, and a `www` record that redirects to
+   the apex — `www.algomate.ro` does not resolve at all today.
+3. **HTML is not cached at the edge** (`cf-cache-status: DYNAMIC`); every page
+   view travels the tunnel to this box. It is fast enough, but a Cache Rule
+   for `text/html` with a short edge TTL would take the origin out of the
+   path. Purge on deploy if you add one.
+4. **There is no analytics.** None of the above can be measured from the site
+   itself. Search Console covers search; Cloudflare Web Analytics is
+   cookie-less and already allowed by the CSP.
+5. **Rich Results Test** on a post URL and on `/` after this deploy (§7 step 5).

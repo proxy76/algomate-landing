@@ -283,8 +283,9 @@ contains the real article text — not an empty `<div id="root">`.
 ## 5. Commit
 
 Generated artefacts are gitignored and must not be committed:
-`src/content/posts.generated.ts`, `.generated-routes.json`,
-`public/sitemap.xml`.
+`src/content/posts.generated.ts`, `src/content/posts/` (one generated module
+per article body), `.generated-routes.json`, `public/sitemap.xml`,
+`public/feed.xml`, `public/llms.txt`.
 
 So a normal post commit contains only the markdown and any cover image:
 

@@ -89,6 +89,14 @@ a visitor sees is prerendered HTML produced at build time.
   a deploy is never observable half-done (§5.2). This replaced the in-place
   rebuild that caused the 5xx
 
+- **Security, performance and SEO pass, 2026-11-12.** Per-visitor rate
+  limiting on the form (it was one bucket for everyone), HTTPS redirect,
+  security headers and a CSP, self-hosted fonts, one chunk per page and per
+  post, a real 404 page, truthful sitemap dates. `docs/SECURITY.md` is the
+  record; `deploy/nginx/*.example` and `deploy/systemd/algomate.service` are
+  the installed configuration. The nginx block quoted in §4.3.2 below is the
+  2026-08 minimum, kept for the explanation — the live file is longer
+
 ### Not built
 
 - **No AI/LLM integration of any kind.** No SDK, no API calls, nothing.
@@ -100,9 +108,14 @@ a visitor sees is prerendered HTML produced at build time.
 
 ### Known issues (do not fix unless asked)
 
-- 8 high / 1 moderate npm advisories in **production** dependencies
-  (`react-router`, `vite`, `rollup`, `axios`, `postcss`, others). Pre-existing.
-  Upgrading carries breakage risk; it's a separate scheduled job.
+- ~~8 high / 1 moderate npm advisories~~ — by 2026-11-12 it was 26 (one
+  critical). All fixed that day with in-range updates, and `axios` removed.
+  What remains is 7 moderate, one `minimatch` issue inside `typescript-eslint`
+  (lint tooling, not shipped, not run on deploy); fixing it is a breaking
+  major and can wait for a deliberate lint upgrade. `docs/SECURITY.md` S-5.
+- `Header.tsx` fails one lint rule (`react-hooks/set-state-in-effect`, closing
+  the mobile menu on navigation). It works; restructuring it is not worth a
+  regression in the menu.
 
 ---
 
@@ -333,11 +346,19 @@ server {
 prerendered and does not need one, and it would make every mistyped URL return
 200 with a blank page, which Google treats as a soft 404.
 
-A fuller reference block, with notes on what must be preserved from the
-existing config, is in **`deploy/nginx/algomate.conf.example`**. Read the
-warning at the top of it: it was written from outside the box and does not
-include the `/api/` proxy the enrollment form needs. Do not paste it over the
-live config — apply the four directives to what is already there.
+The full live config is **`deploy/nginx/algomate.conf.example`** (server
+block) plus **`deploy/nginx/algomate-http.conf.example`** (the `map` and
+rate-limit zone, installed as `/etc/nginx/conf.d/algomate.conf`). Since
+2026-11-12 they are exact copies of what is installed, comments included, and
+they explain every directive. Two things in them look like the bugs above and
+are not:
+
+- `error_page 404 /404.html` serves the prerendered 404 page **with a 404
+  status**. An SPA fallback returns 200. `check-live-seo.mjs` asserts the
+  difference.
+- The HTTP→HTTPS rule returns an absolute `https://algomate.ro…` URL. That is
+  the one deliberate absolute redirect: it names the public origin explicitly,
+  where §4.3.1 was nginx guessing it.
 
 **Verify after reloading nginx:**
 
@@ -359,8 +380,11 @@ already-indexed URL survives) and both variants declare the same canonical;
 `/assets/*.js` and `.css`, `/favicon.svg`, `/og-image.png`,
 `/instructor-razvan.jpg`, `/robots.txt` and `/sitemap.xml` all still 200.
 
-Run this after any nginx or deploy change. Test the enrollment form by hand as
-well — the script does not cover `/api/`.
+Run this after any nginx or deploy change. Since 2026-11-12 it also checks
+that `/api/contact/` reaches the backend (a GET must come back 405), the
+security headers, the HTTPS redirect and the 404 page. It still cannot tell
+whether an email actually arrives — after a backend or SMTP change, submit the
+form once by hand.
 
 ### 4.4 Is the Django backend on this box?
 
@@ -631,7 +655,8 @@ content/posts/*.md
       │
       ▼  scripts/build-content.mjs   (npm run content)
       │
-      ├─► src/content/posts.generated.ts   typed data for the app
+      ├─► src/content/posts.generated.ts   post metadata for the app
+      ├─► src/content/posts/<slug>.generated.ts   one module per article body
       ├─► .generated-routes.json           route list for prerender.js
       └─► public/sitemap.xml               static pages + posts
                     │
@@ -642,7 +667,7 @@ content/posts/*.md
       dist/**/index.html   fully-rendered static HTML
 ```
 
-**All three generated files are gitignored.** A fresh clone has none of them,
+**Every generated file is gitignored** (the full list is in `CLAUDE.md`). A fresh clone has none of them,
 which is why `npm run dev` and `npm run build` both run the generator first.
 If you ever see TypeScript complain that `posts.generated` doesn't exist, run
 `npm run content`.
