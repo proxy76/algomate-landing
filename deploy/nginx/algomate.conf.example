@@ -1,6 +1,6 @@
 # nginx config for algomate.ro — installed as /etc/nginx/sites-available/algomate
 #
-# Reconciled against the live config on 2026-11-12 (`nginx -T`) — the whole
+# Reconciled against the live config on 2026-11-13 (`nginx -T`) — the whole
 # file below is the real one, not a template. Public TLS is terminated by a
 # Cloudflare tunnel (cloudflared), which forwards to nginx on 127.0.0.1:8080.
 #

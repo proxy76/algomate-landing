@@ -6,7 +6,7 @@
 # these need. Every name is prefixed algomate_ — this box serves other sites
 # from the same nginx.
 #
-# Applied 2026-11-12. After any change:
+# Applied 2026-11-13. After any change:
 #     sudo nginx -t && sudo systemctl reload nginx
 #     node frontend/scripts/check-live-seo.mjs https://algomate.ro
 

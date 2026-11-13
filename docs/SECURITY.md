@@ -5,8 +5,13 @@ no context from the session that produced this file.
 
 **Written:** 2026-11-12, from an audit of `main` at `7896e28` (tagged
 `pre-audit-2026-11-12`), the live nginx/systemd configuration, and
-`https://algomate.ro` as served. Everything marked **Fixed** was applied and
-verified in production the same day.
+`https://algomate.ro` as served. Everything marked **Fixed** is live and was
+verified in production: the backend and the frontend release went out on
+2026-11-12 (21:40 UTC), the nginx configuration and the tunnel change early on
+2026-11-13 UTC. Verification was `check-live-seo.mjs` (78 checks), a browser
+run of every route under the enforced CSP, the backend log showing a real
+client address for a request through Cloudflare, and one labelled test
+enrolment that arrived by email.
 
 The companion documents are `docs/SERVER-SETUP.md` (infrastructure) and
 `deploy/nginx/algomate.conf.example` (the live nginx config, with the reason
@@ -98,7 +103,9 @@ Analytics does not need a config change.
   the tunnel and receive a share of algomate.ro's traffic. It is now read
   from `/etc/cloudflared/algomate-tunnel.token` (root, `600`) with
   `--token-file`; the previous unit is kept beside it as
-  `cloudflared.service.bak-20261112`.
+  `cloudflared.service.bak-20261112` (also `600` — it still contains the old
+  token; delete it once the token has been rotated). The switch was made with
+  a temporary second connector running, so the site stayed up throughout.
 
 This box also runs other services, including one that exists to execute
 visitors' code. "Any local user" is not a hypothetical audience.
