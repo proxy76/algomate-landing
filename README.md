@@ -323,9 +323,10 @@ was done.
 
 ## About
 
-Built and run by **Răzvan Rădulescu**, Politehnică graduate,
-programmer, former national informatics olympian, and the person who teaches the
-lessons.
+Built and run by **Răzvan Rădulescu**, an undergraduate at UNSTPB (the
+National University of Science and Technology POLITEHNICA Bucharest), a
+programmer and a prize-winner at national olympiads and competitions, and the
+person who teaches the lessons.
 
 The source is public for review. The site's copy, articles, study guides and
 branding belong to AlgoMate and are not licensed for reuse.

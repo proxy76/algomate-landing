@@ -28,7 +28,7 @@ who downloads a guide and finds it genuinely good is the one who books.
 
 The site for AlgoMate, a one-person tutoring business: mathematics and computer
 science (C++) for Romanian school exams. Owner and sole instructor, Răzvan
-Rădulescu — Politehnică graduate, programmer, former national informatics
+Rădulescu — UNSTPB (Politehnica București) undergraduate, programmer, former national informatics
 olympian. Sessions are **online only**, two hours, small groups.
 
 It is a marketing site whose product is trust. There is no app, no account, no
